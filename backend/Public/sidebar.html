@@ -1,0 +1,171 @@
+<!-- ========== Sidebar Start ========== -->
+<div class="app-menu navbar-menu">
+    <div class="navbar-brand-box">
+        <a href="index.html" class="logo logo-dark">
+            <span class="logo-lg">
+                <span class="fw-bold fs-16 text-white">🏨 Hotel Manager</span>
+            </span>
+            <span class="logo-sm">
+                <span class="fw-bold text-white">🏨</span>
+            </span>
+        </a>
+        <a href="index.html" class="logo logo-light">
+            <span class="logo-lg">
+                <span class="fw-bold fs-16 text-white">🏨 Hotel Manager</span>
+            </span>
+            <span class="logo-sm">
+                <span class="fw-bold text-white">🏨</span>
+            </span>
+        </a>
+        <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover" id="vertical-hover">
+            <i class="ri-record-circle-line"></i>
+        </button>
+    </div>
+
+    <div id="scrollbar">
+        <div class="container-fluid">
+            <div id="two-column-menu"></div>
+            <ul class="navbar-nav" id="navbar-nav">
+
+                <!-- Dashboard — Admin, Manager -->
+                <li class="nav-item sidebar-role" data-roles="admin,manager">
+                    <a class="nav-link menu-link" href="index.html">
+                        <i class="ri-dashboard-2-line"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+
+                <!-- Bookings — Admin, Manager, Receptionist -->
+                <li class="nav-item sidebar-role" data-roles="admin,manager,receptionist">
+                    <a class="nav-link menu-link" href="#bookingsMenu" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="bookingsMenu">
+                        <i class="ri-calendar-check-line"></i>
+                        <span>Bookings</span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="bookingsMenu">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="bookings.html" class="nav-link">All Bookings</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="booking-new.html" class="nav-link">New Booking</a>
+                            </li>
+                            <li class="nav-item sidebar-role" data-roles="admin,manager,receptionist">
+                                <a href="checkin-checkout.html" class="nav-link">Check-in / Check-out</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Rooms — Admin, Manager, Receptionist -->
+                <li class="nav-item sidebar-role" data-roles="admin,manager,receptionist">
+                    <a class="nav-link menu-link" href="rooms.html">
+                        <i class="ri-building-line"></i>
+                        <span>Manage Rooms</span>
+                    </a>
+                </li>
+
+                <!-- Users — Admin only -->
+                <li class="nav-item sidebar-role" data-roles="admin">
+                    <a class="nav-link menu-link" href="users.html">
+                        <i class="ri-user-line"></i>
+                        <span>Manage Users</span>
+                    </a>
+                </li>
+
+                <!-- Billing — Admin, Manager -->
+                <li class="nav-item sidebar-role" data-roles="admin,manager">
+                    <a class="nav-link menu-link" href="#billingMenu" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="billingMenu">
+                        <i class="ri-bill-line"></i>
+                        <span>Billing & Invoices</span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="billingMenu">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="payments.html" class="nav-link">Payments</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="invoices.html" class="nav-link">Invoices</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Housekeeping — Admin, Manager, Housekeeping -->
+                <li class="nav-item sidebar-role" data-roles="admin,manager,housekeeping">
+                    <a class="nav-link menu-link" href="housekeeping.html">
+                        <i class="ri-brush-line"></i>
+                        <span>Housekeeping</span>
+                    </a>
+                </li>
+
+                <!-- Maintenance — Admin, Manager, Maintenance -->
+                <li class="nav-item sidebar-role" data-roles="admin,manager,maintenance">
+                    <a class="nav-link menu-link" href="maintenance.html">
+                        <i class="ri-tools-line"></i>
+                        <span>Maintenance</span>
+                    </a>
+                </li>
+
+                <!-- Feedback — Admin, Manager -->
+                <li class="nav-item sidebar-role" data-roles="admin,manager">
+                    <a class="nav-link menu-link" href="feedback.html">
+                        <i class="ri-star-line"></i>
+                        <span>Feedback</span>
+                    </a>
+                </li>
+
+                <!-- Reports — Admin, Manager -->
+                <li class="nav-item sidebar-role" data-roles="admin,manager">
+                    <a class="nav-link menu-link" href="reports.html">
+                        <i class="ri-bar-chart-line"></i>
+                        <span>Reports & Analytics</span>
+                    </a>
+                </li>
+
+                <!-- Settings — Admin only -->
+                <li class="nav-item sidebar-role" data-roles="admin">
+                    <a class="nav-link menu-link" href="settings.html">
+                        <i class="ri-settings-3-line"></i>
+                        <span>System Settings</span>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+
+    <div class="sidebar-background"></div>
+</div>
+<!-- ========== Sidebar End ========== -->
+
+<script>
+// Role ke hisaab se sidebar items show/hide karo
+(function() {
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const role = user.role || 'guest';
+
+    document.querySelectorAll('.sidebar-role').forEach(function(item) {
+        const allowedRoles = item.getAttribute('data-roles').split(',');
+        if (!allowedRoles.includes(role)) {
+            item.style.display = 'none';
+        }
+    });
+
+    // Active link highlight karo
+    const currentPage = window.location.pathname.split('/').pop();
+    document.querySelectorAll('.nav-link').forEach(function(link) {
+        const href = link.getAttribute('href');
+        if (href === currentPage) {
+            link.classList.add('active');
+            // Parent collapse bhi open karo
+            const parent = link.closest('.collapse');
+            if (parent) {
+                parent.classList.add('show');
+                const trigger = document.querySelector('[data-bs-target="#' + parent.id + '"]') ||
+                                document.querySelector('[href="#' + parent.id + '"]');
+                if (trigger) trigger.setAttribute('aria-expanded', 'true');
+            }
+        }
+    });
+})();
+</script>

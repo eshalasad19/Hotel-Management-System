@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable" data-theme="default" data-theme-colors="default">
+
+<head>
+    <meta charset="utf-8" />
+    <title>Sign In | Hotel Management System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="assets/images/favicon.ico">
+    <script src="assets/js/layout.js"></script>
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <link href="assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <link href="assets/css/app.min.css" rel="stylesheet" type="text/css" />
+    <link href="assets/css/custom.min.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <div class="auth-page-wrapper pt-5">
+
+        <!-- auth page content -->
+        <div class="auth-page-content">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-md-8 col-lg-6 col-xl-5">
+
+                        <!-- Title -->
+                        <div class="text-center mb-4 mt-4">
+                            <h3 class="fw-bold">🏨 Hotel Management System</h3>
+                            <p class="text-muted">Sign in to access your dashboard</p>
+                        </div>
+
+                        <div class="card mt-2">
+                            <div class="card-body p-4">
+
+                                <!-- Error Message -->
+                                <div id="error-msg" class="alert alert-danger d-none"></div>
+
+                                <div class="p-2">
+                                    <form id="loginForm">
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label">Email Address</label>
+                                            <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label" for="password-input">Password</label>
+                                            <div class="position-relative auth-pass-inputgroup mb-3">
+                                                <input type="password" class="form-control pe-5 password-input" placeholder="Enter password" id="password-input" required>
+                                                <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon material-shadow-none" type="button" id="password-addon">
+                                                    <i class="ri-eye-fill align-middle"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-4">
+                                            <button class="btn btn-success w-100" type="submit" id="loginBtn">Sign In</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-3 text-center">
+                            <p class="text-muted mb-0">&copy; 2024 Hotel Management System</p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/libs/simplebar/simplebar.min.js"></script>
+    <script src="assets/libs/node-waves/waves.min.js"></script>
+    <script src="assets/js/plugins.js"></script>
+    <script src="assets/js/pages/password-addon.init.js"></script>
+
+    <script>
+        const API_URL = 'http://localhost:5001/api';
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password-input').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const errorMsg = document.getElementById('error-msg');
+
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Signing in...';
+            errorMsg.classList.add('d-none');
+
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+
+                    const role = data.user.role;
+                    if (role === 'admin' || role === 'manager') {
+                        window.location.href = '/index.html';
+                    } else if (role === 'receptionist') {
+                        window.location.href = '/bookings.html';
+                    } else if (role === 'housekeeping') {
+                        window.location.href = '/housekeeping.html';
+                    } else if (role === 'maintenance') {
+                        window.location.href = '/maintenance.html';
+                    } else {
+                        window.location.href = '/index.html';
+                    }
+                } else {
+                    errorMsg.textContent = data.message || 'Invalid email or password';
+                    errorMsg.classList.remove('d-none');
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = 'Sign In';
+                }
+            } catch (err) {
+                errorMsg.textContent = 'Server error. Please try again.';
+                errorMsg.classList.remove('d-none');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Sign In';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+const mongoose = require('mongoose');
+
+const housekeepingSchema = new mongoose.Schema({
+  roomId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Room',
+    required: true
+  },
+  assignedStaff: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  cleaningStatus: {
+    type: String,
+    enum: ['pending', 'in_progress', 'completed'],
+    default: 'pending'
+  },
+  completedAt: {
+    type: Date
+  }
+}, { timestamps: true });
+
+module.exports = mongoose.model('Housekeeping', housekeepingSchema);
