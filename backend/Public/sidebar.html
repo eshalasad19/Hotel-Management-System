@@ -65,12 +65,22 @@
                 </li>
 
                 <!-- Users — Admin only -->
-                <li class="nav-item sidebar-role" data-roles="admin">
-                    <a class="nav-link menu-link" href="users.html">
-                        <i class="ri-user-line"></i>
-                        <span>Manage Users</span>
-                    </a>
-                </li>
+<li class="nav-item sidebar-role" data-roles="admin">
+    <a class="nav-link menu-link" href="#usersMenu" data-bs-toggle="collapse" role="button">
+        <i class="ri-user-line"></i>
+        <span>Users & Staff</span>
+    </a>
+    <div class="collapse menu-dropdown" id="usersMenu">
+        <ul class="nav nav-sm flex-column">
+            <li class="nav-item">
+                <a href="users.html" class="nav-link">Registered Users</a>
+            </li>
+            <li class="nav-item">
+                <a href="staff.html" class="nav-link">Manage Staff</a>
+            </li>
+        </ul>
+    </div>
+</li>
 
                 <!-- Billing — Admin, Manager -->
                 <li class="nav-item sidebar-role" data-roles="admin,manager">
