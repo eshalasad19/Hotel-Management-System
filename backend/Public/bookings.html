@@ -4,18 +4,15 @@
 <head>
 
     <meta charset="utf-8">
-    <title>Rooms | Hotel Management System</title>
+    <title>Bookings | Hotel Management System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description">
     <meta content="Themesbrand" name="author">
     <!-- App favicon -->
     <link rel="shortcut icon" href="assets/images/favicon.ico">
 
-    <!-- nouisliderribute css -->
-    <link rel="stylesheet" href="assets/libs/nouislider/nouislider.min.css">
-
-    <!-- gridjs css -->
-    <link rel="stylesheet" href="assets/libs/gridjs/theme/mermaid.min.css">
+    <!-- Sweet Alert css-->
+    <link href="assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css">
 
     <!-- Layout config Js -->
     <script src="assets/js/layout.js"></script>
@@ -82,17 +79,15 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                <h4 class="mb-sm-0">Manage Rooms</h4>
-                                <div class="page-title-right">
-                                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addRoomModal">
-                                        <i class="ri-add-line me-1"></i> Add Room
-                                    </button>
-                                </div>
+                                <h4 class="mb-sm-0">Booking Management</h4>
+                                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addBookingModal">
+                                    <i class="ri-add-line me-1"></i> New Booking
+                                </button>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Stats Row -->
+                    <!-- Stats -->
                     <div class="row mb-3">
                         <div class="col-xl-3 col-md-6">
                             <div class="card card-animate">
@@ -100,12 +95,29 @@
                                     <div class="d-flex align-items-center">
                                         <div class="avatar-sm flex-shrink-0">
                                             <span class="avatar-title bg-info-subtle rounded fs-3">
-                                                <i class="bx bx-building text-info"></i>
+                                                <i class="bx bx-calendar-check text-info"></i>
                                             </span>
                                         </div>
                                         <div class="flex-grow-1 ms-3">
-                                            <p class="text-uppercase fw-medium text-muted mb-1 fs-12">Total Rooms</p>
-                                            <h4 class="mb-0 fw-semibold" id="rooms-total">0</h4>
+                                            <p class="text-uppercase fw-medium text-muted mb-1 fs-12">Total Bookings</p>
+                                            <h4 class="mb-0 fw-semibold" id="b-total">0</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <div class="card card-animate">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm flex-shrink-0">
+                                            <span class="avatar-title bg-warning-subtle rounded fs-3">
+                                                <i class="bx bx-time text-warning"></i>
+                                            </span>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <p class="text-uppercase fw-medium text-muted mb-1 fs-12">Pending</p>
+                                            <h4 class="mb-0 fw-semibold" id="b-pending">0</h4>
                                         </div>
                                     </div>
                                 </div>
@@ -121,8 +133,8 @@
                                             </span>
                                         </div>
                                         <div class="flex-grow-1 ms-3">
-                                            <p class="text-uppercase fw-medium text-muted mb-1 fs-12">Available</p>
-                                            <h4 class="mb-0 fw-semibold" id="rooms-available">0</h4>
+                                            <p class="text-uppercase fw-medium text-muted mb-1 fs-12">Confirmed</p>
+                                            <h4 class="mb-0 fw-semibold" id="b-confirmed">0</h4>
                                         </div>
                                     </div>
                                 </div>
@@ -134,29 +146,12 @@
                                     <div class="d-flex align-items-center">
                                         <div class="avatar-sm flex-shrink-0">
                                             <span class="avatar-title bg-danger-subtle rounded fs-3">
-                                                <i class="bx bx-bed text-danger"></i>
+                                                <i class="bx bx-x-circle text-danger"></i>
                                             </span>
                                         </div>
                                         <div class="flex-grow-1 ms-3">
-                                            <p class="text-uppercase fw-medium text-muted mb-1 fs-12">Occupied</p>
-                                            <h4 class="mb-0 fw-semibold" id="rooms-occupied">0</h4>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card card-animate">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-sm flex-shrink-0">
-                                            <span class="avatar-title bg-warning-subtle rounded fs-3">
-                                                <i class="bx bx-wrench text-warning"></i>
-                                            </span>
-                                        </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <p class="text-uppercase fw-medium text-muted mb-1 fs-12">Maintenance</p>
-                                            <h4 class="mb-0 fw-semibold" id="rooms-maintenance">0</h4>
+                                            <p class="text-uppercase fw-medium text-muted mb-1 fs-12">Cancelled</p>
+                                            <h4 class="mb-0 fw-semibold" id="b-cancelled">0</h4>
                                         </div>
                                     </div>
                                 </div>
@@ -164,25 +159,24 @@
                         </div>
                     </div>
 
-                    <!-- Rooms Table -->
+                    <!-- Bookings Table -->
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="card">
                                 <div class="card-header d-flex align-items-center">
-                                    <h5 class="card-title mb-0 flex-grow-1">All Rooms</h5>
+                                    <h5 class="card-title mb-0 flex-grow-1">All Bookings</h5>
                                     <div class="d-flex gap-2">
-                                        <select class="form-select form-select-sm w-auto" id="filter-status">
+                                        <select class="form-select form-select-sm w-auto" id="filter-booking-status">
                                             <option value="">All Status</option>
-                                            <option value="available">Available</option>
-                                            <option value="occupied">Occupied</option>
-                                            <option value="maintenance">Maintenance</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="confirmed">Confirmed</option>
+                                            <option value="cancelled">Cancelled</option>
+                                            <option value="completed">Completed</option>
                                         </select>
-                                        <select class="form-select form-select-sm w-auto" id="filter-type">
-                                            <option value="">All Types</option>
-                                            <option value="single">Single</option>
-                                            <option value="double">Double</option>
-                                            <option value="suite">Suite</option>
-                                            <option value="deluxe">Deluxe</option>
+                                        <select class="form-select form-select-sm w-auto" id="filter-payment-status">
+                                            <option value="">All Payments</option>
+                                            <option value="paid">Paid</option>
+                                            <option value="unpaid">Unpaid</option>
                                         </select>
                                     </div>
                                 </div>
@@ -192,17 +186,19 @@
                                             <thead class="table-light">
                                                 <tr>
                                                     <th>#</th>
-                                                    <th>Room No</th>
-                                                    <th>Type</th>
-                                                    <th>Price/Night</th>
-                                                    <th>Capacity</th>
-                                                    <th>Amenities</th>
+                                                    <th>Guest</th>
+                                                    <th>Room</th>
+                                                    <th>Check In</th>
+                                                    <th>Check Out</th>
+                                                    <th>Guests</th>
+                                                    <th>Amount</th>
+                                                    <th>Payment</th>
                                                     <th>Status</th>
                                                     <th>Actions</th>
                                                 </tr>
                                             </thead>
-                                            <tbody id="rooms-table-body">
-                                                <tr><td colspan="8" class="text-center py-4 text-muted">Loading rooms...</td></tr>
+                                            <tbody id="bookings-table-body">
+                                                <tr><td colspan="10" class="text-center py-4 text-muted">Loading bookings...</td></tr>
                                             </tbody>
                                         </table>
                                     </div>
@@ -212,135 +208,103 @@
                     </div>
                 </div>
 
-                <!-- Add Room Modal -->
-                <div class="modal fade" id="addRoomModal" tabindex="-1">
+                <!-- Add Booking Modal -->
+                <div class="modal fade" id="addBookingModal" tabindex="-1">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title">Add New Room</h5>
+                                <h5 class="modal-title">New Booking</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body">
-                                <div id="add-room-error" class="alert alert-danger d-none"></div>
-                                <form id="addRoomForm">
-                                    <div class="row g-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label">Room Number <span class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" id="add-roomNumber" placeholder="e.g. 101" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Room Type <span class="text-danger">*</span></label>
-                                            <select class="form-select" id="add-roomType" required>
-                                                <option value="">Select Type</option>
-                                                <option value="single">Single</option>
-                                                <option value="double">Double</option>
-                                                <option value="suite">Suite</option>
-                                                <option value="deluxe">Deluxe</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Price per Night (PKR) <span class="text-danger">*</span></label>
-                                            <input type="number" class="form-control" id="add-roomPrice" placeholder="e.g. 5000" required>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label">Capacity (Persons) <span class="text-danger">*</span></label>
-                                            <input type="number" class="form-control" id="add-roomCapacity" placeholder="e.g. 2" required>
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label class="form-label">Amenities <span class="text-muted fs-12">(comma separated)</span></label>
-                                            <input type="text" class="form-control" id="add-roomAmenities" placeholder="e.g. WiFi, AC, TV, Geyser">
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label class="form-label">Description</label>
-                                            <textarea class="form-control" id="add-roomDesc" rows="2" placeholder="Room description..."></textarea>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-success" id="addRoomBtn">Add Room</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Edit Room Modal -->
-                <div class="modal fade" id="editRoomModal" tabindex="-1">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Edit Room</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div id="edit-room-error" class="alert alert-danger d-none"></div>
-                                <input type="hidden" id="edit-roomId">
+                                <div id="add-booking-error" class="alert alert-danger d-none"></div>
                                 <div class="row g-3">
                                     <div class="col-md-6">
-                                        <label class="form-label">Room Number</label>
-                                        <input type="text" class="form-control" id="edit-roomNumber" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Room Type</label>
-                                        <select class="form-select" id="edit-roomType">
-                                            <option value="single">Single</option>
-                                            <option value="double">Double</option>
-                                            <option value="suite">Suite</option>
-                                            <option value="deluxe">Deluxe</option>
+                                        <label class="form-label">Select Room <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="add-roomId">
+                                            <option value="">Loading rooms...</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">Price per Night (PKR)</label>
-                                        <input type="number" class="form-control" id="edit-roomPrice" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Capacity</label>
-                                        <input type="number" class="form-control" id="edit-roomCapacity" required>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Status</label>
-                                        <select class="form-select" id="edit-roomStatus">
-                                            <option value="available">Available</option>
-                                            <option value="occupied">Occupied</option>
-                                            <option value="maintenance">Maintenance</option>
+                                        <label class="form-label">Guest Name <span class="text-danger">*</span></label>
+                                        <select class="form-select" id="add-userId">
+                                            <option value="">Loading guests...</option>
                                         </select>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">Amenities</label>
-                                        <input type="text" class="form-control" id="edit-roomAmenities">
+                                        <label class="form-label">Check In Date <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="add-checkIn" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Check Out Date <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control" id="add-checkOut" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Number of Guests <span class="text-danger">*</span></label>
+                                        <input type="number" class="form-control" id="add-guests" min="1" value="1" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Total Amount (PKR)</label>
+                                        <input type="number" class="form-control" id="add-totalAmount" placeholder="Auto calculated">
                                     </div>
                                     <div class="col-md-12">
-                                        <label class="form-label">Description</label>
-                                        <textarea class="form-control" id="edit-roomDesc" rows="2"></textarea>
+                                        <label class="form-label">Special Requests</label>
+                                        <textarea class="form-control" id="add-specialRequests" rows="2" placeholder="Any special requests..."></textarea>
                                     </div>
                                 </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-primary" id="editRoomBtn">Save Changes</button>
+                                <button type="button" class="btn btn-success" id="addBookingBtn">Create Booking</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Delete Confirm Modal -->
-                <div class="modal fade" id="deleteRoomModal" tabindex="-1">
+                <!-- Update Status Modal -->
+                <div class="modal fade" id="updateStatusModal" tabindex="-1">
                     <div class="modal-dialog modal-sm">
                         <div class="modal-content">
-                            <div class="modal-body text-center p-4">
-                                <div class="avatar-md mx-auto mb-3">
-                                    <span class="avatar-title bg-danger-subtle rounded-circle fs-1">
-                                        <i class="ri-delete-bin-line text-danger"></i>
-                                    </span>
+                            <div class="modal-header">
+                                <h5 class="modal-title">Update Booking</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" id="update-bookingId">
+                                <div class="mb-3">
+                                    <label class="form-label">Booking Status</label>
+                                    <select class="form-select" id="update-bookingStatus">
+                                        <option value="pending">Pending</option>
+                                        <option value="confirmed">Confirmed</option>
+                                        <option value="cancelled">Cancelled</option>
+                                        <option value="completed">Completed</option>
+                                    </select>
                                 </div>
-                                <h5>Delete Room?</h5>
-                                <p class="text-muted">Are you sure you want to delete this room? This cannot be undone.</p>
-                                <input type="hidden" id="delete-roomId">
-                                <div class="d-flex gap-2 justify-content-center">
-                                    <button class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                                    <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                                <div class="mb-3">
+                                    <label class="form-label">Payment Status</label>
+                                    <select class="form-select" id="update-paymentStatus">
+                                        <option value="unpaid">Unpaid</option>
+                                        <option value="paid">Paid</option>
+                                    </select>
                                 </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" id="updateStatusBtn">Update</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- View Booking Modal -->
+                <div class="modal fade" id="viewBookingModal" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Booking Details</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body" id="view-booking-body">
                             </div>
                         </div>
                     </div>
@@ -350,31 +314,6 @@
 
     </div>
     <!-- END layout-wrapper -->
-
-    <!-- removeItemModal -->
-    <div id="removeItemModal" class="modal fade zoomIn" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btn-close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mt-2 text-center">
-                        <lord-icon src="../../../gsqxdxog.json" trigger="loop" colors="primary:#f7b84b,secondary:#f06548" style="width:100px;height:100px"></lord-icon>
-                        <div class="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
-                            <h4>Are you sure ?</h4>
-                            <p class="text-muted mx-4 mb-0">Are you sure you want to remove this product ?</p>
-                        </div>
-                    </div>
-                    <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
-                        <button type="button" class="btn w-sm btn-light" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn w-sm btn-danger " id="delete-product">Yes, Delete It!</button>
-                    </div>
-                </div>
-
-            </div><!-- /.modal-content -->
-        </div><!-- /.modal-dialog -->
-    </div><!-- /.modal -->
 
 
 
@@ -1344,246 +1283,309 @@
     <script src="assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
     <script src="assets/js/plugins.js"></script>
 
-    <!-- nouisliderribute js -->
-    <script src="assets/libs/nouislider/nouislider.min.js"></script>
-    <script src="assets/libs/wnumb/wNumb.min.js"></script>
+    <!-- list.js min js -->
+    <!--list pagination js-->
+    <script src="assets/libs/list.pagination.js/list.pagination.min.js"></script>
 
-    <!-- gridjs js -->
-    <script src="assets/libs/gridjs/gridjs.umd.js"></script>
-    <script src="../../../gridjs%406.2.0/plugins/selection/dist/selection.umd.js"></script>
-    <!-- ecommerce product list -->
-    <script src="assets/js/pages/ecommerce-product-list.init.js"></script>
+    <!-- ecommerce-order init js -->
+    <script src="assets/js/pages/ecommerce-order.init.js"></script>
+
+    <!-- Sweet Alerts js -->
+    <script src="assets/libs/sweetalert2/sweetalert2.min.js"></script>
 
     <!-- App js -->
     <script src="assets/js/app.js"></script>
+
 <script src="hotel-common.js"></script>
 
 <script>
-let allRooms = [];
+let allBookings = [];
 
-function statusBadge(status) {
+function bookingStatusBadge(status) {
     const map = {
-        available:   '<span class="badge bg-success-subtle text-success">Available</span>',
-        occupied:    '<span class="badge bg-danger-subtle text-danger">Occupied</span>',
-        maintenance: '<span class="badge bg-warning-subtle text-warning">Maintenance</span>'
+        pending:   '<span class="badge bg-warning-subtle text-warning">Pending</span>',
+        confirmed: '<span class="badge bg-success-subtle text-success">Confirmed</span>',
+        cancelled: '<span class="badge bg-danger-subtle text-danger">Cancelled</span>',
+        completed: '<span class="badge bg-info-subtle text-info">Completed</span>'
     };
     return map[status] || status;
 }
 
-function typeBadge(type) {
-    const map = {
-        single:  '<span class="badge bg-info-subtle text-info">Single</span>',
-        double:  '<span class="badge bg-primary-subtle text-primary">Double</span>',
-        suite:   '<span class="badge bg-purple-subtle text-purple">Suite</span>',
-        deluxe:  '<span class="badge bg-secondary-subtle text-secondary">Deluxe</span>'
-    };
-    return map[type] || type;
+function paymentBadge(status) {
+    return status === 'paid'
+        ? '<span class="badge bg-success-subtle text-success">Paid</span>'
+        : '<span class="badge bg-danger-subtle text-danger">Unpaid</span>';
 }
 
-async function loadRooms() {
+async function loadBookings() {
     try {
         const token = localStorage.getItem('token');
-        const res = await fetch(window.API_URL + '/rooms', {
+        const res = await fetch(window.API_URL + '/bookings/all', {
             headers: { 'Authorization': 'Bearer ' + token }
         });
-        allRooms = await res.json();
-        renderRooms(allRooms);
-        updateStats(allRooms);
-    } catch(err) {
-        console.error('Load rooms error:', err);
-    }
+        allBookings = await res.json();
+        renderBookings(allBookings);
+        updateStats(allBookings);
+    } catch(err) { console.error(err); }
 }
 
-function updateStats(rooms) {
-    document.getElementById('rooms-total').textContent = rooms.length;
-    document.getElementById('rooms-available').textContent = rooms.filter(r => r.status === 'available').length;
-    document.getElementById('rooms-occupied').textContent = rooms.filter(r => r.status === 'occupied').length;
-    document.getElementById('rooms-maintenance').textContent = rooms.filter(r => r.status === 'maintenance').length;
+function updateStats(bookings) {
+    document.getElementById('b-total').textContent = bookings.length;
+    document.getElementById('b-pending').textContent = bookings.filter(b => b.bookingStatus === 'pending').length;
+    document.getElementById('b-confirmed').textContent = bookings.filter(b => b.bookingStatus === 'confirmed').length;
+    document.getElementById('b-cancelled').textContent = bookings.filter(b => b.bookingStatus === 'cancelled').length;
 }
 
-function renderRooms(rooms) {
-    const tbody = document.getElementById('rooms-table-body');
-    if (!rooms.length) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted">No rooms found. Add a room to get started.</td></tr>';
+function renderBookings(bookings) {
+    const tbody = document.getElementById('bookings-table-body');
+    if (!bookings.length) {
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-muted">No bookings found.</td></tr>';
         return;
     }
-    tbody.innerHTML = rooms.map((room, i) => `
-        <tr>
+    tbody.innerHTML = bookings.map((b, i) => {
+        const guest = b.userId?.name || 'Guest';
+        const room = b.roomId ? 'Room ' + b.roomId.roomNumber : '—';
+        const checkIn = new Date(b.checkInDate).toLocaleDateString('en-PK');
+        const checkOut = new Date(b.checkOutDate).toLocaleDateString('en-PK');
+        return `<tr>
             <td>${i + 1}</td>
-            <td><span class="fw-semibold">Room ${room.roomNumber}</span></td>
-            <td>${typeBadge(room.type)}</td>
-            <td><span class="fw-medium">PKR ${Number(room.price).toLocaleString()}</span></td>
-            <td>${room.capacity} Person(s)</td>
-            <td><small class="text-muted">${room.amenities ? room.amenities.slice(0,3).join(', ') : '—'}</small></td>
-            <td>${statusBadge(room.status)}</td>
+            <td><div class="fw-medium">${guest}</div><small class="text-muted">${b.userId?.email || ''}</small></td>
+            <td>${room}</td>
+            <td>${checkIn}</td>
+            <td>${checkOut}</td>
+            <td>${b.guests}</td>
+            <td class="fw-medium">PKR ${Number(b.totalAmount).toLocaleString()}</td>
+            <td>${paymentBadge(b.paymentStatus)}</td>
+            <td>${bookingStatusBadge(b.bookingStatus)}</td>
             <td>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-soft-primary btn-sm" onclick="openEdit('${room._id}')" title="Edit Room">
+                <div class="d-flex gap-1">
+                    <button class="btn btn-soft-info btn-sm" onclick="viewBooking('${b._id}')" title="View Details">
+                        <i class="ri-eye-line"></i>
+                    </button>
+                    <button class="btn btn-soft-primary btn-sm" onclick="openUpdateStatus('${b._id}')" title="Update Status">
                         <i class="ri-edit-line"></i>
-                    </button>
-                    <button class="btn btn-soft-success btn-sm" onclick="changeStatus('${room._id}', 'available')" title="Mark Available">
-                        <i class="ri-check-line"></i>
-                    </button>
-                    <button class="btn btn-soft-warning btn-sm" onclick="changeStatus('${room._id}', 'maintenance')" title="Mark Maintenance">
-                        <i class="ri-tools-line"></i>
-                    </button>
-                    <button class="btn btn-soft-danger btn-sm" onclick="openDelete('${room._id}')" title="Delete Room">
-                        <i class="ri-delete-bin-line"></i>
                     </button>
                 </div>
             </td>
-        </tr>
-    `).join('');
+        </tr>`;
+    }).join('');
 }
 
-// Filter
+// Filters
 document.addEventListener('change', function(e) {
-    if (e.target.id === 'filter-status' || e.target.id === 'filter-type') {
-        const status = document.getElementById('filter-status').value;
-        const type = document.getElementById('filter-type').value;
-        let filtered = allRooms;
-        if (status) filtered = filtered.filter(r => r.status === status);
-        if (type) filtered = filtered.filter(r => r.type === type);
-        renderRooms(filtered);
+    if (e.target.id === 'filter-booking-status' || e.target.id === 'filter-payment-status') {
+        const bStatus = document.getElementById('filter-booking-status').value;
+        const pStatus = document.getElementById('filter-payment-status').value;
+        let filtered = allBookings;
+        if (bStatus) filtered = filtered.filter(b => b.bookingStatus === bStatus);
+        if (pStatus) filtered = filtered.filter(b => b.paymentStatus === pStatus);
+        renderBookings(filtered);
     }
 });
 
-// Add Room
-document.getElementById('addRoomBtn').addEventListener('click', async function() {
+// Load rooms & users for add booking modal
+async function loadRoomsAndUsers() {
+    const token = localStorage.getItem('token');
+    const headers = { 'Authorization': 'Bearer ' + token };
+
+    const [roomsRes, usersRes] = await Promise.all([
+        fetch(window.API_URL + '/rooms', { headers }),
+        fetch(window.API_URL + '/auth/users', { headers })
+    ]);
+
+    const rooms = await roomsRes.json();
+    const roomSelect = document.getElementById('add-roomId');
+    roomSelect.innerHTML = '<option value="">Select Room</option>' +
+        rooms.filter(r => r.status === 'available').map(r =>
+            `<option value="${r._id}" data-price="${r.price}">Room ${r.roomNumber} (${r.type}) - PKR ${Number(r.price).toLocaleString()}/night</option>`
+        ).join('');
+
+    // Auto calculate amount
+    function calcAmount() {
+        const sel = roomSelect.options[roomSelect.selectedIndex];
+        const price = sel ? Number(sel.dataset.price) : 0;
+        const checkIn = document.getElementById('add-checkIn').value;
+        const checkOut = document.getElementById('add-checkOut').value;
+        if (price && checkIn && checkOut) {
+            const days = (new Date(checkOut) - new Date(checkIn)) / (1000*60*60*24);
+            if (days > 0) document.getElementById('add-totalAmount').value = days * price;
+        }
+    }
+    roomSelect.addEventListener('change', calcAmount);
+    document.getElementById('add-checkIn').addEventListener('change', calcAmount);
+    document.getElementById('add-checkOut').addEventListener('change', calcAmount);
+
+    // Users list
+    if (usersRes.ok) {
+        const users = await usersRes.json();
+        document.getElementById('add-userId').innerHTML = '<option value="">Select Guest</option>' +
+            users.filter(u => u.role === 'guest').map(u =>
+                `<option value="${u._id}">${u.name} (${u.email})</option>`
+            ).join('');
+    }
+}
+
+// Open Add Booking Modal
+document.getElementById('addBookingModal').addEventListener('show.bs.modal', loadRoomsAndUsers);
+
+// Add Booking
+document.getElementById('addBookingBtn').addEventListener('click', async function() {
     const btn = this;
-    const errEl = document.getElementById('add-room-error');
+    const errEl = document.getElementById('add-booking-error');
     errEl.classList.add('d-none');
 
     const body = {
-        roomNumber: document.getElementById('add-roomNumber').value.trim(),
-        type: document.getElementById('add-roomType').value,
-        price: document.getElementById('add-roomPrice').value,
-        capacity: document.getElementById('add-roomCapacity').value,
-        amenities: document.getElementById('add-roomAmenities').value.split(',').map(a=>a.trim()).filter(Boolean),
-        description: document.getElementById('add-roomDesc').value,
-        status: 'available'
+        roomId: document.getElementById('add-roomId').value,
+        userId: document.getElementById('add-userId').value,
+        checkInDate: document.getElementById('add-checkIn').value,
+        checkOutDate: document.getElementById('add-checkOut').value,
+        guests: document.getElementById('add-guests').value,
+        totalAmount: document.getElementById('add-totalAmount').value,
+        specialRequests: document.getElementById('add-specialRequests').value
     };
 
-    if (!body.roomNumber || !body.type || !body.price || !body.capacity) {
+    if (!body.roomId || !body.checkInDate || !body.checkOutDate || !body.guests) {
         errEl.textContent = 'Please fill all required fields.';
         errEl.classList.remove('d-none');
         return;
     }
 
-    btn.disabled = true; btn.textContent = 'Adding...';
+    btn.disabled = true; btn.textContent = 'Creating...';
     try {
-        const res = await fetch(window.API_URL + '/rooms', {
+        const res = await fetch(window.API_URL + '/bookings', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
             body: JSON.stringify(body)
         });
         const data = await res.json();
         if (res.ok) {
-            bootstrap.Modal.getInstance(document.getElementById('addRoomModal')).hide();
-            document.getElementById('addRoomForm').reset();
-            loadRooms();
+            bootstrap.Modal.getInstance(document.getElementById('addBookingModal')).hide();
+            loadBookings();
         } else {
-            errEl.textContent = data.message || 'Error adding room.';
-            errEl.classList.remove('d-none');
-        }
-    } catch(err) {
-        errEl.textContent = 'Server error. Try again.';
-        errEl.classList.remove('d-none');
-    }
-    btn.disabled = false; btn.textContent = 'Add Room';
-});
-
-// Open Edit Modal
-function openEdit(id) {
-    const room = allRooms.find(r => r._id === id);
-    if (!room) return;
-    document.getElementById('edit-roomId').value = room._id;
-    document.getElementById('edit-roomNumber').value = room.roomNumber;
-    document.getElementById('edit-roomType').value = room.type;
-    document.getElementById('edit-roomPrice').value = room.price;
-    document.getElementById('edit-roomCapacity').value = room.capacity;
-    document.getElementById('edit-roomStatus').value = room.status;
-    document.getElementById('edit-roomAmenities').value = room.amenities ? room.amenities.join(', ') : '';
-    document.getElementById('edit-roomDesc').value = room.description || '';
-    new bootstrap.Modal(document.getElementById('editRoomModal')).show();
-}
-
-// Save Edit
-document.getElementById('editRoomBtn').addEventListener('click', async function() {
-    const btn = this;
-    const id = document.getElementById('edit-roomId').value;
-    const errEl = document.getElementById('edit-room-error');
-    errEl.classList.add('d-none');
-
-    const body = {
-        roomNumber: document.getElementById('edit-roomNumber').value,
-        type: document.getElementById('edit-roomType').value,
-        price: document.getElementById('edit-roomPrice').value,
-        capacity: document.getElementById('edit-roomCapacity').value,
-        status: document.getElementById('edit-roomStatus').value,
-        amenities: document.getElementById('edit-roomAmenities').value.split(',').map(a=>a.trim()).filter(Boolean),
-        description: document.getElementById('edit-roomDesc').value
-    };
-
-    btn.disabled = true; btn.textContent = 'Saving...';
-    try {
-        const res = await fetch(window.API_URL + '/rooms/' + id, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
-            body: JSON.stringify(body)
-        });
-        const data = await res.json();
-        if (res.ok) {
-            bootstrap.Modal.getInstance(document.getElementById('editRoomModal')).hide();
-            loadRooms();
-        } else {
-            errEl.textContent = data.message || 'Error updating room.';
+            errEl.textContent = data.message || 'Error creating booking.';
             errEl.classList.remove('d-none');
         }
     } catch(err) {
         errEl.textContent = 'Server error.';
         errEl.classList.remove('d-none');
     }
-    btn.disabled = false; btn.textContent = 'Save Changes';
+    btn.disabled = false; btn.textContent = 'Create Booking';
 });
 
-// Open Delete Modal
-function openDelete(id) {
-    document.getElementById('delete-roomId').value = id;
-    new bootstrap.Modal(document.getElementById('deleteRoomModal')).show();
+// View Booking
+function viewBooking(id) {
+    const b = allBookings.find(b => b._id === id);
+    if (!b) return;
+    const checkIn = new Date(b.checkInDate).toLocaleDateString('en-PK');
+    const checkOut = new Date(b.checkOutDate).toLocaleDateString('en-PK');
+    const days = Math.ceil((new Date(b.checkOutDate) - new Date(b.checkInDate)) / (1000*60*60*24));
+    document.getElementById('view-booking-body').innerHTML = `
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="p-3 bg-light rounded">
+                    <p class="text-muted mb-1 fs-12">Guest Name</p>
+                    <h6 class="mb-0">${b.userId?.name || 'Guest'}</h6>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="p-3 bg-light rounded">
+                    <p class="text-muted mb-1 fs-12">Email</p>
+                    <h6 class="mb-0">${b.userId?.email || '—'}</h6>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="p-3 bg-light rounded">
+                    <p class="text-muted mb-1 fs-12">Room</p>
+                    <h6 class="mb-0">${b.roomId ? 'Room ' + b.roomId.roomNumber + ' (' + b.roomId.type + ')' : '—'}</h6>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="p-3 bg-light rounded">
+                    <p class="text-muted mb-1 fs-12">Guests</p>
+                    <h6 class="mb-0">${b.guests} Person(s)</h6>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 bg-light rounded">
+                    <p class="text-muted mb-1 fs-12">Check In</p>
+                    <h6 class="mb-0">${checkIn}</h6>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 bg-light rounded">
+                    <p class="text-muted mb-1 fs-12">Check Out</p>
+                    <h6 class="mb-0">${checkOut}</h6>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 bg-light rounded">
+                    <p class="text-muted mb-1 fs-12">Duration</p>
+                    <h6 class="mb-0">${days} Night(s)</h6>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 bg-light rounded">
+                    <p class="text-muted mb-1 fs-12">Total Amount</p>
+                    <h6 class="mb-0 text-success">PKR ${Number(b.totalAmount).toLocaleString()}</h6>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 bg-light rounded">
+                    <p class="text-muted mb-1 fs-12">Booking Status</p>
+                    <h6 class="mb-0">${bookingStatusBadge(b.bookingStatus)}</h6>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3 bg-light rounded">
+                    <p class="text-muted mb-1 fs-12">Payment Status</p>
+                    <h6 class="mb-0">${paymentBadge(b.paymentStatus)}</h6>
+                </div>
+            </div>
+            ${b.specialRequests ? `
+            <div class="col-12">
+                <div class="p-3 bg-light rounded">
+                    <p class="text-muted mb-1 fs-12">Special Requests</p>
+                    <h6 class="mb-0">${b.specialRequests}</h6>
+                </div>
+            </div>` : ''}
+        </div>
+    `;
+    new bootstrap.Modal(document.getElementById('viewBookingModal')).show();
 }
 
-// Confirm Delete
-document.getElementById('confirmDeleteBtn').addEventListener('click', async function() {
-    const id = document.getElementById('delete-roomId').value;
-    const btn = this;
-    btn.disabled = true; btn.textContent = 'Deleting...';
-    try {
-        const res = await fetch(window.API_URL + '/rooms/' + id, {
-            method: 'DELETE',
-            headers: { 'Authorization': 'Bearer ' + localStorage.getItem('token') }
-        });
-        if (res.ok) {
-            bootstrap.Modal.getInstance(document.getElementById('deleteRoomModal')).hide();
-            loadRooms();
-        }
-    } catch(err) { console.error(err); }
-    btn.disabled = false; btn.textContent = 'Delete';
-});
+// Open Update Status Modal
+function openUpdateStatus(id) {
+    const b = allBookings.find(b => b._id === id);
+    if (!b) return;
+    document.getElementById('update-bookingId').value = id;
+    document.getElementById('update-bookingStatus').value = b.bookingStatus;
+    document.getElementById('update-paymentStatus').value = b.paymentStatus;
+    new bootstrap.Modal(document.getElementById('updateStatusModal')).show();
+}
 
-// Change Status
-async function changeStatus(id, status) {
+// Update Status
+document.getElementById('updateStatusBtn').addEventListener('click', async function() {
+    const btn = this;
+    const id = document.getElementById('update-bookingId').value;
+    const bookingStatus = document.getElementById('update-bookingStatus').value;
+    const paymentStatus = document.getElementById('update-paymentStatus').value;
+
+    btn.disabled = true; btn.textContent = 'Updating...';
     try {
-        await fetch(window.API_URL + '/rooms/' + id, {
+        const res = await fetch(window.API_URL + '/bookings/' + id, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
-            body: JSON.stringify({ status })
+            body: JSON.stringify({ bookingStatus, paymentStatus })
         });
-        loadRooms();
+        if (res.ok) {
+            bootstrap.Modal.getInstance(document.getElementById('updateStatusModal')).hide();
+            loadBookings();
+        }
     } catch(err) { console.error(err); }
-}
+    btn.disabled = false; btn.textContent = 'Update';
+});
 
-document.addEventListener('DOMContentLoaded', function() { loadRooms(); });
+document.addEventListener('DOMContentLoaded', function() { loadBookings(); });
 </script>
 
 </body>

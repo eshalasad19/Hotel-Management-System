@@ -72,13 +72,16 @@ const updateBookingStatus = async (req, res) => {
   try {
     const booking = await Booking.findByIdAndUpdate(
       req.params.id,
-      { bookingStatus: req.body.bookingStatus },
+      { 
+        bookingStatus: req.body.bookingStatus,
+        paymentStatus: req.body.paymentStatus  // ye line add karo
+      },
       { new: true }
     );
     if (!booking) {
       return res.status(404).json({ message: 'Booking not found' });
     }
-    res.status(200).json({ message: 'Booking status updated', booking });
+    res.status(200).json({ message: 'Booking updated', booking });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
