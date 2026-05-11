@@ -1,18 +1,19 @@
-﻿<!doctype html>
+
+
+<!doctype html>
 <html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable" data-theme="default" data-theme-colors="default">
 
 <head>
 
     <meta charset="utf-8">
-    <title>Dashboard | Hotel Management System</title>
+    <title>Create Product | Velzon - Admin & Dashboard Template</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description">
     <meta content="Themesbrand" name="author">
     <!-- App favicon -->
     <link rel="shortcut icon" href="assets/images/favicon.ico">
 
-    <!-- jsvectormap css -->
-    <!--Swiper slider css-->
+    <!-- Plugins css -->
     <!-- Layout config Js -->
     <script src="assets/js/layout.js"></script>
     <!-- Bootstrap Css -->
@@ -74,257 +75,63 @@
 
             <div class="page-content">
                 <div class="container-fluid">
-
-                    <!-- Welcome Row -->
-                    <div class="row mb-3 pb-1">
+                    <div class="row">
                         <div class="col-12">
-                            <div class="d-flex align-items-lg-center flex-lg-row flex-column">
-                                <div class="flex-grow-1">
-                                    <h4 class="fs-16 mb-1" id="dash-welcome">Good Morning!</h4>
-                                    <p class="text-muted mb-0">Here's what's happening at your hotel today.</p>
-                                </div>
-                                <div class="mt-3 mt-lg-0">
-                                    <span class="text-muted fs-14" id="dash-date"></span>
-                                </div>
+                            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                                <h4 class="mb-sm-0">Check-in / Check-out Management</h4>
+                                <span class="text-muted fs-14" id="today-date"></span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Stat Cards Row -->
-                    <div class="row">
-                        <!-- Total Revenue -->
-                        <div class="col-xl-3 col-md-6">
+                    <!-- Stats Row -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
                             <div class="card card-animate">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
-                                        <div class="flex-grow-1 overflow-hidden">
-                                            <p class="text-uppercase fw-medium text-muted text-truncate mb-0">Total Revenue</p>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-end justify-content-between mt-4">
-                                        <div>
-                                            <h4 class="fs-22 fw-semibold ff-secondary mb-4" id="stat-revenue">PKR 0</h4>
-                                            <a href="payments.html" class="text-decoration-underline">View payments</a>
-                                        </div>
                                         <div class="avatar-sm flex-shrink-0">
                                             <span class="avatar-title bg-success-subtle rounded fs-3">
-                                                <i class="bx bx-dollar-circle text-success"></i>
+                                                <i class="bx bx-log-in text-success"></i>
                                             </span>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <p class="text-uppercase fw-medium text-muted mb-1 fs-12">Today Check-ins</p>
+                                            <h4 class="mb-0 fw-semibold" id="stat-checkins">0</h4>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Total Bookings -->
-                        <div class="col-xl-3 col-md-6">
+                        <div class="col-md-4">
                             <div class="card card-animate">
                                 <div class="card-body">
                                     <div class="d-flex align-items-center">
-                                        <div class="flex-grow-1 overflow-hidden">
-                                            <p class="text-uppercase fw-medium text-muted text-truncate mb-0">Total Bookings</p>
+                                        <div class="avatar-sm flex-shrink-0">
+                                            <span class="avatar-title bg-warning-subtle rounded fs-3">
+                                                <i class="bx bx-log-out text-warning"></i>
+                                            </span>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3">
+                                            <p class="text-uppercase fw-medium text-muted mb-1 fs-12">Today Check-outs</p>
+                                            <h4 class="mb-0 fw-semibold" id="stat-checkouts">0</h4>
                                         </div>
                                     </div>
-                                    <div class="d-flex align-items-end justify-content-between mt-4">
-                                        <div>
-                                            <h4 class="fs-22 fw-semibold ff-secondary mb-4" id="stat-bookings">0</h4>
-                                            <a href="bookings.html" class="text-decoration-underline">View all bookings</a>
-                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card card-animate">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
                                         <div class="avatar-sm flex-shrink-0">
                                             <span class="avatar-title bg-info-subtle rounded fs-3">
-                                                <i class="bx bx-calendar-check text-info"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Available Rooms -->
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card card-animate">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-grow-1 overflow-hidden">
-                                            <p class="text-uppercase fw-medium text-muted text-truncate mb-0">Available Rooms</p>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-end justify-content-between mt-4">
-                                        <div>
-                                            <h4 class="fs-22 fw-semibold ff-secondary mb-4" id="stat-available">0</h4>
-                                            <a href="rooms.html" class="text-decoration-underline">View all rooms</a>
-                                        </div>
-                                        <div class="avatar-sm flex-shrink-0">
-                                            <span class="avatar-title bg-warning-subtle rounded fs-3">
-                                                <i class="bx bx-building text-warning"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Occupied Rooms -->
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card card-animate">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-grow-1 overflow-hidden">
-                                            <p class="text-uppercase fw-medium text-muted text-truncate mb-0">Occupied Rooms</p>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex align-items-end justify-content-between mt-4">
-                                        <div>
-                                            <h4 class="fs-22 fw-semibold ff-secondary mb-4" id="stat-occupied">0</h4>
-                                            <a href="rooms.html" class="text-decoration-underline">View occupied</a>
-                                        </div>
-                                        <div class="avatar-sm flex-shrink-0">
-                                            <span class="avatar-title bg-danger-subtle rounded fs-3">
-                                                <i class="bx bx-bed text-danger"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- end stat cards row -->
-
-                    <div class="row">
-                        <!-- Bookings Overview Chart -->
-                        <div class="col-xl-8">
-                            <div class="card">
-                                <div class="card-header border-0 align-items-center d-flex">
-                                    <h4 class="card-title mb-0 flex-grow-1">Bookings Overview</h4>
-                                </div>
-                                <div class="card-body p-0 pb-2">
-                                    <div class="w-100">
-                                        <div id="booking-overview-chart"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Room Status Chart -->
-                        <div class="col-xl-4">
-                            <div class="card">
-                                <div class="card-header border-0 align-items-center d-flex">
-                                    <h4 class="card-title mb-0 flex-grow-1">Room Status</h4>
-                                </div>
-                                <div class="card-body">
-                                    <div id="room-status-chart"></div>
-                                    <div class="mt-3">
-                                        <div class="d-flex justify-content-between mb-2">
-                                            <span class="text-muted">Available</span>
-                                            <span class="fw-semibold text-success" id="room-available-count">0</span>
-                                        </div>
-                                        <div class="d-flex justify-content-between mb-2">
-                                            <span class="text-muted">Occupied</span>
-                                            <span class="fw-semibold text-danger" id="room-occupied-count">0</span>
-                                        </div>
-                                        <div class="d-flex justify-content-between">
-                                            <span class="text-muted">Maintenance</span>
-                                            <span class="fw-semibold text-warning" id="room-maintenance-count">0</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <!-- Recent Bookings Table -->
-                        <div class="col-xl-8">
-                            <div class="card">
-                                <div class="card-header align-items-center d-flex">
-                                    <h4 class="card-title mb-0 flex-grow-1">Recent Bookings</h4>
-                                    <a href="bookings.html" class="btn btn-soft-info btn-sm">View All</a>
-                                </div>
-                                <div class="card-body">
-                                    <div class="table-responsive">
-                                        <table class="table table-borderless table-hover table-nowrap align-middle mb-0">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th>Guest</th>
-                                                    <th>Room</th>
-                                                    <th>Check In</th>
-                                                    <th>Check Out</th>
-                                                    <th>Amount</th>
-                                                    <th>Status</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="recent-bookings-table">
-                                                <tr><td colspan="6" class="text-center text-muted py-4">Loading...</td></tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Recent Activity -->
-                        <div class="col-xl-4">
-                            <div class="card">
-                                <div class="card-header align-items-center d-flex">
-                                    <h4 class="card-title mb-0 flex-grow-1">Recent Activity</h4>
-                                </div>
-                                <div class="card-body">
-                                    <div id="recent-activity-list">
-                                        <div class="text-center text-muted py-4">Loading...</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Booking Status Summary -->
-                    <div class="row">
-                        <div class="col-xl-4 col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-sm flex-shrink-0">
-                                            <span class="avatar-title bg-warning-subtle rounded fs-3">
-                                                <i class="bx bx-time text-warning"></i>
+                                                <i class="bx bx-hotel text-info"></i>
                                             </span>
                                         </div>
                                         <div class="flex-grow-1 ms-3">
-                                            <p class="text-uppercase fw-medium text-muted mb-1">Pending Bookings</p>
-                                            <h4 class="mb-0 fw-semibold" id="stat-pending">0</h4>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-4 col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-sm flex-shrink-0">
-                                            <span class="avatar-title bg-success-subtle rounded fs-3">
-                                                <i class="bx bx-check-circle text-success"></i>
-                                            </span>
-                                        </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <p class="text-uppercase fw-medium text-muted mb-1">Confirmed Bookings</p>
-                                            <h4 class="mb-0 fw-semibold" id="stat-confirmed">0</h4>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-4 col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-sm flex-shrink-0">
-                                            <span class="avatar-title bg-danger-subtle rounded fs-3">
-                                                <i class="bx bx-x-circle text-danger"></i>
-                                            </span>
-                                        </div>
-                                        <div class="flex-grow-1 ms-3">
-                                            <p class="text-uppercase fw-medium text-muted mb-1">Cancelled Bookings</p>
-                                            <h4 class="mb-0 fw-semibold" id="stat-cancelled">0</h4>
+                                            <p class="text-uppercase fw-medium text-muted mb-1 fs-12">Currently Occupied</p>
+                                            <h4 class="mb-0 fw-semibold" id="stat-occupied">0</h4>
                                         </div>
                                     </div>
                                 </div>
@@ -332,8 +139,167 @@
                         </div>
                     </div>
 
+                    <!-- Tabs -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <ul class="nav nav-tabs-custom rounded card-header-tabs border-bottom-0" role="tablist">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" data-bs-toggle="tab" href="#checkin-tab">
+                                                <i class="ri-login-box-line me-1"></i>
+                                                Check-in Today
+                                                <span class="badge bg-success ms-1" id="checkin-count">0</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-bs-toggle="tab" href="#checkout-tab">
+                                                <i class="ri-logout-box-line me-1"></i>
+                                                Check-out Today
+                                                <span class="badge bg-warning ms-1" id="checkout-count">0</span>
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-bs-toggle="tab" href="#occupied-tab">
+                                                <i class="ri-hotel-bed-line me-1"></i>
+                                                Currently Occupied
+                                                <span class="badge bg-info ms-1" id="occupied-count">0</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="card-body">
+                                    <div class="tab-content">
+
+                                        <!-- Check In Tab -->
+                                        <div class="tab-pane active" id="checkin-tab">
+                                            <p class="text-muted mb-3">
+                                                <i class="ri-information-line me-1"></i>
+                                                Guests whose check-in date is <strong>today</strong> — they will automatically appear here on their check-in date.
+                                            </p>
+                                            <div class="table-responsive">
+                                                <table class="table table-hover align-middle mb-0">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th>Guest</th>
+                                                            <th>Phone</th>
+                                                            <th>Room</th>
+                                                            <th>Check In</th>
+                                                            <th>Check Out</th>
+                                                            <th>Nights</th>
+                                                            <th>Amount</th>
+                                                            <th>Payment</th>
+                                                            <th>Special Request</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="checkin-table">
+                                                        <tr><td colspan="9" class="text-center py-4 text-muted">Loading...</td></tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <!-- Check Out Tab -->
+                                        <div class="tab-pane" id="checkout-tab">
+                                            <p class="text-muted mb-3">
+                                                <i class="ri-information-line me-1"></i>
+                                                Guests whose check-out date is <strong>today or overdue</strong>. Click Check-out to free the room.
+                                            </p>
+                                            <div class="table-responsive">
+                                                <table class="table table-hover align-middle mb-0">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th>Guest</th>
+                                                            <th>Phone</th>
+                                                            <th>Room</th>
+                                                            <th>Check In</th>
+                                                            <th>Check Out</th>
+                                                            <th>Amount</th>
+                                                            <th>Payment</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="checkout-table">
+                                                        <tr><td colspan="8" class="text-center py-4 text-muted">Loading...</td></tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <!-- Currently Occupied Tab -->
+                                        <div class="tab-pane" id="occupied-tab">
+                                            <p class="text-muted mb-3">
+                                                <i class="ri-information-line me-1"></i>
+                                                Guests currently staying — check-in date has passed and check-out date is in the future.
+                                            </p>
+                                            <div class="table-responsive">
+                                                <table class="table table-hover align-middle mb-0">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th>Guest</th>
+                                                            <th>Phone</th>
+                                                            <th>Room</th>
+                                                            <th>Check In</th>
+                                                            <th>Check Out</th>
+                                                            <th>Nights Left</th>
+                                                            <th>Amount</th>
+                                                            <th>Payment</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="occupied-table">
+                                                        <tr><td colspan="8" class="text-center py-4 text-muted">Loading...</td></tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <!-- container-fluid -->
+
+                <!-- Checkout Modal -->
+                <div class="modal fade" id="checkoutModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header bg-warning-subtle">
+                                <h5 class="modal-title">
+                                    <i class="ri-logout-box-line me-2 text-warning"></i>Confirm Check-out
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" id="checkout-bookingId">
+                                <input type="hidden" id="checkout-roomId">
+
+                                <div class="p-3 bg-light rounded mb-3" id="checkout-guest-info">
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-semibold">Payment Status</label>
+                                    <select class="form-select" id="checkout-payment">
+                                        <option value="paid">Paid ✅</option>
+                                        <option value="unpaid">Unpaid ❌</option>
+                                    </select>
+                                </div>
+
+                                <div class="alert alert-warning">
+                                    <i class="ri-alert-line me-2"></i>
+                                    After check-out, the room will be automatically marked as <strong>Available</strong>.
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-warning" id="confirmCheckoutBtn">
+                                    <i class="ri-logout-box-line me-1"></i> Confirm Check-out
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
 </div><!-- end main content-->
 
     </div>
@@ -1307,171 +1273,250 @@
     <script src="assets/js/pages/plugins/lord-icon-2.1.0.js"></script>
     <script src="assets/js/plugins.js"></script>
 
-    <!-- apexcharts -->
-    <!-- Vector map-->
-    <!--Swiper slider js-->
-    <!-- Dashboard init -->
+    <!-- ckeditor -->
+    <script src="assets/libs/%40ckeditor/ckeditor5-build-classic/build/ckeditor.js"></script>
+
+    <!-- dropzone js -->
+    <script src="assets/js/pages/ecommerce-product-create.init.js"></script>
+
     <!-- App js -->
     <script src="assets/js/app.js"></script>
 <script src="hotel-common.js"></script>
 
-<script src="assets/libs/apexcharts/apexcharts.min.js"></script>
 <script>
-// Date set karo
-const now = new Date();
-const dateEl = document.getElementById('dash-date');
-if (dateEl) dateEl.textContent = now.toLocaleDateString('en-PK', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+let allBookings = [];
 
-// Welcome message
-const user = JSON.parse(localStorage.getItem('user') || '{}');
-const hour = now.getHours();
-const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
-const welcomeEl = document.getElementById('dash-welcome');
-if (welcomeEl) welcomeEl.textContent = greeting + ', ' + (user.name || 'Admin') + '!';
+// Today date set karo
+const todayDate = new Date();
+todayDate.setHours(0, 0, 0, 0);
+document.getElementById('today-date').textContent =
+    todayDate.toLocaleDateString('en-PK', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-function formatPKR(amount) {
-    return 'PKR ' + Number(amount).toLocaleString('en-PK');
+function paymentBadge(status) {
+    return status === 'paid'
+        ? '<span class="badge bg-success-subtle text-success">Paid</span>'
+        : '<span class="badge bg-danger-subtle text-danger">Unpaid</span>';
 }
 
-function statusBadge(status) {
-    const map = {
-        pending:   '<span class="badge bg-warning-subtle text-warning">Pending</span>',
-        confirmed: '<span class="badge bg-success-subtle text-success">Confirmed</span>',
-        cancelled: '<span class="badge bg-danger-subtle text-danger">Cancelled</span>',
-        completed: '<span class="badge bg-info-subtle text-info">Completed</span>'
-    };
-    return map[status] || status;
+function isSameDay(date1, date2) {
+    return date1.getFullYear() === date2.getFullYear() &&
+           date1.getMonth() === date2.getMonth() &&
+           date1.getDate() === date2.getDate();
 }
 
-async function loadDashboard() {
+async function loadBookings() {
     try {
         const token = localStorage.getItem('token');
-        if (!token) { window.location.href = '/auth-signin-basic.html'; return; }
-        const headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
-
-        const [roomsRes, bookingsRes] = await Promise.all([
-            fetch(window.API_URL + '/rooms', { headers }),
-            fetch(window.API_URL + '/bookings/all', { headers })
-        ]);
-
-        const rooms = await roomsRes.json();
-        const bookings = await bookingsRes.json();
-
-        // Stats
-        const totalRooms = rooms.length;
-        const availableRooms = rooms.filter(r => r.status === 'available').length;
-        const occupiedRooms = rooms.filter(r => r.status === 'occupied').length;
-        const maintenanceRooms = rooms.filter(r => r.status === 'maintenance').length;
-        const totalBookings = bookings.length;
-        const pendingBookings = bookings.filter(b => b.bookingStatus === 'pending').length;
-        const confirmedBookings = bookings.filter(b => b.bookingStatus === 'confirmed').length;
-        const cancelledBookings = bookings.filter(b => b.bookingStatus === 'cancelled').length;
-        const totalRevenue = bookings.filter(b => b.paymentStatus === 'paid').reduce((s, b) => s + b.totalAmount, 0);
-
-        // Update cards
-        document.getElementById('stat-revenue').textContent = formatPKR(totalRevenue);
-        document.getElementById('stat-bookings').textContent = totalBookings;
-        document.getElementById('stat-available').textContent = availableRooms;
-        document.getElementById('stat-occupied').textContent = occupiedRooms;
-        document.getElementById('stat-pending').textContent = pendingBookings;
-        document.getElementById('stat-confirmed').textContent = confirmedBookings;
-        document.getElementById('stat-cancelled').textContent = cancelledBookings;
-        document.getElementById('room-available-count').textContent = availableRooms;
-        document.getElementById('room-occupied-count').textContent = occupiedRooms;
-        document.getElementById('room-maintenance-count').textContent = maintenanceRooms;
-
-        // Bookings Overview Chart
-        const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-        const monthlyBookings = new Array(12).fill(0);
-        const monthlyRevenue = new Array(12).fill(0);
-        bookings.forEach(b => {
-            const m = new Date(b.createdAt).getMonth();
-            monthlyBookings[m]++;
-            if (b.paymentStatus === 'paid') monthlyRevenue[m] += b.totalAmount;
+        const res = await fetch(window.API_URL + '/bookings/all', {
+            headers: { 'Authorization': 'Bearer ' + token }
         });
+        allBookings = await res.json();
+        renderAll();
+    } catch(err) { console.error(err); }
+}
 
-        new ApexCharts(document.getElementById('booking-overview-chart'), {
-            series: [
-                { name: 'Bookings', type: 'bar', data: monthlyBookings },
-                { name: 'Revenue (PKR)', type: 'line', data: monthlyRevenue }
-            ],
-            chart: { height: 320, type: 'line', toolbar: { show: false } },
-            stroke: { width: [0, 3], curve: 'smooth' },
-            plotOptions: { bar: { columnWidth: '50%' } },
-            fill: { opacity: [1, 1] },
-            colors: ['#0ab39c', '#405189'],
-            xaxis: { categories: months },
-            yaxis: [
-                { title: { text: 'Bookings' } },
-                { opposite: true, title: { text: 'Revenue (PKR)' } }
-            ],
-            tooltip: { shared: true, intersect: false },
-            legend: { position: 'top' }
-        }).render();
+function renderAll() {
+    const confirmedBookings = allBookings.filter(b => b.bookingStatus === 'confirmed');
 
-        // Room Status Donut Chart
-        new ApexCharts(document.getElementById('room-status-chart'), {
-            series: [availableRooms, occupiedRooms, maintenanceRooms],
-            labels: ['Available', 'Occupied', 'Maintenance'],
-            chart: { type: 'donut', height: 200 },
-            colors: ['#0ab39c', '#f06548', '#f7b84b'],
-            legend: { show: false },
-            plotOptions: { pie: { donut: { size: '70%' } } },
-            dataLabels: { enabled: false }
-        }).render();
+    // Check-in: checkInDate === today
+    const checkInList = confirmedBookings.filter(b => {
+        const checkIn = new Date(b.checkInDate);
+        return isSameDay(checkIn, todayDate);
+    });
 
-        // Recent Bookings Table
-        const tbody = document.getElementById('recent-bookings-table');
-        if (bookings.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">No bookings yet</td></tr>';
-        } else {
-            tbody.innerHTML = bookings.slice(0, 8).map(b => {
-                const guest = b.userId?.name || 'Guest';
-                const room = b.roomId ? 'Room ' + b.roomId.roomNumber : '—';
-                const checkIn = new Date(b.checkInDate).toLocaleDateString('en-PK');
-                const checkOut = new Date(b.checkOutDate).toLocaleDateString('en-PK');
-                return '<tr>' +
-                    '<td><div class="fw-medium">' + guest + '</div></td>' +
-                    '<td>' + room + '</td>' +
-                    '<td>' + checkIn + '</td>' +
-                    '<td>' + checkOut + '</td>' +
-                    '<td>' + formatPKR(b.totalAmount) + '</td>' +
-                    '<td>' + statusBadge(b.bookingStatus) + '</td>' +
-                    '</tr>';
-            }).join('');
-        }
+    // Check-out: checkOutDate <= today
+    const checkOutList = confirmedBookings.filter(b => {
+        const checkOut = new Date(b.checkOutDate);
+        checkOut.setHours(0, 0, 0, 0);
+        return checkOut <= todayDate;
+    });
 
-        // Recent Activity
-        const activityEl = document.getElementById('recent-activity-list');
-        const colors = ['#0ab39c','#405189','#f7b84b','#f06548','#299cdb'];
-        if (bookings.length === 0) {
-            activityEl.innerHTML = '<div class="text-center text-muted py-4">No activity yet</div>';
-        } else {
-            activityEl.innerHTML = bookings.slice(0, 6).map((b, i) => {
-                const name = b.userId?.name || 'Guest';
-                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-                const color = colors[i % colors.length];
-                const date = new Date(b.createdAt).toLocaleDateString('en-PK');
-                const text = b.bookingStatus === 'confirmed' ? 'confirmed a booking' :
-                             b.bookingStatus === 'pending' ? 'requested a booking' :
-                             b.bookingStatus === 'cancelled' ? 'cancelled booking' : 'completed stay';
-                return '<div class="d-flex align-items-center mb-3">' +
-                    '<div class="avatar-xs flex-shrink-0 me-3">' +
-                    '<span class="avatar-title rounded-circle text-white fw-semibold" style="background:' + color + '; font-size:12px;">' + initials + '</span>' +
-                    '</div>' +
-                    '<div class="flex-grow-1">' +
-                    '<p class="mb-0 fw-medium">' + name + '</p>' +
-                    '<small class="text-muted">' + text + ' · ' + date + '</small>' +
-                    '</div></div>';
-            }).join('');
-        }
+    // Currently Occupied: checkIn < today AND checkOut > today
+    const occupiedList = confirmedBookings.filter(b => {
+        const checkIn = new Date(b.checkInDate);
+        const checkOut = new Date(b.checkOutDate);
+        checkIn.setHours(0, 0, 0, 0);
+        checkOut.setHours(0, 0, 0, 0);
+        return checkIn <= todayDate && checkOut > todayDate;
+    });
 
-    } catch(err) {
-        console.error('Dashboard error:', err);
+    // Update stats
+    document.getElementById('stat-checkins').textContent = checkInList.length;
+    document.getElementById('stat-checkouts').textContent = checkOutList.length;
+    document.getElementById('stat-occupied').textContent = occupiedList.length;
+    document.getElementById('checkin-count').textContent = checkInList.length;
+    document.getElementById('checkout-count').textContent = checkOutList.length;
+    document.getElementById('occupied-count').textContent = occupiedList.length;
+
+    // Render Check-in Table
+    const checkinTbody = document.getElementById('checkin-table');
+    if (!checkInList.length) {
+        checkinTbody.innerHTML = '<tr><td colspan="9" class="text-center py-4 text-muted"><i class="ri-calendar-check-line fs-24 d-block mb-2"></i>No check-ins scheduled for today</td></tr>';
+    } else {
+        checkinTbody.innerHTML = checkInList.map(b => {
+            const guest = b.userId?.name || 'Guest';
+            const phone = b.userId?.phone || '—';
+            const room = b.roomId ? 'Room ' + b.roomId.roomNumber + ' (' + b.roomId.type + ')' : '—';
+            const checkIn = new Date(b.checkInDate).toLocaleDateString('en-PK');
+            const checkOut = new Date(b.checkOutDate).toLocaleDateString('en-PK');
+            const nights = Math.ceil((new Date(b.checkOutDate) - new Date(b.checkInDate)) / (1000*60*60*24));
+            return `<tr>
+                <td><div class="fw-semibold">${guest}</div></td>
+                <td><small>${phone}</small></td>
+                <td><span class="badge bg-primary-subtle text-primary">${room}</span></td>
+                <td><span class="text-success fw-medium">${checkIn}</span></td>
+                <td>${checkOut}</td>
+                <td>${nights} night(s)</td>
+                <td class="fw-semibold">PKR ${Number(b.totalAmount).toLocaleString()}</td>
+                <td>${paymentBadge(b.paymentStatus)}</td>
+                <td><small class="text-muted">${b.specialRequests || '—'}</small></td>
+            </tr>`;
+        }).join('');
+    }
+
+    // Render Check-out Table
+    const checkoutTbody = document.getElementById('checkout-table');
+    if (!checkOutList.length) {
+        checkoutTbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted"><i class="ri-logout-box-line fs-24 d-block mb-2"></i>No check-outs scheduled for today</td></tr>';
+    } else {
+        checkoutTbody.innerHTML = checkOutList.map(b => {
+            const guest = b.userId?.name || 'Guest';
+            const phone = b.userId?.phone || '—';
+            const room = b.roomId ? 'Room ' + b.roomId.roomNumber + ' (' + b.roomId.type + ')' : '—';
+            const checkIn = new Date(b.checkInDate).toLocaleDateString('en-PK');
+            const checkOut = new Date(b.checkOutDate).toLocaleDateString('en-PK');
+            const isOverdue = new Date(b.checkOutDate) < todayDate;
+            return `<tr class="${isOverdue ? 'table-danger' : ''}">
+                <td>
+                    <div class="fw-semibold">${guest}</div>
+                    ${isOverdue ? '<small class="text-danger"><i class="ri-alarm-warning-line me-1"></i>Overdue</small>' : ''}
+                </td>
+                <td><small>${phone}</small></td>
+                <td><span class="badge bg-primary-subtle text-primary">${room}</span></td>
+                <td>${checkIn}</td>
+                <td><span class="text-warning fw-medium">${checkOut}</span></td>
+                <td class="fw-semibold">PKR ${Number(b.totalAmount).toLocaleString()}</td>
+                <td>${paymentBadge(b.paymentStatus)}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm" onclick="openCheckoutModal('${b._id}', '${b.roomId?._id || ''}')">
+                        <i class="ri-logout-box-line me-1"></i> Check-out
+                    </button>
+                </td>
+            </tr>`;
+        }).join('');
+    }
+
+    // Render Occupied Table
+    const occupiedTbody = document.getElementById('occupied-table');
+    if (!occupiedList.length) {
+        occupiedTbody.innerHTML = '<tr><td colspan="8" class="text-center py-4 text-muted"><i class="ri-hotel-bed-line fs-24 d-block mb-2"></i>No guests currently staying</td></tr>';
+    } else {
+        occupiedTbody.innerHTML = occupiedList.map(b => {
+            const guest = b.userId?.name || 'Guest';
+            const phone = b.userId?.phone || '—';
+            const room = b.roomId ? 'Room ' + b.roomId.roomNumber + ' (' + b.roomId.type + ')' : '—';
+            const checkIn = new Date(b.checkInDate).toLocaleDateString('en-PK');
+            const checkOut = new Date(b.checkOutDate).toLocaleDateString('en-PK');
+            const checkOutDate = new Date(b.checkOutDate);
+            checkOutDate.setHours(0,0,0,0);
+            const nightsLeft = Math.ceil((checkOutDate - todayDate) / (1000*60*60*24));
+            return `<tr>
+                <td><div class="fw-semibold">${guest}</div></td>
+                <td><small>${phone}</small></td>
+                <td><span class="badge bg-primary-subtle text-primary">${room}</span></td>
+                <td>${checkIn}</td>
+                <td>${checkOut}</td>
+                <td>
+                    <span class="badge ${nightsLeft <= 1 ? 'bg-danger-subtle text-danger' : 'bg-info-subtle text-info'}">
+                        ${nightsLeft} night(s) left
+                    </span>
+                </td>
+                <td class="fw-semibold">PKR ${Number(b.totalAmount).toLocaleString()}</td>
+                <td>${paymentBadge(b.paymentStatus)}</td>
+            </tr>`;
+        }).join('');
     }
 }
 
-document.addEventListener("DOMContentLoaded", function() { loadDashboard(); });
+// Open Checkout Modal
+function openCheckoutModal(bookingId, roomId) {
+    const b = allBookings.find(b => b._id === bookingId);
+    if (!b) return;
+
+    document.getElementById('checkout-bookingId').value = bookingId;
+    document.getElementById('checkout-roomId').value = roomId;
+    document.getElementById('checkout-payment').value = b.paymentStatus;
+
+    const guest = b.userId?.name || 'Guest';
+    const phone = b.userId?.phone || '—';
+    const room = b.roomId ? 'Room ' + b.roomId.roomNumber + ' (' + b.roomId.type + ')' : '—';
+    const nights = Math.ceil((new Date(b.checkOutDate) - new Date(b.checkInDate)) / (1000*60*60*24));
+
+    document.getElementById('checkout-guest-info').innerHTML = `
+        <div class="row g-2">
+            <div class="col-6">
+                <p class="text-muted mb-1 fs-12">Guest</p>
+                <h6 class="mb-0">${guest}</h6>
+            </div>
+            <div class="col-6">
+                <p class="text-muted mb-1 fs-12">Phone</p>
+                <h6 class="mb-0">${phone}</h6>
+            </div>
+            <div class="col-6">
+                <p class="text-muted mb-1 fs-12">Room</p>
+                <h6 class="mb-0">${room}</h6>
+            </div>
+            <div class="col-6">
+                <p class="text-muted mb-1 fs-12">Duration</p>
+                <h6 class="mb-0">${nights} night(s)</h6>
+            </div>
+            <div class="col-12 mt-1 pt-2 border-top">
+                <p class="text-muted mb-1 fs-12">Total Amount</p>
+                <h5 class="mb-0 text-success">PKR ${Number(b.totalAmount).toLocaleString()}</h5>
+            </div>
+        </div>
+    `;
+
+    new bootstrap.Modal(document.getElementById('checkoutModal')).show();
+}
+
+// Confirm Checkout
+document.getElementById('confirmCheckoutBtn').addEventListener('click', async function() {
+    const btn = this;
+    const bookingId = document.getElementById('checkout-bookingId').value;
+    const roomId = document.getElementById('checkout-roomId').value;
+    const paymentStatus = document.getElementById('checkout-payment').value;
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="ri-loader-line me-1"></i> Processing...';
+
+    try {
+        const token = localStorage.getItem('token');
+        const headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+
+        // Booking completed karo — backend room bhi available karega automatically
+        const res = await fetch(window.API_URL + '/bookings/' + bookingId, {
+            method: 'PUT',
+            headers,
+            body: JSON.stringify({ bookingStatus: 'completed', paymentStatus })
+        });
+
+        if (res.ok) {
+            bootstrap.Modal.getInstance(document.getElementById('checkoutModal')).hide();
+            loadBookings();
+        } else {
+            alert('Error processing check-out. Please try again.');
+        }
+    } catch(err) {
+        alert('Server error.');
+        console.error(err);
+    }
+
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ri-logout-box-line me-1"></i> Confirm Check-out';
+});
+
+document.addEventListener('DOMContentLoaded', loadBookings);
 </script>
 
 </body>
