@@ -20,6 +20,18 @@ import Maintenance from './Component/Admin/Maintenance';
 import Feedback from './Component/Admin/Feedback';
 import Reports from './Component/Admin/Reports';
 
+// User Pages
+import UserDashboard from './Component/Users/UserDashboard';
+import UserRooms from './Component/Users/Rooms';
+import RoomDetails from './Component/Users/RoomDetails';
+import UserBooking from './Component/Users/Booking';
+import MyBookings from './Component/Users/MyBookings';
+import UserPayments from './Component/Users/Payment';
+import UserFeedback from './Component/Users/Feedback';
+import UserProfile from './Component/Users/Profile';
+import UserNotifications from './Component/Users/Notifications';
+import UserServices from './Component/Users/Services';
+
 // CSS — template ka
 import './assets/css/bootstrap.min.css';
 import './assets/css/icons.min.css';
@@ -48,6 +60,19 @@ function App() {
           <Route path="maintenance" element={<Maintenance />} />
           <Route path="feedback" element={<Feedback />} />
           <Route path="reports" element={<Reports />} />
+        </Route>
+         <Route path="/user" element={<UserLayout />}>
+          <Route index element={<Navigate to="/user/dashboard" replace />} />
+          <Route path="dashboard" element={<UserDashboard />} />
+          <Route path="rooms" element={<UserRooms />} />
+          <Route path="room/:id" element={<RoomDetails />} />
+          <Route path="booking" element={<UserBooking />} />
+          <Route path="my-bookings" element={<MyBookings />} />
+          <Route path="payment" element={<UserPayments />} />
+          <Route path="feedback" element={<UserFeedback />} />
+          <Route path="profile" element={<UserProfile />} />
+          <Route path="notifications" element={<UserNotifications />} />
+          <Route path="services" element={<UserServices />} />
         </Route>
 
         {/* Default redirect */}
