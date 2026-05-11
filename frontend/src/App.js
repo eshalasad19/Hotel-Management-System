@@ -19,6 +19,7 @@ import Housekeeping from './Component/Admin/Housekeeping';
 import Maintenance from './Component/Admin/Maintenance';
 import Feedback from './Component/Admin/Feedback';
 import Reports from './Component/Admin/Reports';
+import Restaurant from "./Component/Users/Restaurant";
 
 // User Pages
 import UserDashboard from './Component/Users/UserDashboard';
@@ -74,6 +75,7 @@ function App() {
           <Route path="profile" element={<UserProfile />} />
           <Route path="notifications" element={<UserNotifications />} />
           <Route path="services" element={<UserServices />} />
+          <Route path="/restaurant" element={<Restaurant />} />
         </Route>
 
         {/* Default redirect */}

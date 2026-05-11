@@ -1,4 +1,5 @@
-const express = require('express');
+
+const express = require("express");
 const dotenv = require('dotenv');
 const cors = require('cors');
 const connectDB = require('./Config/db');
@@ -31,12 +32,15 @@ app.use('/api/payments', paymentRoutes);
 // Feedback Routes
 const feedbackRoutes = require('./Routes/feedbackRoutes');
 app.use('/api/feedbacks', feedbackRoutes);
+//Restuarant Routes
+const restaurantOrderRoutes = require ('./Routes/restaurantOrderRoutes.js');
+app.use("/api/orders", restaurantOrderRoutes);
 
 // Test route
 app.get('/', (req, res) => {
   res.send('Hotel Management API is running...');
 });
-const serviceRoutes = require('./Routes/serviceRoutes');
+const serviceRoutes = require('./Routes/serviceRoutes');npm 
 const maintenanceRoutes = require('./Routes/maintenanceRoutes');
 const housekeepingRoutes = require('./Routes/housekeepingRoutes');
 
