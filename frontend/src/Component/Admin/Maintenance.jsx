@@ -3,33 +3,33 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5001/api';
 
-const Housekeeping = () => {
+const Maintenance = () => {
   const token = localStorage.getItem('token');
   const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
 
-  const [tasks, setTasks] = useState([]);
+  const [requests, setRequests] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [filterStatus, setFilterStatus] = useState('');
   const [rooms, setRooms] = useState([]);
-  const [hkStaff, setHkStaff] = useState([]);
+  const [maintStaff, setMaintStaff] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [addForm, setAddForm] = useState({ roomId: '', staffId: '' });
-  const [updateStatus, setUpdateStatus] = useState('pending');
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [addForm, setAddForm] = useState({ roomId: '', issue: '' });
+  const [updateForm, setUpdateForm] = useState({ status: 'pending', assignedTo: '' });
   const [error, setError] = useState('');
 
-  useEffect(() => { loadTasks(); }, []);
+  useEffect(() => { loadRequests(); }, []);
 
   useEffect(() => {
-    setFiltered(filterStatus ? tasks.filter(t => t.cleaningStatus === filterStatus) : tasks);
-  }, [filterStatus, tasks]);
+    setFiltered(filterStatus ? requests.filter(r => r.status === filterStatus) : requests);
+  }, [filterStatus, requests]);
 
-  const loadTasks = async () => {
+  const loadRequests = async () => {
     try {
-      const res = await axios.get(`${API_URL}/housekeeping`, { headers });
-      setTasks(res.data);
+      const res = await axios.get(`${API_URL}/maintenance`, { headers });
+      setRequests(res.data);
       setFiltered(res.data);
     } catch (err) { console.error(err); }
   };
@@ -41,50 +41,52 @@ const Housekeeping = () => {
         axios.get(`${API_URL}/auth/users`, { headers })
       ]);
       setRooms(roomsRes.data);
-      setHkStaff(usersRes.data.filter(u => u.role === 'housekeeping'));
+      setMaintStaff(usersRes.data.filter(u => u.role === 'maintenance'));
     } catch (err) { console.error(err); }
   };
 
   const stats = {
-    total: tasks.length,
-    pending: tasks.filter(t => t.cleaningStatus === 'pending').length,
-    inProgress: tasks.filter(t => t.cleaningStatus === 'in_progress').length,
-    completed: tasks.filter(t => t.cleaningStatus === 'completed').length,
+    total: requests.length,
+    pending: requests.filter(r => r.status === 'pending').length,
+    inProgress: requests.filter(r => r.status === 'in_progress').length,
+    resolved: requests.filter(r => r.status === 'resolved').length,
   };
 
   const statusBadge = (status) => {
     const map = {
       pending:     'bg-warning-subtle text-warning',
       in_progress: 'bg-primary-subtle text-primary',
-      completed:   'bg-success-subtle text-success'
+      resolved:    'bg-success-subtle text-success'
     };
     return <span className={`badge ${map[status]}`}>{status.replace('_', ' ')}</span>;
   };
 
   const handleAdd = async () => {
     setError('');
-    if (!addForm.roomId || !addForm.staffId) { setError('Please select room and staff.'); return; }
+    if (!addForm.roomId || !addForm.issue) { setError('Please select room and describe the issue.'); return; }
     try {
-      await axios.post(`${API_URL}/housekeeping`, { roomId: addForm.roomId, assignedStaff: addForm.staffId }, { headers });
+      await axios.post(`${API_URL}/maintenance`, { roomId: addForm.roomId, issue: addForm.issue }, { headers });
       setShowAddModal(false);
-      setAddForm({ roomId: '', staffId: '' });
-      loadTasks();
-    } catch (err) { setError(err.response?.data?.message || 'Error assigning task.'); }
+      setAddForm({ roomId: '', issue: '' });
+      loadRequests();
+    } catch (err) { setError(err.response?.data?.message || 'Error adding request.'); }
   };
 
-  const handleUpdateStatus = async () => {
+  const handleUpdate = async () => {
     try {
-      await axios.put(`${API_URL}/housekeeping/${selectedTask._id}`, { cleaningStatus: updateStatus }, { headers });
+      const body = { status: updateForm.status };
+      if (updateForm.assignedTo) body.assignedTo = updateForm.assignedTo;
+      await axios.put(`${API_URL}/maintenance/${selectedRequest._id}`, body, { headers });
       setShowUpdateModal(false);
-      loadTasks();
+      loadRequests();
     } catch (err) { console.error(err); }
   };
 
   const handleDelete = async () => {
     try {
-      await axios.delete(`${API_URL}/housekeeping/${selectedTask._id}`, { headers });
+      await axios.delete(`${API_URL}/maintenance/${selectedRequest._id}`, { headers });
       setShowDeleteModal(false);
-      loadTasks();
+      loadRequests();
     } catch (err) { console.error(err); }
   };
 
@@ -93,9 +95,9 @@ const Housekeeping = () => {
       <div className="row">
         <div className="col-12">
           <div className="page-title-box d-sm-flex align-items-center justify-content-between">
-            <h4 className="mb-sm-0">Housekeeping Management</h4>
-            <button className="btn btn-success" onClick={() => { loadModalData(); setAddForm({ roomId: '', staffId: '' }); setError(''); setShowAddModal(true); }}>
-              <i className="ri-add-line me-1"></i> Assign Task
+            <h4 className="mb-sm-0">Maintenance Requests</h4>
+            <button className="btn btn-success" onClick={() => { loadModalData(); setAddForm({ roomId: '', issue: '' }); setError(''); setShowAddModal(true); }}>
+              <i className="ri-add-line me-1"></i> Add Request
             </button>
           </div>
         </div>
@@ -104,10 +106,10 @@ const Housekeeping = () => {
       {/* Stats */}
       <div className="row mb-3">
         {[
-          { label: 'Total Tasks', value: stats.total, icon: 'bx bx-list-ul', color: 'info' },
+          { label: 'Total Requests', value: stats.total, icon: 'bx bx-list-ul', color: 'info' },
           { label: 'Pending', value: stats.pending, icon: 'bx bx-time', color: 'warning' },
           { label: 'In Progress', value: stats.inProgress, icon: 'bx bx-loader', color: 'primary' },
-          { label: 'Completed', value: stats.completed, icon: 'bx bx-check-circle', color: 'success' },
+          { label: 'Resolved', value: stats.resolved, icon: 'bx bx-check-circle', color: 'success' },
         ].map((s, i) => (
           <div className="col-md-3 col-6" key={i}>
             <div className="card card-animate">
@@ -132,67 +134,62 @@ const Housekeeping = () => {
       {/* Table */}
       <div className="card">
         <div className="card-header d-flex align-items-center">
-          <h5 className="card-title mb-0 flex-grow-1">Cleaning Tasks</h5>
+          <h5 className="card-title mb-0 flex-grow-1">All Maintenance Requests</h5>
           <select className="form-select form-select-sm w-auto" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
             <option value="">All Status</option>
             <option value="pending">Pending</option>
             <option value="in_progress">In Progress</option>
-            <option value="completed">Completed</option>
+            <option value="resolved">Resolved</option>
           </select>
         </div>
         <div className="card-body">
           <div className="table-responsive">
             <table className="table table-hover align-middle mb-0">
               <thead className="table-light">
-                <tr><th>#</th><th>Room</th><th>Assigned Staff</th><th>Status</th><th>Assigned On</th><th>Completed At</th><th>Actions</th></tr>
+                <tr><th>#</th><th>Room</th><th>Issue</th><th>Reported By</th><th>Assigned To</th><th>Status</th><th>Date</th><th>Actions</th></tr>
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
-                  <tr><td colSpan="7" className="text-center py-4 text-muted">No tasks found.</td></tr>
-                ) : filtered.map((t, i) => {
-                  const staffName = t.assignedStaff?.name || '—';
-                  const initials = staffName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-                  return (
-                    <tr key={t._id}>
-                      <td>{i + 1}</td>
-                      <td><span className="fw-medium">{t.roomId ? `Room ${t.roomId.roomNumber} (${t.roomId.type})` : '—'}</span></td>
-                      <td>
-                        <div className="d-flex align-items-center gap-2">
-                          <div className="avatar-xs">
-                            <span className="avatar-title rounded-circle bg-success-subtle text-success" style={{ fontSize: '11px' }}>{initials}</span>
-                          </div>
-                          {staffName}
-                        </div>
-                      </td>
-                      <td>{statusBadge(t.cleaningStatus)}</td>
-                      <td><small className="text-muted">{new Date(t.createdAt).toLocaleDateString('en-PK')}</small></td>
-                      <td><small className="text-muted">{t.completedAt ? new Date(t.completedAt).toLocaleDateString('en-PK') : '—'}</small></td>
-                      <td>
-                        <div className="d-flex gap-1">
-                          <button className="btn btn-soft-primary btn-sm" onClick={() => { setSelectedTask(t); setUpdateStatus(t.cleaningStatus); setShowUpdateModal(true); }} title="Update Status">
-                            <i className="ri-edit-line"></i>
-                          </button>
-                          <button className="btn btn-soft-danger btn-sm" onClick={() => { setSelectedTask(t); setShowDeleteModal(true); }} title="Delete">
-                            <i className="ri-delete-bin-line"></i>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+                  <tr><td colSpan="8" className="text-center py-4 text-muted">No maintenance requests found.</td></tr>
+                ) : filtered.map((r, i) => (
+                  <tr key={r._id}>
+                    <td>{i + 1}</td>
+                    <td><span className="fw-medium">{r.roomId ? `Room ${r.roomId.roomNumber}` : '—'}</span></td>
+                    <td><span className="text-muted">{r.issue}</span></td>
+                    <td>{r.reportedBy?.name || '—'}</td>
+                    <td>{r.assignedTo?.name || <span className="text-muted">Not assigned</span>}</td>
+                    <td>{statusBadge(r.status)}</td>
+                    <td><small className="text-muted">{new Date(r.createdAt).toLocaleDateString('en-PK')}</small></td>
+                    <td>
+                      <div className="d-flex gap-1">
+                        <button className="btn btn-soft-primary btn-sm" title="Update" onClick={() => {
+                          loadModalData();
+                          setSelectedRequest(r);
+                          setUpdateForm({ status: r.status, assignedTo: r.assignedTo?._id || '' });
+                          setShowUpdateModal(true);
+                        }}>
+                          <i className="ri-edit-line"></i>
+                        </button>
+                        <button className="btn btn-soft-danger btn-sm" title="Delete" onClick={() => { setSelectedRequest(r); setShowDeleteModal(true); }}>
+                          <i className="ri-delete-bin-line"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
         </div>
       </div>
 
-      {/* Add Task Modal */}
+      {/* Add Modal */}
       {showAddModal && (
         <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Assign Cleaning Task</h5>
+                <h5 className="modal-title">Add Maintenance Request</h5>
                 <button className="btn-close" onClick={() => setShowAddModal(false)}></button>
               </div>
               <div className="modal-body">
@@ -202,52 +199,57 @@ const Housekeeping = () => {
                     <label className="form-label">Select Room <span className="text-danger">*</span></label>
                     <select className="form-select" value={addForm.roomId} onChange={e => setAddForm({ ...addForm, roomId: e.target.value })}>
                       <option value="">Select Room</option>
-                      {rooms.map(r => (
-                        <option key={r._id} value={r._id}>Room {r.roomNumber} ({r.type}) — {r.status}</option>
-                      ))}
+                      {rooms.map(r => <option key={r._id} value={r._id}>Room {r.roomNumber} ({r.type})</option>)}
                     </select>
                   </div>
                   <div className="col-12">
-                    <label className="form-label">Assign Staff <span className="text-danger">*</span></label>
-                    <select className="form-select" value={addForm.staffId} onChange={e => setAddForm({ ...addForm, staffId: e.target.value })}>
-                      <option value="">Select Housekeeping Staff</option>
-                      {hkStaff.length === 0
-                        ? <option disabled>No housekeeping staff found</option>
-                        : hkStaff.map(u => <option key={u._id} value={u._id}>{u.name}</option>)
-                      }
-                    </select>
+                    <label className="form-label">Issue Description <span className="text-danger">*</span></label>
+                    <textarea className="form-control" rows="3" value={addForm.issue}
+                      onChange={e => setAddForm({ ...addForm, issue: e.target.value })}
+                      placeholder="Describe the maintenance issue..."></textarea>
                   </div>
                 </div>
               </div>
               <div className="modal-footer">
                 <button className="btn btn-light" onClick={() => setShowAddModal(false)}>Cancel</button>
-                <button className="btn btn-success" onClick={handleAdd}>Assign Task</button>
+                <button className="btn btn-success" onClick={handleAdd}>Submit Request</button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Update Status Modal */}
+      {/* Update Modal */}
       {showUpdateModal && (
         <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-sm">
+          <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">Update Task Status</h5>
+                <h5 className="modal-title">Update Maintenance Request</h5>
                 <button className="btn-close" onClick={() => setShowUpdateModal(false)}></button>
               </div>
               <div className="modal-body">
-                <label className="form-label">Status</label>
-                <select className="form-select" value={updateStatus} onChange={e => setUpdateStatus(e.target.value)}>
-                  <option value="pending">Pending</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="completed">Completed</option>
-                </select>
+                <div className="row g-3">
+                  <div className="col-12">
+                    <label className="form-label">Status</label>
+                    <select className="form-select" value={updateForm.status} onChange={e => setUpdateForm({ ...updateForm, status: e.target.value })}>
+                      <option value="pending">Pending</option>
+                      <option value="in_progress">In Progress</option>
+                      <option value="resolved">Resolved</option>
+                    </select>
+                  </div>
+                  <div className="col-12">
+                    <label className="form-label">Assign Staff</label>
+                    <select className="form-select" value={updateForm.assignedTo} onChange={e => setUpdateForm({ ...updateForm, assignedTo: e.target.value })}>
+                      <option value="">Not Assigned</option>
+                      {maintStaff.map(u => <option key={u._id} value={u._id}>{u.name}</option>)}
+                    </select>
+                  </div>
+                </div>
               </div>
               <div className="modal-footer">
                 <button className="btn btn-light" onClick={() => setShowUpdateModal(false)}>Cancel</button>
-                <button className="btn btn-primary" onClick={handleUpdateStatus}>Update</button>
+                <button className="btn btn-primary" onClick={handleUpdate}>Update</button>
               </div>
             </div>
           </div>
@@ -265,7 +267,7 @@ const Housekeeping = () => {
                     <i className="ri-delete-bin-line text-danger"></i>
                   </span>
                 </div>
-                <h5>Delete Task?</h5>
+                <h5>Delete Request?</h5>
                 <p className="text-muted">This action cannot be undone.</p>
                 <div className="d-flex gap-2 justify-content-center">
                   <button className="btn btn-light" onClick={() => setShowDeleteModal(false)}>Cancel</button>
@@ -280,4 +282,4 @@ const Housekeeping = () => {
   );
 };
 
-export default Housekeeping;
+export default Maintenance;
