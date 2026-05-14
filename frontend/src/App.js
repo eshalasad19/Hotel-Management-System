@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
 // Layout
 import AdminLayout from './Layouts/AdminLayout';
