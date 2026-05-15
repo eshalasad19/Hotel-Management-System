@@ -20,6 +20,7 @@ import Housekeeping from './Component/Admin/housekeeping';
 import Maintenance from './Component/Admin/Maintenance';
 import Feedback from './Component/Admin/Feedback';
 import Reports from './Component/Admin/Reports';
+import Settings from './Component/Admin/Settings';
 
 // User Pages
 // import UserDashboard from './Component/Users/UserDashboard';
@@ -62,6 +63,7 @@ function App() {
           <Route path="maintenance" element={<Maintenance />} />
           <Route path="feedback" element={<Feedback />} />
           <Route path="reports" element={<Reports />} />
+          <Route path="settings" element={<Settings />} />
         </Route>
          {/* <Route path="/user" element={<UserLayout />}>
           <Route index element={<Navigate to="/user/dashboard" replace />} />
