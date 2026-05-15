@@ -5,18 +5,18 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import AdminLayout from './Layouts/AdminLayout';
 
 // Auth
-import Login from './Component/Admin/Login';
+import Login from './Component/Admin/login';
 
 // Admin Pages
 import Dashboard from './Component/Admin/Dashboard';
-import Rooms from './Component/Admin/Rooms';
-import Bookings from './Component/Admin/Bookings';
+import Rooms from './Component/Admin/rooms';
+import Bookings from './Component/Admin/bookings';
 import BookingNew from './Component/Admin/BookingNew';
 import CheckinCheckout from './Component/Admin/CheckinCheckout';
 import Users from './Component/Admin/users';
-import Staff from './Component/Admin/Staff';
-import Payments from './Component/Admin/Payments';
-import Housekeeping from './Component/Admin/Housekeeping';
+import Staff from './Component/Admin/staff';
+import Payments from './Component/Admin/payments';
+import Housekeeping from './Component/Admin/housekeeping';
 import Maintenance from './Component/Admin/Maintenance';
 import Feedback from './Component/Admin/Feedback';
 import Reports from './Component/Admin/Reports';
