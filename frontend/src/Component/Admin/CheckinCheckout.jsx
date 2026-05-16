@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-
+// Page
 const API_URL = 'http://localhost:5001/api';
 
 const CheckinCheckout = () => {
