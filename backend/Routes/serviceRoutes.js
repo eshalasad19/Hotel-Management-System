@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { createService, getAllServices, updateServiceStatus } = require('../controllers/serviceController');
-const { protect, adminOnly } = require('../middleware/authMiddleware');
+const { protect, adminOnly, staffRoles } = require('../middleware/authMiddleware');
 
 router.post('/', protect, createService);
-router.get('/', protect, adminOnly, getAllServices);
-router.put('/:id', protect, adminOnly, updateServiceStatus);
+router.get('/', protect, staffRoles('admin', 'manager', 'receptionist'), getAllServices);
+router.put('/:id', protect, staffRoles('admin', 'manager', 'receptionist'), updateServiceStatus);
 
 module.exports = router;

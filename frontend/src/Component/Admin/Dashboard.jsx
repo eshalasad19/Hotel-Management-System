@@ -5,7 +5,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
 
-const API_URL = 'http://localhost:5001/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 
 const Dashboard = () => {
   const token = localStorage.getItem('token');
@@ -24,6 +24,11 @@ const Dashboard = () => {
   const [monthlyData, setMonthlyData] = useState([]);
   const [roomTypeData, setRoomTypeData] = useState([]);
   const [bookingStatusData, setBookingStatusData] = useState([]);
+  const [restaurantStats, setRestaurantStats] = useState({
+    menuItems: 0, totalOrders: 0, pendingOrders: 0, todayOrders: 0, restaurantRevenue: 0,
+  });
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [orderStatusData, setOrderStatusData] = useState([]);
 
   const now = new Date();
   const hour = now.getHours();
@@ -39,13 +44,33 @@ const Dashboard = () => {
 
   const loadDashboard = async () => {
     try {
-      const [roomsRes, bookingsRes] = await Promise.all([
+      const [roomsRes, bookingsRes, menuRes, ordersRes] = await Promise.all([
         axios.get(`${API_URL}/rooms`, { headers }),
-        axios.get(`${API_URL}/bookings/all`, { headers })
+        axios.get(`${API_URL}/bookings/all`, { headers }),
+        axios.get(`${API_URL}/restaurant/menu`, { headers }).catch(() => ({ data: { data: [] } })),
+        axios.get(`${API_URL}/restaurant/orders`, { headers }).catch(() => ({ data: { data: [] } })),
       ]);
 
       const rooms = roomsRes.data;
       const bookings = bookingsRes.data;
+      const menu = menuRes.data.data || [];
+      const orders = ordersRes.data.data || [];
+      const today = new Date().toDateString();
+
+      setRestaurantStats({
+        menuItems: menu.length,
+        totalOrders: orders.length,
+        pendingOrders: orders.filter(o => ['Pending', 'Confirmed', 'Preparing'].includes(o.status)).length,
+        todayOrders: orders.filter(o => new Date(o.createdAt).toDateString() === today).length,
+        restaurantRevenue: orders.filter(o => o.status === 'Delivered').reduce((s, o) => s + (o.totalAmount || 0), 0),
+      });
+      setRecentOrders(orders.slice(0, 5));
+      setOrderStatusData([
+        { name: 'Pending', value: orders.filter(o => o.status === 'Pending').length },
+        { name: 'Preparing', value: orders.filter(o => ['Confirmed', 'Preparing'].includes(o.status)).length },
+        { name: 'Ready', value: orders.filter(o => o.status === 'Ready').length },
+        { name: 'Delivered', value: orders.filter(o => o.status === 'Delivered').length },
+      ].filter(d => d.value > 0));
 
       setStats({
         totalRevenue: bookings.filter(b => b.paymentStatus === 'paid').reduce((s, b) => s + b.totalAmount, 0),
@@ -132,6 +157,42 @@ const Dashboard = () => {
         ].map((s, i) => (
           <div className="col-xl-3 col-md-6" key={i}>
             <div className="card card-animate">
+              <div className="card-body">
+                <div className="d-flex align-items-end justify-content-between mt-2">
+                  <div>
+                    <p className="text-uppercase fw-medium text-muted mb-2 fs-12">{s.label}</p>
+                    <h4 className="fs-22 fw-semibold mb-1">{s.value}</h4>
+                    <small className="text-muted">{s.sub}</small>
+                  </div>
+                  <div className="avatar-sm flex-shrink-0">
+                    <span className={`avatar-title bg-${s.color}-subtle rounded fs-3`}>
+                      <i className={`${s.icon} text-${s.color}`}></i>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Restaurant Stats */}
+      <div className="row mt-2 mb-1">
+        <div className="col-12">
+          <h5 className="text-muted text-uppercase fs-12 mb-0">
+            <i className="ri-restaurant-line me-1"></i> Restaurant Overview
+          </h5>
+        </div>
+      </div>
+      <div className="row">
+        {[
+          { label: 'Menu Items', value: restaurantStats.menuItems, icon: 'ri-restaurant-2-line', color: 'primary', sub: 'Active dishes' },
+          { label: 'Orders Today', value: restaurantStats.todayOrders, icon: 'ri-shopping-bag-line', color: 'info', sub: `${restaurantStats.totalOrders} total orders` },
+          { label: 'Pending Orders', value: restaurantStats.pendingOrders, icon: 'ri-timer-line', color: 'warning', sub: 'Awaiting preparation' },
+          { label: 'Restaurant Revenue', value: formatPKR(restaurantStats.restaurantRevenue), icon: 'ri-money-dollar-circle-line', color: 'success', sub: 'Delivered orders' },
+        ].map((s, i) => (
+          <div className="col-xl-3 col-md-6" key={`rest-${i}`}>
+            <div className="card card-animate border border-dashed">
               <div className="card-body">
                 <div className="d-flex align-items-end justify-content-between mt-2">
                   <div>
@@ -308,6 +369,71 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Restaurant Orders + Status */}
+      {recentOrders.length > 0 && (
+        <div className="row">
+          <div className="col-xl-8">
+            <div className="card">
+              <div className="card-header d-flex align-items-center">
+                <h4 className="card-title mb-0 flex-grow-1">Recent Restaurant Orders</h4>
+                <a href="/admin/restaurant-orders" className="btn btn-sm btn-soft-primary">View All</a>
+              </div>
+              <div className="card-body">
+                <div className="table-responsive">
+                  <table className="table table-borderless table-hover align-middle mb-0">
+                    <thead className="table-light">
+                      <tr><th>Guest</th><th>Room</th><th>Items</th><th>Total</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                      {recentOrders.map(o => (
+                        <tr key={o._id}>
+                          <td className="fw-medium">{o.guestName || o.userId?.name || 'Guest'}</td>
+                          <td>{o.roomNumber || '—'}</td>
+                          <td><small>{o.items?.map(it => `${it.name} x${it.quantity}`).join(', ')}</small></td>
+                          <td>{formatPKR(o.totalAmount)}</td>
+                          <td><span className="badge bg-primary-subtle text-primary">{o.status}</span></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="col-xl-4">
+            <div className="card h-100">
+              <div className="card-header"><h4 className="card-title mb-0">Order Status</h4></div>
+              <div className="card-body d-flex flex-column align-items-center justify-content-center">
+                {orderStatusData.length === 0 ? (
+                  <p className="text-muted">No orders yet</p>
+                ) : (
+                  <>
+                    <ResponsiveContainer width="100%" height={180}>
+                      <PieChart>
+                        <Pie data={orderStatusData} cx="50%" cy="50%" innerRadius={45} outerRadius={75} paddingAngle={3} dataKey="value">
+                          {orderStatusData.map((entry, index) => (
+                            <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="d-flex flex-wrap gap-2 justify-content-center mt-2">
+                      {orderStatusData.map((entry, index) => (
+                        <div key={index} className="d-flex align-items-center gap-1">
+                          <div style={{ width: 10, height: 10, borderRadius: '50%', background: COLORS[index % COLORS.length] }}></div>
+                          <small className="text-muted">{entry.name} ({entry.value})</small>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Recent Bookings + Activity */}
       <div className="row">

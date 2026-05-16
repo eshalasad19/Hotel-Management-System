@@ -1,14 +1,18 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-
 const {
-  addMenuItem, getMenu, getMenuByCategory,updateMenuItem,deleteMenuItem} 
-  = require("../Controllers/restaurantMenuController");
+  addMenuItem,
+  getMenu,
+  getMenuByCategory,
+  updateMenuItem,
+  deleteMenuItem
+} = require('../controllers/restaurantMenuController');
+const { protect, adminOnly, staffRoles } = require('../middleware/authMiddleware');
 
-router.post("/add", addMenuItem);
-router.get("/", getMenu);
-router.get("/:category", getMenuByCategory);
-router.put("/:id", updateMenuItem);
-router.delete("/:id", deleteMenuItem);
+router.get('/', getMenu);
+router.get('/category/:category', getMenuByCategory);
+router.post('/', protect, staffRoles('admin', 'manager'), addMenuItem);
+router.put('/:id', protect, staffRoles('admin', 'manager'), updateMenuItem);
+router.delete('/:id', protect, adminOnly, deleteMenuItem);
 
 module.exports = router;

@@ -1,12 +1,16 @@
-const express = require ("express");
-
-const {createOrder,getOrders,updateOrderStatus} = require ('../controllers/restaurantOrderController.js');
+const express = require('express');
 const router = express.Router();
+const {
+  createOrder,
+  getOrders,
+  updateOrderStatus,
+  deleteOrder
+} = require('../controllers/restaurantOrderController');
+const { protect, adminOnly, staffRoles } = require('../middleware/authMiddleware');
 
-router.post("/create", createOrder);
+router.post('/', protect, staffRoles('admin', 'manager', 'receptionist'), createOrder);
+router.get('/', protect, staffRoles('admin', 'manager', 'receptionist'), getOrders);
+router.put('/:id', protect, staffRoles('admin', 'manager', 'receptionist'), updateOrderStatus);
+router.delete('/:id', protect, adminOnly, deleteOrder);
 
-router.get("/all", getOrders);
-
-router.put("/update/:id", updateOrderStatus);
-
-export default router;
+module.exports = router;

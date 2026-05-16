@@ -44,10 +44,20 @@ const Payments = () => {
 
   const handleUpdatePayment = async () => {
     try {
-      await axios.put(`${API_URL}/bookings/${selectedBooking._id}`, { paymentStatus }, { headers });
+      if (paymentStatus === 'paid') {
+        await axios.post(`${API_URL}/payments`, {
+          bookingId: selectedBooking._id,
+          paymentMethod: 'cash',
+        }, { headers });
+      } else {
+        await axios.put(`${API_URL}/bookings/${selectedBooking._id}`, { paymentStatus }, { headers });
+      }
       setShowUpdateModal(false);
       loadBookings();
-    } catch (err) { console.error(err); }
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || 'Payment update failed');
+    }
   };
 
   const printInvoice = () => {
