@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Layouts
 import AdminLayout from './Layouts/AdminLayout';
-import UserLayout from './Layouts/UserLayout';
+// import UserLayout from './Layouts/UserLayout';
 
 // Auth
 import Login from './Component/Admin/login';
@@ -26,18 +26,18 @@ import RestaurantOrders from './Component/Admin/RestaurantOrders';
 import Services from './Component/Admin/Services';
 
 // User pages
-import Home from './Component/User/Home/Home';
-import ContactUs from './Component/User/Home/ContactUs';
-import About from './Component/User/Home/About';
-import RoomsPage from './Component/User/Home/RoomsPage';
-import ServicesPage from './Component/User/Home/ServicesPage';
-import RestaurantPage from './Component/User/Home/RestaurantPage';
-import Gallery from './Component/User/Home/Gallery';
-import Spa from './Component/User/Home/Spa';
-import Faq from './Component/User/Home/Faq';
-import RoomDetailsPage from './Component/User/Home/RoomDetailsPage';
-import BlogDetailsPage from './Component/User/Home/BlogDetailsPage';
-import BlogPage from './Component/User/Home/BlogPage';
+// import Home from './Component/User/Home/Home';
+// import ContactUs from './Component/User/Home/ContactUs';
+// import About from './Component/User/Home/About';
+// import RoomsPage from './Component/User/Home/RoomsPage';
+// import ServicesPage from './Component/User/Home/ServicesPage';
+// import RestaurantPage from './Component/User/Home/RestaurantPage';
+// import Gallery from './Component/User/Home/Gallery';
+// import Spa from './Component/User/Home/Spa';
+// import Faq from './Component/User/Home/Faq';
+// import RoomDetailsPage from './Component/User/Home/RoomDetailsPage';
+// import BlogDetailsPage from './Component/User/Home/BlogDetailsPage';
+// import BlogPage from './Component/User/Home/BlogPage';
 
 
 
@@ -47,9 +47,8 @@ import BlogPage from './Component/User/Home/BlogPage';
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* Public hotel site */}
-        <Route path="/" element={<UserLayout />}>
+       <Routes>
+        {/* <Route path="/" element={<UserLayout />}>
           <Route index element={<Home />} />
           <Route path="/contact-us" element={<ContactUs />} />
           <Route path="/about" element={<About />} />
@@ -61,10 +60,10 @@ function App() {
           <Route path="/faq" element={<Faq />} />
           <Route path="/roomsdetails/:id" element={<RoomDetailsPage />} />
           <Route path="/blog" element={<BlogPage/>} />
-          <Route path="/blog/:id" element={<BlogDetailsPage />} /> {/* ✅ */}
+          <Route path="/blog/:id" element={<BlogDetailsPage />} />  */}
 
-
-        </Route>
+          {/* Default route */}
+  <Route path="/" element={<Navigate to="/login" replace />} />
 
         {/* Auth */}
         <Route path="/login" element={<Login />} />
@@ -92,7 +91,7 @@ function App() {
 
         {/* Unknown URLs → home */}
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+        </Routes> 
     </BrowserRouter>
   );
 }

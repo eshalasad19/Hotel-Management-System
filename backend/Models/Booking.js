@@ -27,16 +27,23 @@ const bookingSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  bookingStatus: {
-    type: String,
-    enum: ['pending', 'confirmed', 'cancelled', 'completed'],
-    default: 'pending'
-  },
+bookingStatus: {
+  type: String,
+  enum: [
+    'pending',
+    'confirmed',
+    'checked_in',
+    'checked_out',
+    'completed',
+    'cancelled'
+  ],
+  default: 'pending'
+},
   paymentStatus: {
-    type: String,
-    enum: ['unpaid', 'paid'],
-    default: 'unpaid'
-  },
+  type: String,
+  enum: ['unpaid', 'partial', 'paid', 'refunded'],
+  default: 'unpaid'
+},
   specialRequests: {
     type: String
   }

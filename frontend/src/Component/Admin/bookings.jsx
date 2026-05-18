@@ -12,9 +12,9 @@ const Bookings = () => {
   const [filterBookingStatus, setFilterBookingStatus] = useState('');
   const [filterPaymentStatus, setFilterPaymentStatus] = useState('');
   const [showViewModal, setShowViewModal] = useState(false);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  // const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
-  const [updateStatus, setUpdateStatus] = useState({ bookingStatus: '', paymentStatus: '' });
+  // const [updateStatus, setUpdateStatus] = useState({ bookingStatus: '', paymentStatus: '' });
 
   useEffect(() => { loadBookings(); }, []);
 
@@ -60,20 +60,85 @@ const Bookings = () => {
     setSelectedBooking(b);
     setShowViewModal(true);
   };
+const confirmBooking = async (id) => {
+  try {
+    await axios.put(
+      `${API_URL}/bookings/${id}`,
+      { bookingStatus: 'confirmed' },
+      { headers }
+    );
 
-  const openUpdate = (b) => {
-    setSelectedBooking(b);
-    setUpdateStatus({ bookingStatus: b.bookingStatus, paymentStatus: b.paymentStatus });
-    setShowUpdateModal(true);
-  };
+    loadBookings();
+  } catch (err) {
+    console.error(err);
+  }
+};
+const checkInBooking = async (id) => {
+  try {
+    await axios.put(
+      `${API_URL}/bookings/${id}/check-in`,
+      {},
+      { headers }
+    );
 
-  const handleUpdate = async () => {
-    try {
-      await axios.put(`${API_URL}/bookings/${selectedBooking._id}`, updateStatus, { headers });
-      setShowUpdateModal(false);
-      loadBookings();
-    } catch (err) { console.error(err); }
-  };
+    loadBookings();
+  } catch (err) {
+    console.error(err);
+  }
+};
+const checkOutBooking = async (id) => {
+  try {
+    await axios.put(
+      `${API_URL}/bookings/${id}/check-out`,
+      {},
+      { headers }
+    );
+
+    loadBookings();
+  } catch (err) {
+    console.error(err);
+  }
+};
+const completeBooking = async (id) => {
+  try {
+    await axios.put(
+      `${API_URL}/bookings/${id}/complete`,
+      {},
+      { headers }
+    );
+
+    loadBookings();
+  } catch (err) {
+    console.error(err);
+  }
+};
+const cancelBooking = async (id) => {
+  try {
+    await axios.put(
+      `${API_URL}/bookings/${id}`,
+      { bookingStatus: 'cancelled' },
+      { headers }
+    );
+
+    loadBookings();
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+  // const openUpdate = (b) => {
+  //   setSelectedBooking(b);
+  //   setUpdateStatus({ bookingStatus: b.bookingStatus, paymentStatus: b.paymentStatus });
+  //   setShowUpdateModal(true);
+  // };
+
+  // const handleUpdate = async () => {
+  //   try {
+  //     await axios.put(`${API_URL}/bookings/${selectedBooking._id}`, updateStatus, { headers });
+  //     setShowUpdateModal(false);
+  //     loadBookings();
+  //   } catch (err) { console.error(err); }
+  // };
 
   return (
     <div className="container-fluid">
@@ -157,12 +222,78 @@ const Bookings = () => {
                     <td className="fw-medium">PKR {Number(b.totalAmount).toLocaleString()}</td>
                     <td>{paymentBadge(b.paymentStatus)}</td>
                     <td>{statusBadge(b.bookingStatus)}</td>
-                    <td>
-                      <div className="d-flex gap-1">
-                        <button className="btn btn-soft-info btn-sm" onClick={() => openView(b)} title="View"><i className="ri-eye-line"></i></button>
-                        <button className="btn btn-soft-primary btn-sm" onClick={() => openUpdate(b)} title="Update"><i className="ri-edit-line"></i></button>
-                      </div>
-                    </td>
+                   <td>
+  <div className="d-flex gap-1 flex-wrap">
+
+    {/* View */}
+    <button
+      className="btn btn-soft-info btn-sm"
+      onClick={() => openView(b)}
+      title="View"
+    >
+      <i className="ri-eye-line"></i>
+    </button>
+
+    {/* Pending */}
+    {b.bookingStatus === 'pending' && (
+      <>
+        <button
+          className="btn btn-soft-success btn-sm"
+          onClick={() => confirmBooking(b._id)}
+        >
+          Confirm
+        </button>
+
+        <button
+          className="btn btn-soft-danger btn-sm"
+          onClick={() => cancelBooking(b._id)}
+        >
+          Cancel
+        </button>
+      </>
+    )}
+
+    {/* Confirmed */}
+    {b.bookingStatus === 'confirmed' && (
+      <>
+        <button
+          className="btn btn-soft-primary btn-sm"
+          onClick={() => checkInBooking(b._id)}
+        >
+          Check-In
+        </button>
+
+        <button
+          className="btn btn-soft-danger btn-sm"
+          onClick={() => cancelBooking(b._id)}
+        >
+          Cancel
+        </button>
+      </>
+    )}
+
+    {/* Checked In */}
+    {b.bookingStatus === 'checked_in' && (
+      <button
+        className="btn btn-soft-warning btn-sm"
+        onClick={() => checkOutBooking(b._id)}
+      >
+        Check-Out
+      </button>
+    )}
+
+    {/* Checked Out */}
+    {b.bookingStatus === 'checked_out' && (
+      <button
+        className="btn btn-soft-success btn-sm"
+        onClick={() => completeBooking(b._id)}
+      >
+        Complete
+      </button>
+    )}
+
+  </div>
+</td>
                   </tr>
                 ))}
               </tbody>
@@ -230,7 +361,7 @@ const Bookings = () => {
       )}
 
       {/* Update Modal */}
-      {showUpdateModal && selectedBooking && (
+      {/* {showUpdateModal && selectedBooking && (
         <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog modal-sm">
             <div className="modal-content">
@@ -265,7 +396,7 @@ const Bookings = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
