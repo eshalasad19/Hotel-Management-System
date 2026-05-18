@@ -59,4 +59,21 @@ const getInvoice = async (req, res) => {
   }
 };
 
-module.exports = { createPayment, getInvoice };
+const getAllPayments = async (req, res) => {
+  try {
+    const payments = await Payment.find()
+      .populate({
+        path: 'bookingId',
+        populate: [
+          { path: 'userId', select: 'name email phone' },
+          { path: 'roomId', select: 'roomNumber type price' }
+        ]
+      })
+      .sort({ createdAt: -1 });
+    res.status(200).json(payments);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+module.exports = { createPayment, getInvoice, getAllPayments };

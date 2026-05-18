@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { submitFeedback, getAllFeedbacks } = require('../controllers/feedbackController');
-const { protect, adminOnly } = require('../middleware/authMiddleware');
+const { submitFeedback, getAllFeedbacks, deleteFeedback, replyToFeedback } = require('../controllers/feedbackController');
+const { protect, staffRoles, adminOnly } = require('../middleware/authMiddleware');
 
 router.post('/', protect, submitFeedback);
-router.get('/', protect, adminOnly, getAllFeedbacks);
+router.get('/', protect, staffRoles('admin', 'manager'), getAllFeedbacks);
+router.put('/:id/reply', protect, staffRoles('admin', 'manager'), replyToFeedback);
+router.delete('/:id', protect, adminOnly, deleteFeedback);
 
 module.exports = router;

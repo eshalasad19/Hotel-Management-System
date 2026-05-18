@@ -11,7 +11,10 @@ const Users = () => {
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [editForm, setEditForm] = useState({ name: '', phone: '', address: '' });
+  const [error, setError] = useState('');
 
   useEffect(() => { loadUsers(); }, []);
 
@@ -35,6 +38,24 @@ const Users = () => {
       setShowDeleteModal(false);
       loadUsers();
     } catch (err) { console.error(err); }
+  };
+
+  const handleEdit = async () => {
+    setError('');
+    try {
+      await axios.put(`${API_URL}/auth/users/${selectedUser._id}`, editForm, { headers });
+      setShowEditModal(false);
+      loadUsers();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error updating user.');
+    }
+  };
+
+  const openEdit = (u) => {
+    setSelectedUser(u);
+    setEditForm({ name: u.name, phone: u.phone || '', address: u.address || '' });
+    setError('');
+    setShowEditModal(true);
   };
 
   const walkinCount = users.filter(u => u.email?.includes('@walkin.hotel')).length;
@@ -114,6 +135,9 @@ const Users = () => {
                       <td><span className="badge bg-info-subtle text-info">{isWalkin ? 'Walk-in' : 'Online'}</span></td>
                       <td><small className="text-muted">{new Date(u.createdAt).toLocaleDateString('en-PK')}</small></td>
                       <td>
+                        <button className="btn btn-soft-primary btn-sm me-1" onClick={() => openEdit(u)}>
+                          <i className="ri-pencil-line"></i>
+                        </button>
                         <button className="btn btn-soft-danger btn-sm" onClick={() => { setSelectedUser(u); setShowDeleteModal(true); }}>
                           <i className="ri-delete-bin-line"></i>
                         </button>
@@ -126,6 +150,38 @@ const Users = () => {
           </div>
         </div>
       </div>
+
+      {showEditModal && (
+        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Edit Guest</h5>
+                <button type="button" className="btn-close" onClick={() => setShowEditModal(false)}></button>
+              </div>
+              <div className="modal-body">
+                {error && <div className="alert alert-danger">{error}</div>}
+                <div className="mb-3">
+                  <label className="form-label">Name</label>
+                  <input className="form-control" value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Phone</label>
+                  <input className="form-control" value={editForm.phone} onChange={e => setEditForm({ ...editForm, phone: e.target.value })} />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">Address</label>
+                  <textarea className="form-control" rows={2} value={editForm.address} onChange={e => setEditForm({ ...editForm, address: e.target.value })} />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-light" onClick={() => setShowEditModal(false)}>Cancel</button>
+                <button className="btn btn-primary" onClick={handleEdit}>Save Changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Delete Modal */}
       {showDeleteModal && (

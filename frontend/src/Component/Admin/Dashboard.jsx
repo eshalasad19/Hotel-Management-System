@@ -1,5 +1,9 @@
-﻿import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect } from 'react';
 import axios from 'axios';
+import {
+  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+} from 'recharts';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 
@@ -11,10 +15,20 @@ const Dashboard = () => {
   const [stats, setStats] = useState({
     totalRevenue: 0, totalBookings: 0,
     availableRooms: 0, occupiedRooms: 0,
-    pendingBookings: 0, confirmedBookings: 0, cancelledBookings: 0
+    pendingBookings: 0, confirmedBookings: 0,
+    cancelledBookings: 0, completedBookings: 0,
+    totalRooms: 0
   });
   const [recentBookings, setRecentBookings] = useState([]);
   const [activity, setActivity] = useState([]);
+  const [monthlyData, setMonthlyData] = useState([]);
+  const [roomTypeData, setRoomTypeData] = useState([]);
+  const [bookingStatusData, setBookingStatusData] = useState([]);
+  const [restaurantStats, setRestaurantStats] = useState({
+    menuItems: 0, totalOrders: 0, pendingOrders: 0, todayOrders: 0, restaurantRevenue: 0,
+  });
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [orderStatusData, setOrderStatusData] = useState([]);
 
   const now = new Date();
   const hour = now.getHours();
@@ -22,6 +36,85 @@ const Dashboard = () => {
   const dateStr = now.toLocaleDateString('en-PK', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
   const formatPKR = (amount) => 'PKR ' + Number(amount).toLocaleString('en-PK');
+
+  const COLORS = ['#405189', '#0ab39c', '#f7b84b', '#f06548', '#299cdb', '#45CB85'];
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  useEffect(() => { loadDashboard(); }, []);
+
+  const loadDashboard = async () => {
+    try {
+      const [roomsRes, bookingsRes, menuRes, ordersRes] = await Promise.all([
+        axios.get(`${API_URL}/rooms`, { headers }),
+        axios.get(`${API_URL}/bookings/all`, { headers }),
+        axios.get(`${API_URL}/restaurant/menu`, { headers }).catch(() => ({ data: { data: [] } })),
+        axios.get(`${API_URL}/restaurant/orders`, { headers }).catch(() => ({ data: { data: [] } })),
+      ]);
+
+      const rooms = roomsRes.data;
+      const bookings = bookingsRes.data;
+      const menu = menuRes.data.data || [];
+      const orders = ordersRes.data.data || [];
+      const today = new Date().toDateString();
+
+      setRestaurantStats({
+        menuItems: menu.length,
+        totalOrders: orders.length,
+        pendingOrders: orders.filter(o => ['Pending', 'Confirmed', 'Preparing'].includes(o.status)).length,
+        todayOrders: orders.filter(o => new Date(o.createdAt).toDateString() === today).length,
+        restaurantRevenue: orders.filter(o => o.status === 'Delivered').reduce((s, o) => s + (o.totalAmount || 0), 0),
+      });
+      setRecentOrders(orders.slice(0, 5));
+      setOrderStatusData([
+        { name: 'Pending', value: orders.filter(o => o.status === 'Pending').length },
+        { name: 'Preparing', value: orders.filter(o => ['Confirmed', 'Preparing'].includes(o.status)).length },
+        { name: 'Ready', value: orders.filter(o => o.status === 'Ready').length },
+        { name: 'Delivered', value: orders.filter(o => o.status === 'Delivered').length },
+      ].filter(d => d.value > 0));
+
+      setStats({
+        totalRevenue: bookings.filter(b => b.paymentStatus === 'paid').reduce((s, b) => s + b.totalAmount, 0),
+        totalBookings: bookings.length,
+        availableRooms: rooms.filter(r => r.status === 'available').length,
+        occupiedRooms: rooms.filter(r => r.status === 'occupied').length,
+        pendingBookings: bookings.filter(b => b.bookingStatus === 'pending').length,
+        confirmedBookings: bookings.filter(b => b.bookingStatus === 'confirmed').length,
+        cancelledBookings: bookings.filter(b => b.bookingStatus === 'cancelled').length,
+        completedBookings: bookings.filter(b => b.bookingStatus === 'completed').length,
+        totalRooms: rooms.length,
+      });
+
+      setRecentBookings(bookings.slice(0, 8));
+      setActivity(bookings.slice(0, 6));
+
+      // Monthly data for charts
+      const monthly = months.map((month, i) => {
+        const monthBookings = bookings.filter(b => new Date(b.createdAt).getMonth() === i);
+        return {
+          month,
+          revenue: monthBookings.filter(b => b.paymentStatus === 'paid').reduce((s, b) => s + b.totalAmount, 0),
+          bookings: monthBookings.length,
+        };
+      });
+      setMonthlyData(monthly);
+
+      // Room type distribution
+      const typeCount = {};
+      rooms.forEach(r => { typeCount[r.type] = (typeCount[r.type] || 0) + 1; });
+      setRoomTypeData(Object.entries(typeCount).map(([name, value]) => ({
+        name: name.charAt(0).toUpperCase() + name.slice(1), value
+      })));
+
+      // Booking status pie
+      setBookingStatusData([
+        { name: 'Confirmed', value: bookings.filter(b => b.bookingStatus === 'confirmed').length },
+        { name: 'Completed', value: bookings.filter(b => b.bookingStatus === 'completed').length },
+        { name: 'Pending', value: bookings.filter(b => b.bookingStatus === 'pending').length },
+        { name: 'Cancelled', value: bookings.filter(b => b.bookingStatus === 'cancelled').length },
+      ].filter(d => d.value > 0));
+
+    } catch (err) { console.error(err); }
+  };
 
   const statusBadge = (status) => {
     const map = {
@@ -33,45 +126,8 @@ const Dashboard = () => {
     return <span className={`badge ${map[status] || 'bg-secondary'}`}>{status}</span>;
   };
 
-  const paymentBadge = (status) => (
-    <span className={`badge ${status === 'paid' ? 'bg-success-subtle text-success' : 'bg-danger-subtle text-danger'}`}>
-      {status}
-    </span>
-  );
-
-  useEffect(() => {
-    loadDashboard();
-  }, []);
-
-  const loadDashboard = async () => {
-    try {
-      const [roomsRes, bookingsRes] = await Promise.all([
-        axios.get(`${API_URL}/rooms`, { headers }),
-        axios.get(`${API_URL}/bookings/all`, { headers })
-      ]);
-
-      const rooms = roomsRes.data;
-      const bookings = bookingsRes.data;
-
-      setStats({
-        totalRevenue: bookings.filter(b => b.paymentStatus === 'paid').reduce((s, b) => s + b.totalAmount, 0),
-        totalBookings: bookings.length,
-        availableRooms: rooms.filter(r => r.status === 'available').length,
-        occupiedRooms: rooms.filter(r => r.status === 'occupied').length,
-        pendingBookings: bookings.filter(b => b.bookingStatus === 'pending').length,
-        confirmedBookings: bookings.filter(b => b.bookingStatus === 'confirmed').length,
-        cancelledBookings: bookings.filter(b => b.bookingStatus === 'cancelled').length,
-      });
-
-      setRecentBookings(bookings.slice(0, 8));
-      setActivity(bookings.slice(0, 6));
-
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const colors = ['#0ab39c', '#405189', '#f7b84b', '#f06548', '#299cdb'];
+  const avatarColors = ['#0ab39c', '#405189', '#f7b84b', '#f06548', '#299cdb'];
+  const occupancyRate = stats.totalRooms > 0 ? Math.round((stats.occupiedRooms / stats.totalRooms) * 100) : 0;
 
   return (
     <div className="container-fluid">
@@ -81,7 +137,7 @@ const Dashboard = () => {
         <div className="col-12">
           <div className="d-flex align-items-lg-center flex-lg-row flex-column">
             <div className="flex-grow-1">
-              <h4 className="fs-16 mb-1">{greeting}, {user.name || 'Admin'}!</h4>
+              <h4 className="fs-16 mb-1">{greeting}, {user.name || 'Admin'}! 👋</h4>
               <p className="text-muted mb-0">Here's what's happening at your hotel today.</p>
             </div>
             <div className="mt-3 mt-lg-0">
@@ -93,134 +149,318 @@ const Dashboard = () => {
 
       {/* Stat Cards */}
       <div className="row">
-        <div className="col-xl-3 col-md-6">
-          <div className="card card-animate">
-            <div className="card-body">
-              <div className="d-flex align-items-center">
-                <div className="flex-grow-1 overflow-hidden">
-                  <p className="text-uppercase fw-medium text-muted text-truncate mb-0">Total Revenue</p>
-                </div>
-              </div>
-              <div className="d-flex align-items-end justify-content-between mt-4">
-                <div>
-                  <h4 className="fs-22 fw-semibold ff-secondary mb-4">{formatPKR(stats.totalRevenue)}</h4>
-                  <a href="#" className="text-decoration-underline">View payments</a>
-                </div>
-                <div className="avatar-sm flex-shrink-0">
-                  <span className="avatar-title bg-success-subtle rounded fs-3">
-                    <i className="bx bx-dollar-circle text-success"></i>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="col-xl-3 col-md-6">
-          <div className="card card-animate">
-            <div className="card-body">
-              <div className="d-flex align-items-center">
-                <div className="flex-grow-1 overflow-hidden">
-                  <p className="text-uppercase fw-medium text-muted text-truncate mb-0">Total Bookings</p>
-                </div>
-              </div>
-              <div className="d-flex align-items-end justify-content-between mt-4">
-                <div>
-                  <h4 className="fs-22 fw-semibold ff-secondary mb-4">{stats.totalBookings}</h4>
-                  <a href="#" className="text-decoration-underline">View all bookings</a>
-                </div>
-                <div className="avatar-sm flex-shrink-0">
-                  <span className="avatar-title bg-info-subtle rounded fs-3">
-                    <i className="bx bx-calendar-check text-info"></i>
-                  </span>
+        {[
+          { label: 'Total Revenue', value: formatPKR(stats.totalRevenue), icon: 'bx bx-dollar-circle', color: 'success', sub: 'Paid bookings only' },
+          { label: 'Total Bookings', value: stats.totalBookings, icon: 'bx bx-calendar-check', color: 'info', sub: `${stats.confirmedBookings} confirmed` },
+          { label: 'Available Rooms', value: stats.availableRooms, icon: 'bx bx-building', color: 'warning', sub: `of ${stats.totalRooms} total rooms` },
+          { label: 'Occupancy Rate', value: `${occupancyRate}%`, icon: 'bx bx-bed', color: 'danger', sub: `${stats.occupiedRooms} occupied` },
+        ].map((s, i) => (
+          <div className="col-xl-3 col-md-6" key={i}>
+            <div className="card card-animate">
+              <div className="card-body">
+                <div className="d-flex align-items-end justify-content-between mt-2">
+                  <div>
+                    <p className="text-uppercase fw-medium text-muted mb-2 fs-12">{s.label}</p>
+                    <h4 className="fs-22 fw-semibold mb-1">{s.value}</h4>
+                    <small className="text-muted">{s.sub}</small>
+                  </div>
+                  <div className="avatar-sm flex-shrink-0">
+                    <span className={`avatar-title bg-${s.color}-subtle rounded fs-3`}>
+                      <i className={`${s.icon} text-${s.color}`}></i>
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        ))}
+      </div>
 
-        <div className="col-xl-3 col-md-6">
-          <div className="card card-animate">
-            <div className="card-body">
-              <div className="d-flex align-items-center">
-                <div className="flex-grow-1 overflow-hidden">
-                  <p className="text-uppercase fw-medium text-muted text-truncate mb-0">Available Rooms</p>
-                </div>
-              </div>
-              <div className="d-flex align-items-end justify-content-between mt-4">
-                <div>
-                  <h4 className="fs-22 fw-semibold ff-secondary mb-4">{stats.availableRooms}</h4>
-                  <a href="#" className="text-decoration-underline">View all rooms</a>
-                </div>
-                <div className="avatar-sm flex-shrink-0">
-                  <span className="avatar-title bg-warning-subtle rounded fs-3">
-                    <i className="bx bx-building text-warning"></i>
-                  </span>
+      {/* Restaurant Stats */}
+      <div className="row mt-2 mb-1">
+        <div className="col-12">
+          <h5 className="text-muted text-uppercase fs-12 mb-0">
+            <i className="ri-restaurant-line me-1"></i> Restaurant Overview
+          </h5>
+        </div>
+      </div>
+      <div className="row">
+        {[
+          { label: 'Menu Items', value: restaurantStats.menuItems, icon: 'ri-restaurant-2-line', color: 'primary', sub: 'Active dishes' },
+          { label: 'Orders Today', value: restaurantStats.todayOrders, icon: 'ri-shopping-bag-line', color: 'info', sub: `${restaurantStats.totalOrders} total orders` },
+          { label: 'Pending Orders', value: restaurantStats.pendingOrders, icon: 'ri-timer-line', color: 'warning', sub: 'Awaiting preparation' },
+          { label: 'Restaurant Revenue', value: formatPKR(restaurantStats.restaurantRevenue), icon: 'ri-money-dollar-circle-line', color: 'success', sub: 'Delivered orders' },
+        ].map((s, i) => (
+          <div className="col-xl-3 col-md-6" key={`rest-${i}`}>
+            <div className="card card-animate border border-dashed">
+              <div className="card-body">
+                <div className="d-flex align-items-end justify-content-between mt-2">
+                  <div>
+                    <p className="text-uppercase fw-medium text-muted mb-2 fs-12">{s.label}</p>
+                    <h4 className="fs-22 fw-semibold mb-1">{s.value}</h4>
+                    <small className="text-muted">{s.sub}</small>
+                  </div>
+                  <div className="avatar-sm flex-shrink-0">
+                    <span className={`avatar-title bg-${s.color}-subtle rounded fs-3`}>
+                      <i className={`${s.icon} text-${s.color}`}></i>
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+        ))}
+      </div>
+
+      {/* Revenue Chart + Pie Chart */}
+      <div className="row">
+        <div className="col-xl-8">
+          <div className="card">
+            <div className="card-header d-flex align-items-center">
+              <h4 className="card-title mb-0 flex-grow-1">Revenue & Bookings</h4>
+              <small className="text-muted">Monthly Overview</small>
+            </div>
+            <div className="card-body">
+              <ResponsiveContainer width="100%" height={280}>
+                <AreaChart data={monthlyData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#0ab39c" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#0ab39c" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="colorBook" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#405189" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#405189" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="month" tick={{ fontSize: 11 }} />
+                  <YAxis yAxisId="left" tick={{ fontSize: 10 }} width={60} />
+                  <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10 }} width={30} />
+                  <Tooltip formatter={(value, name) => [
+                    name === 'revenue' ? `PKR ${Number(value).toLocaleString()}` : value,
+                    name === 'revenue' ? 'Revenue' : 'Bookings'
+                  ]} />
+                  <Legend />
+                  <Area yAxisId="left" type="monotone" dataKey="revenue" name="revenue"
+                    stroke="#0ab39c" fill="url(#colorRev)" strokeWidth={2} />
+                  <Area yAxisId="right" type="monotone" dataKey="bookings" name="bookings"
+                    stroke="#405189" fill="url(#colorBook)" strokeWidth={2} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
         </div>
 
-        <div className="col-xl-3 col-md-6">
-          <div className="card card-animate">
+        <div className="col-xl-4">
+          <div className="card h-100">
+            <div className="card-header">
+              <h4 className="card-title mb-0">Booking Status</h4>
+            </div>
+            <div className="card-body d-flex flex-column align-items-center justify-content-center">
+              {bookingStatusData.length === 0 ? (
+                <div className="text-center text-muted py-4">
+                  <i className="bx bx-calendar fs-48 d-block mb-2 opacity-25"></i>
+                  No booking data yet
+                </div>
+              ) : (
+                <>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie data={bookingStatusData} cx="50%" cy="50%"
+                        innerRadius={55} outerRadius={85} paddingAngle={3} dataKey="value">
+                        {bookingStatusData.map((entry, index) => (
+                          <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="d-flex flex-wrap gap-2 justify-content-center mt-2">
+                    {bookingStatusData.map((entry, index) => (
+                      <div key={index} className="d-flex align-items-center gap-1">
+                        <div style={{ width: 10, height: 10, borderRadius: '50%', background: COLORS[index % COLORS.length] }}></div>
+                        <small className="text-muted">{entry.name} ({entry.value})</small>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Room Type Bar + Occupancy */}
+      <div className="row">
+        <div className="col-xl-6">
+          <div className="card">
+            <div className="card-header">
+              <h4 className="card-title mb-0">Rooms by Type</h4>
+            </div>
             <div className="card-body">
-              <div className="d-flex align-items-center">
-                <div className="flex-grow-1 overflow-hidden">
-                  <p className="text-uppercase fw-medium text-muted text-truncate mb-0">Occupied Rooms</p>
-                </div>
+              {roomTypeData.length === 0 ? (
+                <div className="text-center text-muted py-4">No rooms added yet</div>
+              ) : (
+                <ResponsiveContainer width="100%" height={230}>
+                  <BarChart data={roomTypeData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                    <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
+                    <Tooltip />
+                    <Bar dataKey="value" name="Rooms" radius={[4, 4, 0, 0]}>
+                      {roomTypeData.map((entry, index) => (
+                        <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="col-xl-6">
+          <div className="card">
+            <div className="card-header">
+              <h4 className="card-title mb-0">Room Occupancy</h4>
+            </div>
+            <div className="card-body">
+              <div className="row g-3 mb-3">
+                {[
+                  { label: 'Available', value: stats.availableRooms, color: 'success' },
+                  { label: 'Occupied', value: stats.occupiedRooms, color: 'danger' },
+                ].map((s, i) => (
+                  <div className="col-6" key={i}>
+                    <div className={`p-3 bg-${s.color}-subtle rounded text-center`}>
+                      <h3 className={`fw-bold text-${s.color} mb-1`}>{s.value}</h3>
+                      <p className="text-muted mb-0 fs-12">{s.label}</p>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="d-flex align-items-end justify-content-between mt-4">
-                <div>
-                  <h4 className="fs-22 fw-semibold ff-secondary mb-4">{stats.occupiedRooms}</h4>
-                  <a href="#" className="text-decoration-underline">View occupied</a>
-                </div>
-                <div className="avatar-sm flex-shrink-0">
-                  <span className="avatar-title bg-danger-subtle rounded fs-3">
-                    <i className="bx bx-bed text-danger"></i>
-                  </span>
-                </div>
+              <div className="mb-2 d-flex justify-content-between">
+                <span className="text-muted fs-12">Occupancy Rate</span>
+                <span className="fw-semibold">{occupancyRate}%</span>
+              </div>
+              <div className="progress mb-4" style={{ height: '10px' }}>
+                <div className="progress-bar bg-danger" style={{ width: `${occupancyRate}%` }}></div>
+                <div className="progress-bar bg-success" style={{ width: `${100 - occupancyRate}%` }}></div>
+              </div>
+              <div className="row g-2">
+                {[
+                  { label: 'Pending', value: stats.pendingBookings, color: 'warning' },
+                  { label: 'Confirmed', value: stats.confirmedBookings, color: 'success' },
+                  { label: 'Completed', value: stats.completedBookings, color: 'info' },
+                  { label: 'Cancelled', value: stats.cancelledBookings, color: 'danger' },
+                ].map((s, i) => (
+                  <div className="col-6" key={i}>
+                    <div className="d-flex align-items-center gap-2 p-2 bg-light rounded">
+                      <div className={`bg-${s.color} rounded`} style={{ width: 8, height: 8, flexShrink: 0 }}></div>
+                      <div>
+                        <div className="fw-semibold">{s.value}</div>
+                        <div className="text-muted fs-12">{s.label}</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Restaurant Orders + Status */}
+      {recentOrders.length > 0 && (
+        <div className="row">
+          <div className="col-xl-8">
+            <div className="card">
+              <div className="card-header d-flex align-items-center">
+                <h4 className="card-title mb-0 flex-grow-1">Recent Restaurant Orders</h4>
+                <a href="/admin/restaurant-orders" className="btn btn-sm btn-soft-primary">View All</a>
+              </div>
+              <div className="card-body">
+                <div className="table-responsive">
+                  <table className="table table-borderless table-hover align-middle mb-0">
+                    <thead className="table-light">
+                      <tr><th>Guest</th><th>Room</th><th>Items</th><th>Total</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                      {recentOrders.map(o => (
+                        <tr key={o._id}>
+                          <td className="fw-medium">{o.guestName || o.userId?.name || 'Guest'}</td>
+                          <td>{o.roomNumber || '—'}</td>
+                          <td><small>{o.items?.map(it => `${it.name} x${it.quantity}`).join(', ')}</small></td>
+                          <td>{formatPKR(o.totalAmount)}</td>
+                          <td><span className="badge bg-primary-subtle text-primary">{o.status}</span></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="col-xl-4">
+            <div className="card h-100">
+              <div className="card-header"><h4 className="card-title mb-0">Order Status</h4></div>
+              <div className="card-body d-flex flex-column align-items-center justify-content-center">
+                {orderStatusData.length === 0 ? (
+                  <p className="text-muted">No orders yet</p>
+                ) : (
+                  <>
+                    <ResponsiveContainer width="100%" height={180}>
+                      <PieChart>
+                        <Pie data={orderStatusData} cx="50%" cy="50%" innerRadius={45} outerRadius={75} paddingAngle={3} dataKey="value">
+                          {orderStatusData.map((entry, index) => (
+                            <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="d-flex flex-wrap gap-2 justify-content-center mt-2">
+                      {orderStatusData.map((entry, index) => (
+                        <div key={index} className="d-flex align-items-center gap-1">
+                          <div style={{ width: 10, height: 10, borderRadius: '50%', background: COLORS[index % COLORS.length] }}></div>
+                          <small className="text-muted">{entry.name} ({entry.value})</small>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Recent Bookings + Activity */}
       <div className="row">
         <div className="col-xl-8">
           <div className="card">
-            <div className="card-header align-items-center d-flex">
-              <h4 className="card-title mb-0 flex-grow-1">Recent Bookings</h4>
+            <div className="card-header">
+              <h4 className="card-title mb-0">Recent Bookings</h4>
             </div>
             <div className="card-body">
               <div className="table-responsive">
                 <table className="table table-borderless table-hover table-nowrap align-middle mb-0">
                   <thead className="table-light">
-                    <tr>
-                      <th>Guest</th>
-                      <th>Room</th>
-                      <th>Check In</th>
-                      <th>Check Out</th>
-                      <th>Amount</th>
-                      <th>Status</th>
-                    </tr>
+                    <tr><th>Guest</th><th>Room</th><th>Check In</th><th>Check Out</th><th>Amount</th><th>Status</th></tr>
                   </thead>
                   <tbody>
                     {recentBookings.length === 0 ? (
                       <tr><td colSpan="6" className="text-center text-muted py-4">No bookings yet</td></tr>
-                    ) : (
-                      recentBookings.map(b => (
-                        <tr key={b._id}>
-                          <td><div className="fw-medium">{b.userId?.name || 'Guest'}</div></td>
-                          <td>{b.roomId ? `Room ${b.roomId.roomNumber}` : '—'}</td>
-                          <td>{new Date(b.checkInDate).toLocaleDateString('en-PK')}</td>
-                          <td>{new Date(b.checkOutDate).toLocaleDateString('en-PK')}</td>
-                          <td>{formatPKR(b.totalAmount)}</td>
-                          <td>{statusBadge(b.bookingStatus)}</td>
-                        </tr>
-                      ))
-                    )}
+                    ) : recentBookings.map(b => (
+                      <tr key={b._id}>
+                        <td><div className="fw-medium">{b.userId?.name || 'Guest'}</div></td>
+                        <td>{b.roomId ? `Room ${b.roomId.roomNumber}` : '—'}</td>
+                        <td>{new Date(b.checkInDate).toLocaleDateString('en-PK')}</td>
+                        <td>{new Date(b.checkOutDate).toLocaleDateString('en-PK')}</td>
+                        <td className="fw-medium">{formatPKR(b.totalAmount)}</td>
+                        <td>{statusBadge(b.bookingStatus)}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -228,94 +468,35 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Activity */}
         <div className="col-xl-4">
           <div className="card">
-            <div className="card-header align-items-center d-flex">
-              <h4 className="card-title mb-0 flex-grow-1">Recent Activity</h4>
+            <div className="card-header">
+              <h4 className="card-title mb-0">Recent Activity</h4>
             </div>
             <div className="card-body">
               {activity.length === 0 ? (
                 <div className="text-center text-muted py-4">No activity yet</div>
-              ) : (
-                activity.map((b, i) => {
-                  const name = b.userId?.name || 'Guest';
-                  const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-                  const color = colors[i % colors.length];
-                  const text = b.bookingStatus === 'confirmed' ? 'confirmed a booking' :
-                    b.bookingStatus === 'pending' ? 'requested a booking' :
-                    b.bookingStatus === 'cancelled' ? 'cancelled booking' : 'completed stay';
-                  return (
-                    <div key={b._id} className="d-flex align-items-center mb-3">
-                      <div className="avatar-xs flex-shrink-0 me-3">
-                        <span className="avatar-title rounded-circle text-white fw-semibold"
-                          style={{ background: color, fontSize: '12px' }}>
-                          {initials}
-                        </span>
-                      </div>
-                      <div className="flex-grow-1">
-                        <p className="mb-0 fw-medium">{name}</p>
-                        <small className="text-muted">{text} · {new Date(b.createdAt).toLocaleDateString('en-PK')}</small>
-                      </div>
+              ) : activity.map((b, i) => {
+                const name = b.userId?.name || 'Guest';
+                const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                const text = b.bookingStatus === 'confirmed' ? 'confirmed a booking' :
+                  b.bookingStatus === 'pending' ? 'requested a booking' :
+                  b.bookingStatus === 'cancelled' ? 'cancelled booking' : 'completed stay';
+                return (
+                  <div key={b._id} className="d-flex align-items-center mb-3">
+                    <div className="avatar-xs flex-shrink-0 me-3">
+                      <span className="avatar-title rounded-circle text-white fw-semibold"
+                        style={{ background: avatarColors[i % avatarColors.length], fontSize: '12px' }}>
+                        {initials}
+                      </span>
                     </div>
-                  );
-                })
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Booking Status Summary */}
-      <div className="row">
-        <div className="col-xl-4 col-md-6">
-          <div className="card">
-            <div className="card-body">
-              <div className="d-flex align-items-center">
-                <div className="avatar-sm flex-shrink-0">
-                  <span className="avatar-title bg-warning-subtle rounded fs-3">
-                    <i className="bx bx-time text-warning"></i>
-                  </span>
-                </div>
-                <div className="flex-grow-1 ms-3">
-                  <p className="text-uppercase fw-medium text-muted mb-1">Pending Bookings</p>
-                  <h4 className="mb-0 fw-semibold">{stats.pendingBookings}</h4>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="col-xl-4 col-md-6">
-          <div className="card">
-            <div className="card-body">
-              <div className="d-flex align-items-center">
-                <div className="avatar-sm flex-shrink-0">
-                  <span className="avatar-title bg-success-subtle rounded fs-3">
-                    <i className="bx bx-check-circle text-success"></i>
-                  </span>
-                </div>
-                <div className="flex-grow-1 ms-3">
-                  <p className="text-uppercase fw-medium text-muted mb-1">Confirmed Bookings</p>
-                  <h4 className="mb-0 fw-semibold">{stats.confirmedBookings}</h4>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="col-xl-4 col-md-6">
-          <div className="card">
-            <div className="card-body">
-              <div className="d-flex align-items-center">
-                <div className="avatar-sm flex-shrink-0">
-                  <span className="avatar-title bg-danger-subtle rounded fs-3">
-                    <i className="bx bx-x-circle text-danger"></i>
-                  </span>
-                </div>
-                <div className="flex-grow-1 ms-3">
-                  <p className="text-uppercase fw-medium text-muted mb-1">Cancelled Bookings</p>
-                  <h4 className="mb-0 fw-semibold">{stats.cancelledBookings}</h4>
-                </div>
-              </div>
+                    <div className="flex-grow-1">
+                      <p className="mb-0 fw-medium">{name}</p>
+                      <small className="text-muted">{text} · {new Date(b.createdAt).toLocaleDateString('en-PK')}</small>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

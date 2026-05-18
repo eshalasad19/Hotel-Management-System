@@ -32,9 +32,15 @@ app.use('/api/payments', paymentRoutes);
 // Feedback Routes
 const feedbackRoutes = require('./Routes/feedbackRoutes');
 app.use('/api/feedbacks', feedbackRoutes);
-//Restuarant Routes
-// const restaurantOrderRoutes = require ('./Routes/restaurantOrderRoutes.js');
-// app.use("/api/orders", restaurantOrderRoutes);
+// Restaurant Routes
+const restaurantMenuRoutes = require('./Routes/restaurantMenuRoutes');
+const restaurantOrderRoutes = require('./Routes/restaurantOrderRoutes');
+app.use('/api/restaurant/menu', restaurantMenuRoutes);
+app.use('/api/restaurant/orders', restaurantOrderRoutes);
+
+// Settings Routes
+const settingsRoutes = require('./Routes/settingsRoutes');
+app.use('/api/settings', settingsRoutes);
 
 // Test route
 app.get('/', (req, res) => {

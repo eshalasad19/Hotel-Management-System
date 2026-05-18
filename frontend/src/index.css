@@ -1,3 +1,23 @@
+/* Sidebar submenu chevron for React-controlled dropdowns */
+.navbar-menu .navbar-nav .nav-link.menu-link.submenu-toggle {
+  position: relative;
+}
+
+.navbar-menu .navbar-nav .nav-link.menu-link.submenu-toggle::after {
+  display: block;
+  content: "\f0142";
+  font-family: "Material Design Icons";
+  margin-left: auto;
+  transition: transform 0.2s;
+  font-size: 1.05rem;
+  position: absolute;
+  right: 18px;
+  color: inherit;
+}
+
+.navbar-menu .navbar-nav .nav-link.menu-link.submenu-toggle[aria-expanded="true"]::after {
+  transform: rotate(90deg);
+}
 
 body {
   margin: 0;

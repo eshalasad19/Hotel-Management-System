@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5001/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 
 const Settings = () => {
   const token = localStorage.getItem('token');
@@ -75,44 +75,52 @@ const Settings = () => {
     setSuccess('');
   };
 
-  const savePricing = () => {
-    localStorage.setItem('hotel_pricing', JSON.stringify(pricing));
-    showSuccess('Pricing settings saved successfully!');
+  const persistSettings = async (key, value, successMsg) => {
+    try {
+      await axios.post(`${API_URL}/settings`, { key, value }, { headers });
+      localStorage.setItem(`hotel_${key}`, JSON.stringify(value));
+      showSuccess(successMsg);
+    } catch {
+      localStorage.setItem(`hotel_${key}`, JSON.stringify(value));
+      showSuccess(`${successMsg} (saved locally — server unavailable)`);
+    }
   };
 
-  const saveTaxes = () => {
-    localStorage.setItem('hotel_taxes', JSON.stringify(taxes));
-    showSuccess('Tax settings saved successfully!');
-  };
+  const savePricing = () => persistSettings('pricing', pricing, 'Pricing settings saved!');
+  const saveTaxes = () => persistSettings('taxes', taxes, 'Tax settings saved!');
+  const savePolicies = () => persistSettings('policies', policies, 'Policy settings saved!');
+  const saveNotifications = () => persistSettings('notifications', notifications, 'Notification settings saved!');
+  const saveHotelInfo = () => persistSettings('hotelInfo', hotelInfo, 'Hotel information saved!');
 
-  const savePolicies = () => {
-    localStorage.setItem('hotel_policies', JSON.stringify(policies));
-    showSuccess('Policy settings saved successfully!');
-  };
-
-  const saveNotifications = () => {
-    localStorage.setItem('hotel_notifications', JSON.stringify(notifications));
-    showSuccess('Notification settings saved successfully!');
-  };
-
-  const saveHotelInfo = () => {
-    localStorage.setItem('hotel_info', JSON.stringify(hotelInfo));
-    showSuccess('Hotel information saved successfully!');
-  };
-
-  // Load saved settings
   useEffect(() => {
-    const savedPricing = localStorage.getItem('hotel_pricing');
-    const savedTaxes = localStorage.getItem('hotel_taxes');
-    const savedPolicies = localStorage.getItem('hotel_policies');
-    const savedNotifications = localStorage.getItem('hotel_notifications');
-    const savedHotelInfo = localStorage.getItem('hotel_info');
+    const loadFromStorage = () => {
+      const savedPricing = localStorage.getItem('hotel_pricing');
+      const savedTaxes = localStorage.getItem('hotel_taxes');
+      const savedPolicies = localStorage.getItem('hotel_policies');
+      const savedNotifications = localStorage.getItem('hotel_notifications');
+      const savedHotelInfo = localStorage.getItem('hotel_hotelInfo') || localStorage.getItem('hotel_info');
+      if (savedPricing) setPricing(JSON.parse(savedPricing));
+      if (savedTaxes) setTaxes(JSON.parse(savedTaxes));
+      if (savedPolicies) setPolicies(JSON.parse(savedPolicies));
+      if (savedNotifications) setNotifications(JSON.parse(savedNotifications));
+      if (savedHotelInfo) setHotelInfo(JSON.parse(savedHotelInfo));
+    };
 
-    if (savedPricing) setPricing(JSON.parse(savedPricing));
-    if (savedTaxes) setTaxes(JSON.parse(savedTaxes));
-    if (savedPolicies) setPolicies(JSON.parse(savedPolicies));
-    if (savedNotifications) setNotifications(JSON.parse(savedNotifications));
-    if (savedHotelInfo) setHotelInfo(JSON.parse(savedHotelInfo));
+    const loadFromApi = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/settings`, { headers });
+        const s = res.data;
+        if (s.pricing) setPricing(s.pricing);
+        if (s.taxes) setTaxes(s.taxes);
+        if (s.policies) setPolicies(s.policies);
+        if (s.notifications) setNotifications(s.notifications);
+        if (s.hotelInfo) setHotelInfo(s.hotelInfo);
+      } catch {
+        loadFromStorage();
+      }
+    };
+
+    loadFromApi();
   }, []);
 
   const tabs = [

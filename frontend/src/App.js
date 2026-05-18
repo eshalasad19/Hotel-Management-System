@@ -21,6 +21,9 @@ import Maintenance from './Component/Admin/Maintenance';
 import Feedback from './Component/Admin/Feedback';
 import Reports from './Component/Admin/Reports';
 import Settings from './Component/Admin/Settings';
+import RestaurantMenu from './Component/Admin/RestaurantMenu';
+import RestaurantOrders from './Component/Admin/RestaurantOrders';
+import Services from './Component/Admin/Services';
 
 // User pages
 import Home from './Component/User/Home/Home';
@@ -82,6 +85,9 @@ function App() {
           <Route path="feedback" element={<Feedback />} />
           <Route path="reports" element={<Reports />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="restaurant-menu" element={<RestaurantMenu />} />
+          <Route path="restaurant-orders" element={<RestaurantOrders />} />
+          <Route path="services" element={<Services />} />
         </Route>
 
         {/* Unknown URLs → home */}

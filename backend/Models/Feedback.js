@@ -15,6 +15,15 @@ const feedbackSchema = new mongoose.Schema({
   review: {
     type: String,
     required: true
+  },
+  adminReply: {
+    type: String,
+    default: ''
+  },
+  repliedAt: Date,
+  repliedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   }
 }, { timestamps: true });
 
