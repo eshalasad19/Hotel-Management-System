@@ -73,45 +73,6 @@ const confirmBooking = async (id) => {
     console.error(err);
   }
 };
-const checkInBooking = async (id) => {
-  try {
-    await axios.put(
-      `${API_URL}/bookings/${id}/check-in`,
-      {},
-      { headers }
-    );
-
-    loadBookings();
-  } catch (err) {
-    console.error(err);
-  }
-};
-const checkOutBooking = async (id) => {
-  try {
-    await axios.put(
-      `${API_URL}/bookings/${id}/check-out`,
-      {},
-      { headers }
-    );
-
-    loadBookings();
-  } catch (err) {
-    console.error(err);
-  }
-};
-const completeBooking = async (id) => {
-  try {
-    await axios.put(
-      `${API_URL}/bookings/${id}/complete`,
-      {},
-      { headers }
-    );
-
-    loadBookings();
-  } catch (err) {
-    console.error(err);
-  }
-};
 const cancelBooking = async (id) => {
   try {
     await axios.put(
@@ -251,45 +212,6 @@ const cancelBooking = async (id) => {
           Cancel
         </button>
       </>
-    )}
-
-    {/* Confirmed */}
-    {b.bookingStatus === 'confirmed' && (
-      <>
-        <button
-          className="btn btn-soft-primary btn-sm"
-          onClick={() => checkInBooking(b._id)}
-        >
-          Check-In
-        </button>
-
-        <button
-          className="btn btn-soft-danger btn-sm"
-          onClick={() => cancelBooking(b._id)}
-        >
-          Cancel
-        </button>
-      </>
-    )}
-
-    {/* Checked In */}
-    {b.bookingStatus === 'checked_in' && (
-      <button
-        className="btn btn-soft-warning btn-sm"
-        onClick={() => checkOutBooking(b._id)}
-      >
-        Check-Out
-      </button>
-    )}
-
-    {/* Checked Out */}
-    {b.bookingStatus === 'checked_out' && (
-      <button
-        className="btn btn-soft-success btn-sm"
-        onClick={() => completeBooking(b._id)}
-      >
-        Complete
-      </button>
     )}
 
   </div>
