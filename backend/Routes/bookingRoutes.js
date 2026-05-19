@@ -9,6 +9,7 @@ const {
   checkInBooking,
   checkOutBooking,
   completeBooking,
+  updatePaymentStatus,
 } = require('../controllers/bookingController');
 
 const {
@@ -54,6 +55,12 @@ router.put(
   protect,
   staffRoles('admin', 'manager', 'receptionist'),
   checkOutBooking
+);
+router.put(
+  "/:id/payment",
+  protect,
+  adminOnly,
+  updatePaymentStatus
 );
 
 // Complete Booking

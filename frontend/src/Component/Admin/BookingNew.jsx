@@ -29,7 +29,10 @@ const BookingNew = () => {
     checkIn: "",
     checkOut: "",
     guests: 1,
+
     paymentMethod: "cash",
+    paymentStatus: "pending",
+
     specialRequests: "",
   });
 
@@ -38,40 +41,32 @@ const BookingNew = () => {
   useEffect(() => {
     loadRooms();
   }, []);
-const loadRooms = async () => {
-  try {
-    const [roomsRes, bookingsRes] = await Promise.all([
-      axios.get(`${API_URL}/rooms`, { headers }),
-      axios.get(`${API_URL}/bookings/all`, { headers }),
-    ]);
+  const loadRooms = async () => {
+    try {
+      const [roomsRes, bookingsRes] = await Promise.all([
+        axios.get(`${API_URL}/rooms`, { headers }),
+        axios.get(`${API_URL}/bookings/all`, { headers }),
+      ]);
 
-    const allRooms = roomsRes.data;
-    const allBookings = bookingsRes.data;
+      const allRooms = roomsRes.data;
+      const allBookings = bookingsRes.data;
 
-    const activeStatuses = [
-      "pending",
-      "confirmed",
-      "checked_in",
-    ];
+      const activeStatuses = ["pending", "confirmed", "checked_in"];
 
-    const blockedRoomIds = allBookings
-      .filter((b) =>
-        activeStatuses.includes(b.bookingStatus)
-      )
-      .map((b) => b.roomId?._id || b.roomId);
+      const blockedRoomIds = allBookings
+        .filter((b) => activeStatuses.includes(b.bookingStatus))
+        .map((b) => b.roomId?._id || b.roomId);
 
-    const availableRooms = allRooms.filter(
-      (room) =>
-        room.status === "available" &&
-        !blockedRoomIds.includes(room._id)
-    );
+      const availableRooms = allRooms.filter(
+        (room) =>
+          room.status === "available" && !blockedRoomIds.includes(room._id),
+      );
 
-    setRooms(availableRooms);
-
-  } catch (err) {
-    console.error(err);
-  }
-};
+      setRooms(availableRooms);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const calcSummary = (roomId, checkIn, checkOut) => {
     const room = rooms.find((r) => r._id === roomId);
@@ -134,149 +129,119 @@ const loadRooms = async () => {
     );
   };
 
-const handleSubmit = async () => {
-  setError("");
-  setSuccess("");
+  const handleSubmit = async () => {
+    setError("");
+    setSuccess("");
 
-  if (!form.guestName.trim()) {
-    setError("Guest name is required.");
-    return;
-  }
-
-  if (!form.guestPhone.trim()) {
-    setError("Guest phone is required.");
-    return;
-  }
-
-  if (!form.roomId) {
-    setError("Please select a room.");
-    return;
-  }
-
-  // Phone validation
-  const phoneRegex = /^03\d{9}$/;
-
-  if (!phoneRegex.test(form.guestPhone)) {
-    setError("Enter valid Pakistani phone number (03XXXXXXXXX)");
-    return;
-  }
-
-  // Email validation
-  if (form.guestEmail) {
-    const emailRegex =
-      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
-
-    if (!emailRegex.test(form.guestEmail)) {
-      setError("Enter valid email address.");
+    if (!form.guestName.trim()) {
+      setError("Guest name is required.");
       return;
     }
-  }
 
-  if (!form.checkIn || !form.checkOut) {
-    setError("Check-in and check-out dates are required.");
-    return;
-  }
+    if (!form.guestPhone.trim()) {
+      setError("Guest phone is required.");
+      return;
+    }
 
-  if (!summary) {
-    setError("Invalid dates selected.");
-    return;
-  }
+    if (!form.roomId) {
+      setError("Please select a room.");
+      return;
+    }
 
-  if (guestError) {
-    setError(guestError);
-    return;
-  }
+    // Phone validation
+    const phoneRegex = /^03\d{9}$/;
 
-  const selectedRoom = rooms.find(
-    (r) => r._id === form.roomId
-  );
+    if (!phoneRegex.test(form.guestPhone)) {
+      setError("Enter valid Pakistani phone number (03XXXXXXXXX)");
+      return;
+    }
 
-  if (
-    selectedRoom &&
-    Number(form.guests) > Number(selectedRoom.capacity)
-  ) {
-    setError(
-      `Room capacity is only ${selectedRoom.capacity} guest(s).`
-    );
-    return;
-  }
+    // Email validation
+    if (form.guestEmail) {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
 
-  setLoading(true);
-
-  try {
-
-    // Temporary email if empty
-    const email =
-      form.guestEmail?.trim() ||
-      `guest${Date.now()}@hotel.com`;
-
-    let userId = null;
-
-    // Create walk-in guest account
-    const regRes = await axios.post(
-      `${API_URL}/auth/register`,
-      {
-        name: form.guestName.trim(),
-        email,
-        phone: form.guestPhone.trim(),
-        password: "guest123",
-        role: "guest",
+      if (!emailRegex.test(form.guestEmail)) {
+        setError("Enter valid email address.");
+        return;
       }
-    );
+    }
 
-    userId = regRes.data.user._id;
+    if (!form.checkIn || !form.checkOut) {
+      setError("Check-in and check-out dates are required.");
+      return;
+    }
 
-    // Booking status
-    const bookingStatus =
-      form.paymentMethod === "cash"
-        ? "confirmed"
-        : "pending";
+    if (!summary) {
+      setError("Invalid dates selected.");
+      return;
+    }
 
-    // Payment status
-    const paymentStatus =
-      form.paymentMethod === "cash"
-        ? "paid"
-        : "unpaid";
+    if (guestError) {
+      setError(guestError);
+      return;
+    }
 
-    // Create booking
-    await axios.post(
-      `${API_URL}/bookings`,
-      {
-        roomId: form.roomId,
-        userId,
-        checkInDate: form.checkIn,
-        checkOutDate: form.checkOut,
-        guests: form.guests,
-        totalAmount: summary.total,
-        paymentMethod: form.paymentMethod,
-        paymentStatus,
-        specialRequests: form.specialRequests,
-        bookingStatus,
-      },
-      { headers }
-    );
+    const selectedRoom = rooms.find((r) => r._id === form.roomId);
 
-    setSuccess(
-      `Booking created successfully! Room ${summary.room.roomNumber} booked for ${form.guestName}`
-    );
+    if (selectedRoom && Number(form.guests) > Number(selectedRoom.capacity)) {
+      setError(`Room capacity is only ${selectedRoom.capacity} guest(s).`);
+      return;
+    }
 
-    setTimeout(() => {
-      navigate("/admin/bookings");
-    }, 2000);
+    setLoading(true);
 
-  } catch (err) {
+    try {
+      const paymentStatus =
+  form.paymentMethod === "online"
+    ? "paid"
+    : form.paymentStatus;
 
-    console.log(err.response?.data);
+const bookingStatus =
+  form.paymentMethod === "online"
+    ? "confirmed"
+    : "pending";
 
-    setError(
-      err.response?.data?.message ||
-      "Error creating booking."
-    );
+      
+      // Create booking
+     await axios.post(
+  `${API_URL}/bookings`,
+  {
+    roomId: form.roomId,
 
-  } finally {
-    setLoading(false);
-  }
-};
+    guestName: form.guestName,
+    guestPhone: form.guestPhone,
+    guestEmail: form.guestEmail,
+
+    checkInDate: form.checkIn,
+    checkOutDate: form.checkOut,
+    guests: form.guests,
+
+    totalAmount: summary.total,
+
+    paymentMethod: form.paymentMethod,
+    paymentStatus: paymentStatus,
+
+    specialRequests: form.specialRequests,
+    bookingStatus: bookingStatus,
+  },
+  { headers }
+);
+
+      setSuccess(
+        `Booking created successfully! Room ${summary.room.roomNumber} booked for ${form.guestName}`,
+      );
+
+      setTimeout(() => {
+        navigate("/admin/bookings");
+      }, 2000);
+    } catch (err) {
+      console.log(err.response?.data);
+
+      setError(err.response?.data?.message || "Error creating booking.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="container-fluid">
@@ -342,11 +307,11 @@ const handleSubmit = async () => {
                         value={form.guestPhone}
                         maxLength="11"
                         onChange={(e) =>
-  handleChange(
-    "guestPhone",
-    e.target.value.replace(/\D/g, "")
-  )
-}
+                          handleChange(
+                            "guestPhone",
+                            e.target.value.replace(/\D/g, ""),
+                          )
+                        }
                         placeholder="03XXXXXXXXX"
                       />
                     </div>
@@ -489,6 +454,33 @@ const handleSubmit = async () => {
                         <option value="online">Online</option>
                       </select>
                     </div>
+                    {form.paymentMethod === "cash" && (
+  <div className="col-12">
+    <label className="form-label">
+      Cash Payment Status
+    </label>
+
+    <select
+      className="form-select"
+      value={form.paymentStatus}
+      onChange={(e) =>
+        handleChange("paymentStatus", e.target.value)
+      }
+    >
+      <option value="pending">
+        Pending
+      </option>
+
+      <option value="paid">
+        Paid
+      </option>
+    </select>
+
+    <small className="text-muted">
+      Select paid if guest already paid cash.
+    </small>
+  </div>
+)}
                   </div>
                 </div>
               </div>

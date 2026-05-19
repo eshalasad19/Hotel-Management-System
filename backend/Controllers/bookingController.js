@@ -2,6 +2,7 @@ const Booking = require("../models/Booking");
 const Room = require("../models/Room");
 
 // Create Booking
+// Create Booking
 const createBooking = async (req, res) => {
   try {
     const {
@@ -12,9 +13,11 @@ const createBooking = async (req, res) => {
       specialRequests,
       totalAmount,
       bookingStatus,
+      paymentMethod,
+      paymentStatus,
     } = req.body;
 
-    // Room check karo
+    // Room check
     const room = await Room.findById(roomId);
 
     if (!room) {
@@ -23,14 +26,14 @@ const createBooking = async (req, res) => {
       });
     }
 
-    // Room available hai?
+    // Room availability check
     if (room.status !== "available") {
       return res.status(400).json({
         message: "Room is not available",
       });
     }
 
-    // Total amount calculate karo agar nahi diya
+    // Calculate total amount
     let amount = totalAmount;
 
     if (!amount) {
@@ -44,6 +47,20 @@ const createBooking = async (req, res) => {
       amount = days * room.price;
     }
 
+    // ONLINE PAYMENT
+    // agar online payment he to automatically paid
+    let finalPaymentStatus = "unpaid";
+
+    if (paymentMethod === "online") {
+      finalPaymentStatus = "paid";
+    }
+
+    // CASH PAYMENT
+    // manager baad me paid karega
+    if (paymentMethod === "cash") {
+      finalPaymentStatus = paymentStatus || "unpaid";
+    }
+
     // Booking create
     const booking = await Booking.create({
       userId: req.body.userId || req.user.id,
@@ -53,10 +70,14 @@ const createBooking = async (req, res) => {
       guests,
       totalAmount: amount,
       specialRequests,
+
       bookingStatus: bookingStatus || "confirmed",
+
+      paymentMethod,
+      paymentStatus: finalPaymentStatus,
     });
 
-    // Room reserved karo
+    // Reserve room
     await Room.findByIdAndUpdate(roomId, {
       status: "reserved",
     });
@@ -311,7 +332,43 @@ const completeBooking = async (req, res) => {
     });
   }
 };
+const updatePaymentStatus = async (req, res) => {
+  try {
 
+    const booking = await Booking.findById(
+      req.params.id
+    );
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found",
+      });
+    }
+
+    booking.paymentStatus = "paid";
+
+// Auto confirm booking on payment
+if (booking.bookingStatus === "pending") {
+  booking.bookingStatus = "confirmed";
+}
+
+await booking.save();
+    res.status(200).json({
+      success: true,
+      message: "Payment marked as paid",
+      booking,
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
+  }
+};
 module.exports = {
   createBooking,
   getMyBookings,
@@ -320,4 +377,5 @@ module.exports = {
   checkInBooking,
   checkOutBooking,
   completeBooking,
+  updatePaymentStatus,
 };
