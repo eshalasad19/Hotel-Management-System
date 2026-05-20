@@ -60,11 +60,16 @@ function App() {
           <Route path="/faq" element={<Faq />} />
           <Route path="/roomsdetails/:id" element={<RoomDetailsPage />} />
           <Route path="/blog" element={<BlogPage/>} />
+<<<<<<< Updated upstream
           <Route path="/blog/:id" element={<BlogDetailsPage />} />  */}
 
           {/* Default route */}
   <Route path="/" element={<Navigate to="/login" replace />} />
 
+=======
+          <Route path="/blog/:id" element={<BlogDetailsPage />} /> 
+        </Route>
+>>>>>>> Stashed changes
         {/* Auth */}
         <Route path="/login" element={<Login />} />
 
