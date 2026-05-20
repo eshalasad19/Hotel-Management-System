@@ -279,8 +279,28 @@ const Rooms = () => {
                     <td>
                       <div className="d-flex gap-1">
                         <button className="btn btn-soft-primary btn-sm" onClick={() => openEdit(room)} title="Edit"><i className="ri-edit-line"></i></button>
-                        <button className="btn btn-soft-success btn-sm" onClick={() => changeStatus(room._id, 'available')} title="Mark Available"><i className="ri-check-line"></i></button>
-                        <button className="btn btn-soft-warning btn-sm" onClick={() => changeStatus(room._id, 'maintenance')} title="Mark Maintenance"><i className="ri-tools-line"></i></button>
+                       {room.status === "cleaning" && (
+  <button
+    className="btn btn-soft-success btn-sm"
+    onClick={() =>
+      changeStatus(room._id, "available")
+    }
+    title="Mark Cleaned"
+  >
+    <i className="ri-check-line"></i>
+  </button>
+)}
+                        {room.status !== "maintenance" && (
+  <button
+    className="btn btn-soft-warning btn-sm"
+    onClick={() =>
+      changeStatus(room._id, "maintenance")
+    }
+    title="Send To Maintenance"
+  >
+    <i className="ri-tools-line"></i>
+  </button>
+)}
                         <button className="btn btn-soft-danger btn-sm" onClick={() => { setSelectedRoom(room); setShowDeleteModal(true); }} title="Delete"><i className="ri-delete-bin-line"></i></button>
                       </div>
                     </td>
@@ -295,7 +315,7 @@ const Rooms = () => {
       {/* Add Modal */}
       {showAddModal && (
         <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-lg">
+          <div className="modal-dialog modal-lg modal-dialog-scrollable">
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">Add New Room</h5>
@@ -418,6 +438,46 @@ const Rooms = () => {
                     <label className="form-label">Description</label>
                     <textarea className="form-control" rows="2" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}></textarea>
                   </div>
+                 <div className="col-12">
+
+  <label className="form-label">
+    Room Images
+  </label>
+
+  <input
+    type="file"
+    className="form-control"
+    multiple
+    onChange={(e) =>
+      setForm({
+        ...form,
+        images: [...e.target.files]
+      })
+    }
+  />
+
+  <div className="d-flex gap-2 flex-wrap mt-2">
+
+    {form.images?.map((img, index) => (
+
+      <div key={index}>
+        <img
+          src={URL.createObjectURL(img)}
+          alt="preview"
+          width="80"
+          height="80"
+          style={{
+            objectFit: 'cover',
+            borderRadius: '8px'
+          }}
+        />
+      </div>
+
+    ))}
+
+  </div>
+
+</div>
                 </div>
               </div>
               <div className="modal-footer">
@@ -495,6 +555,27 @@ const Rooms = () => {
       })
     }
   />
+
+  <div className="d-flex gap-2 flex-wrap mt-2">
+
+    {form.images?.map((img, index) => (
+
+      <div key={index}>
+        <img
+          src={URL.createObjectURL(img)}
+          alt="preview"
+          width="80"
+          height="80"
+          style={{
+            objectFit: 'cover',
+            borderRadius: '8px'
+          }}
+        />
+      </div>
+
+    ))}
+
+  </div>
 
 </div>
                 </div>

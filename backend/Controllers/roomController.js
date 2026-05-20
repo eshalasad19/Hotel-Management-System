@@ -13,6 +13,10 @@ const addRoom = async (req, res) => {
 
       ...req.body,
 
+      amenities: Array.isArray(req.body.amenities)
+        ? req.body.amenities
+        : [req.body.amenities],
+
       images: imagePaths,
 
     });
@@ -24,12 +28,15 @@ const addRoom = async (req, res) => {
 
   } catch (err) {
 
+    console.log(err);
+
     res.status(500).json({
       message: 'Server error',
       error: err.message
     });
 
   }
+
 };
 
 // Get All Rooms
@@ -70,15 +77,49 @@ const updateRoom = async (req, res) => {
 
 // Delete Room
 const deleteRoom = async (req, res) => {
+
   try {
-    const room = await Room.findByIdAndDelete(req.params.id);
+
+    const room = await Room.findById(req.params.id);
+
     if (!room) {
-      return res.status(404).json({ message: 'Room not found' });
+
+      return res.status(404).json({
+        message: 'Room not found'
+      });
+
     }
-    res.status(200).json({ message: 'Room deleted successfully' });
+
+    // DELETE PROTECTION
+
+    if (
+      room.status === 'occupied' ||
+  room.status === 'reserved' ||
+  room.status === 'cleaning' ||
+  room.status === 'maintenance'
+    ) {
+
+     return res.status(400).json({
+    message: 'Cannot delete active room'
+      });
+
+    }
+
+    await Room.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+      message: 'Room deleted successfully'
+    });
+
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+
+    res.status(500).json({
+      message: 'Server error',
+      error: err.message
+    });
+
   }
+
 };
 
 module.exports = { addRoom, getAllRooms, getRoomById, updateRoom, deleteRoom };

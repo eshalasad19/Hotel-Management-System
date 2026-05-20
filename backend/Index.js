@@ -2,6 +2,7 @@
 const express = require("express");
 const dotenv = require('dotenv');
 const cors = require('cors');
+const path = require('path');
 const connectDB = require('./Config/db');
 
 dotenv.config();
@@ -12,6 +13,12 @@ app.use(cors());
 app.use(express.json());
 
 connectDB();
+app.use(
+  '/Uploads',
+  express.static(
+    path.join(__dirname, 'uploads')
+  )
+);
 
 // Static files 
 app.use(express.static('Public'));

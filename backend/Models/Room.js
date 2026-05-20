@@ -25,9 +25,10 @@ const roomSchema = new mongoose.Schema({
   amenities: {
     type: [String]
   },
-  images: {
-    type: [String]
-  },
+images: {
+  type: [String],
+  default: [],
+},
   floor: {
     type: String,
     enum: ['ground', 'first', 'second'],

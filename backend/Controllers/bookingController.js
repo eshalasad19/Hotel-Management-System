@@ -76,6 +76,12 @@ const createBooking = async (req, res) => {
       paymentMethod,
       paymentStatus: finalPaymentStatus,
     });
+    await Room.findByIdAndUpdate(
+  roomId,
+  {
+    status: 'reserved'
+  }
+);
 
     // Reserve room
     await Room.findByIdAndUpdate(roomId, {
