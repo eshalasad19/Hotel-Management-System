@@ -66,10 +66,6 @@ function App() {
           {/* Default route */}
   <Route path="/" element={<Navigate to="/login" replace />} />
 
-=======
-          <Route path="/blog/:id" element={<BlogDetailsPage />} /> 
-        </Route>
->>>>>>> Stashed changes
         {/* Auth */}
         <Route path="/login" element={<Login />} />
 
