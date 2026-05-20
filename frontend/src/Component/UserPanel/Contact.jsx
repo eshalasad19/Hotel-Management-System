@@ -83,13 +83,14 @@ export default function ContactPage() {
 
   const inputStyle = (key) => ({
     width: "100%",
-    padding: "12px 14px",
+    padding: "14px 16px",
+    borderRadius: "12px",
     border: `1px solid ${
       errors[key]
         ? "#c0392b"
-        : "rgba(201,168,76,0.3)"
+        : "rgba(201,168,76,0.25)"
     }`,
-    background: "white",
+    background: "#fff",
     fontSize: "13px",
     color: COLORS.dark,
     outline: "none",
@@ -105,12 +106,16 @@ export default function ContactPage() {
         background: COLORS.cream,
       }}
     >
-      {/* HEADER */}
+      {/* HERO */}
       <div
         style={{
-          background: COLORS.darker,
-          padding: "5rem 2rem 4rem",
+          backgroundImage:
+            "linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.78)), url('https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1600&auto=format&fit=crop')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          padding: "7rem 2rem 6rem",
           textAlign: "center",
+          position: "relative",
         }}
       >
         <SectionTag>Get in Touch</SectionTag>
@@ -118,9 +123,9 @@ export default function ContactPage() {
         <h1
           style={{
             fontFamily: "Cormorant Garamond, serif",
-            fontSize: "clamp(40px,5vw,72px)",
+            fontSize: "clamp(42px,5vw,78px)",
             fontWeight: 300,
-            color: "#f0ead8",
+            color: "#f5efe2",
             marginBottom: "1rem",
           }}
         >
@@ -131,45 +136,48 @@ export default function ContactPage() {
 
         <p
           style={{
-            color: "#999",
-            fontSize: "14px",
-            maxWidth: "500px",
+            color: "#d0d0d0",
+            fontSize: "15px",
+            maxWidth: "620px",
             margin: "0 auto",
             lineHeight: 1.9,
           }}
         >
-          Our team is available 24 hours a day to
-          assist with reservations, enquiries and
-          special requests.
+          Whether you are planning a luxury stay,
+          wellness retreat or unforgettable event,
+          our team is available around the clock to
+          assist you.
         </p>
       </div>
 
-      {/* MAIN SECTION */}
+      {/* MAIN */}
       <div
         style={{
-          padding: "4rem 2rem",
+          padding: "5rem 2rem",
+          maxWidth: "1200px",
+          margin: "0 auto",
           display: "grid",
           gridTemplateColumns:
-            "repeat(auto-fit,minmax(320px,1fr))",
+            "repeat(auto-fit,minmax(340px,1fr))",
           gap: "3rem",
-          maxWidth: "1100px",
-          margin: "0 auto",
           alignItems: "start",
         }}
       >
         {/* LEFT SIDE */}
         <div>
+          <SectionTag>Contact Details</SectionTag>
+
           <h2
             style={{
               fontFamily:
                 "Cormorant Garamond, serif",
-              fontSize: "36px",
+              fontSize: "42px",
               fontWeight: 300,
               color: COLORS.dark,
-              marginBottom: "2rem",
+              marginBottom: "2.5rem",
             }}
           >
-            Contact <em>Details</em>
+            Let’s Start a <em>Conversation</em>
           </h2>
 
           {CONTACT_ITEMS.map((c, i) => (
@@ -177,17 +185,29 @@ export default function ContactPage() {
               key={i}
               style={{
                 display: "flex",
-                gap: "1.25rem",
-                marginBottom: "1.75rem",
-                paddingBottom: "1.75rem",
-                borderBottom:
+                gap: "1.2rem",
+                marginBottom: "1.5rem",
+                background: "#fff",
+                padding: "1.5rem",
+                borderRadius: "18px",
+                border:
                   "1px solid rgba(201,168,76,0.15)",
+                boxShadow:
+                  "0 10px 30px rgba(0,0,0,0.04)",
               }}
             >
               <div
                 style={{
-                  fontSize: "22px",
-                  marginTop: "2px",
+                  width: "56px",
+                  height: "56px",
+                  borderRadius: "50%",
+                  background:
+                    "rgba(201,168,76,0.08)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "24px",
+                  flexShrink: 0,
                 }}
               >
                 {c.icon}
@@ -200,7 +220,7 @@ export default function ContactPage() {
                     letterSpacing: "2px",
                     textTransform: "uppercase",
                     color: COLORS.gold,
-                    marginBottom: "6px",
+                    marginBottom: "8px",
                   }}
                 >
                   {c.label}
@@ -210,7 +230,7 @@ export default function ContactPage() {
                   style={{
                     fontSize: "14px",
                     color: COLORS.text,
-                    lineHeight: 1.8,
+                    lineHeight: 1.9,
                     whiteSpace: "pre-line",
                   }}
                 >
@@ -231,41 +251,36 @@ export default function ContactPage() {
                 marginBottom: "1rem",
               }}
             >
-              Follow Us
+              Follow LuxuryStay
             </div>
 
             <div
               style={{
                 display: "flex",
                 gap: "12px",
+                flexWrap: "wrap",
               }}
             >
-              {["In", "Tw", "Fb", "Li"].map((s) => (
-                <div
-                  key={s}
-                  style={{
-                    width: "40px",
-                    height: "40px",
-                    border:
-                      "1px solid rgba(201,168,76,0.3)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    transition: "0.3s",
-                  }}
-                >
-                  <span
+              {["Instagram", "Facebook", "X", "LinkedIn"].map(
+                (s) => (
+                  <div
+                    key={s}
                     style={{
-                      fontSize: "11px",
-                      color: COLORS.gold,
-                      fontWeight: 500,
+                      padding: "12px 18px",
+                      borderRadius: "30px",
+                      border:
+                        "1px solid rgba(201,168,76,0.25)",
+                      background: "#fff",
+                      fontSize: "12px",
+                      color: COLORS.dark,
+                      cursor: "pointer",
+                      transition: "0.3s",
                     }}
                   >
                     {s}
-                  </span>
-                </div>
-              ))}
+                  </div>
+                )
+              )}
             </div>
           </div>
         </div>
@@ -273,10 +288,13 @@ export default function ContactPage() {
         {/* FORM */}
         <div
           style={{
-            background: COLORS.light,
-            padding: "2.5rem",
+            background: "#fff",
+            padding: "2.8rem",
+            borderRadius: "24px",
             border:
-              "1px solid rgba(201,168,76,0.2)",
+              "1px solid rgba(201,168,76,0.15)",
+            boxShadow:
+              "0 20px 50px rgba(0,0,0,0.08)",
           }}
         >
           {sent ? (
@@ -288,21 +306,18 @@ export default function ContactPage() {
             >
               <div
                 style={{
-                  fontFamily:
-                    "Cormorant Garamond, serif",
-                  fontSize: "56px",
-                  color: COLORS.gold,
+                  fontSize: "70px",
                   marginBottom: "1rem",
                 }}
               >
-                ✦
+                ✨
               </div>
 
               <h3
                 style={{
                   fontFamily:
                     "Cormorant Garamond, serif",
-                  fontSize: "32px",
+                  fontSize: "38px",
                   color: COLORS.dark,
                   marginBottom: "1rem",
                 }}
@@ -314,12 +329,13 @@ export default function ContactPage() {
                 style={{
                   fontSize: "14px",
                   color: COLORS.muted,
-                  lineHeight: 1.8,
+                  lineHeight: 1.9,
                   marginBottom: "2rem",
                 }}
               >
-                Thank you, {form.name}. Our team will
-                respond within 2 business hours.
+                Thank you, {form.name}. Our team
+                will contact you shortly with a
+                personalised response.
               </p>
 
               <Btn
@@ -330,7 +346,8 @@ export default function ContactPage() {
                     name: "",
                     email: "",
                     phone: "",
-                    subject: "General Enquiry",
+                    subject:
+                      "General Enquiry",
                     message: "",
                   });
                 }}
@@ -344,10 +361,10 @@ export default function ContactPage() {
                 style={{
                   fontFamily:
                     "Cormorant Garamond, serif",
-                  fontSize: "30px",
+                  fontSize: "36px",
                   fontWeight: 400,
                   color: COLORS.dark,
-                  marginBottom: "1.8rem",
+                  marginBottom: "2rem",
                 }}
               >
                 Send a Message
@@ -377,9 +394,10 @@ export default function ContactPage() {
                         display: "block",
                         fontSize: "10px",
                         letterSpacing: "2px",
-                        textTransform: "uppercase",
+                        textTransform:
+                          "uppercase",
                         color: COLORS.muted,
-                        marginBottom: "6px",
+                        marginBottom: "8px",
                       }}
                     >
                       {label}
@@ -397,7 +415,7 @@ export default function ContactPage() {
                         style={{
                           fontSize: "11px",
                           color: "#c0392b",
-                          marginTop: "4px",
+                          marginTop: "5px",
                         }}
                       >
                         Required
@@ -416,10 +434,10 @@ export default function ContactPage() {
                     letterSpacing: "2px",
                     textTransform: "uppercase",
                     color: COLORS.muted,
-                    marginBottom: "6px",
+                    marginBottom: "8px",
                   }}
                 >
-                  Phone (optional)
+                  Phone Number
                 </label>
 
                 <input
@@ -439,7 +457,7 @@ export default function ContactPage() {
                     letterSpacing: "2px",
                     textTransform: "uppercase",
                     color: COLORS.muted,
-                    marginBottom: "6px",
+                    marginBottom: "8px",
                   }}
                 >
                   Subject
@@ -449,14 +467,8 @@ export default function ContactPage() {
                   value={form.subject}
                   onChange={update("subject")}
                   style={{
-                    width: "100%",
-                    padding: "12px 14px",
-                    border:
-                      "1px solid rgba(201,168,76,0.3)",
-                    background: "white",
-                    fontSize: "13px",
-                    color: COLORS.dark,
-                    outline: "none",
+                    ...inputStyle("subject"),
+                    cursor: "pointer",
                   }}
                 >
                   {SUBJECTS.map((o) => (
@@ -474,14 +486,14 @@ export default function ContactPage() {
                     letterSpacing: "2px",
                     textTransform: "uppercase",
                     color: COLORS.muted,
-                    marginBottom: "6px",
+                    marginBottom: "8px",
                   }}
                 >
-                  Message
+                  Your Message
                 </label>
 
                 <textarea
-                  rows={5}
+                  rows={6}
                   value={form.message}
                   onChange={update("message")}
                   style={{
@@ -495,7 +507,7 @@ export default function ContactPage() {
                     style={{
                       fontSize: "11px",
                       color: "#c0392b",
-                      marginTop: "4px",
+                      marginTop: "5px",
                     }}
                   >
                     Required
@@ -507,8 +519,9 @@ export default function ContactPage() {
                 onClick={submit}
                 style={{
                   width: "100%",
-                  padding: "14px",
+                  padding: "15px",
                   fontSize: "11px",
+                  borderRadius: "12px",
                 }}
               >
                 Send Message
@@ -521,47 +534,76 @@ export default function ContactPage() {
       {/* MAP SECTION */}
       <div
         style={{
-          background: COLORS.dark,
-          height: "260px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          borderTop:
-            "1px solid rgba(201,168,76,0.1)",
+          position: "relative",
+          height: "380px",
+          overflow: "hidden",
         }}
       >
-        <div style={{ textAlign: "center" }}>
-          <div
-            style={{
-              fontSize: "34px",
-              marginBottom: "0.5rem",
-            }}
-          >
-            📍
+        <img
+          src="https://images.unsplash.com/photo-1526772662000-3f88f10405ff?q=80&w=1600&auto=format&fit=crop"
+          alt="map"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            filter: "brightness(0.45)",
+          }}
+        />
+
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            padding: "2rem",
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontSize: "54px",
+                marginBottom: "1rem",
+              }}
+            >
+              📍
+            </div>
+
+            <h3
+              style={{
+                fontFamily:
+                  "Cormorant Garamond, serif",
+                fontSize: "42px",
+                fontWeight: 300,
+                color: "#f0ead8",
+                marginBottom: "0.8rem",
+              }}
+            >
+              Visit LuxuryStay
+            </h3>
+
+            <p
+              style={{
+                color: "#ccc",
+                fontSize: "14px",
+                letterSpacing: "1px",
+                marginBottom: "1.5rem",
+              }}
+            >
+              One LuxuryStay Tower · Karachi
+            </p>
+
+            <Btn
+              style={{
+                padding: "12px 30px",
+                fontSize: "11px",
+              }}
+            >
+              Open in Maps
+            </Btn>
           </div>
-
-          <p
-            style={{
-              fontSize: "12px",
-              color: "#555",
-              letterSpacing: "2px",
-              textTransform: "uppercase",
-            }}
-          >
-            One LuxuryStay Tower, Karachi
-          </p>
-
-          <p
-            style={{
-              fontSize: "11px",
-              color: COLORS.gold,
-              marginTop: "8px",
-              cursor: "pointer",
-              letterSpacing: "1px",
-            }}
-          >
-            Open in Maps →
-          </p>
         </div>
       </div>
     </div>

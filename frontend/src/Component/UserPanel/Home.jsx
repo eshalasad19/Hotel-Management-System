@@ -52,8 +52,6 @@ const FEATURES = [
   },
 ];
 
-
-
 export default function HomePage() {
   const [slide, setSlide] = useState(0);
   const [hovered, setHovered] = useState(null);
@@ -376,6 +374,191 @@ export default function HomePage() {
           })}
         </div>
       </div>
+
+      {/* FOOTER */}
+      <footer
+        style={{
+          background: COLORS.darker,
+          padding: "5rem 2rem 2rem",
+          color: "#ddd",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: "1250px",
+            margin: "0 auto",
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fit,minmax(240px,1fr))",
+            gap: "3rem",
+            paddingBottom: "3rem",
+            borderBottom:
+              "1px solid rgba(201,168,76,0.15)",
+          }}
+        >
+          {/* LOGO */}
+          <div>
+            <h2
+              style={{
+                fontFamily:
+                  "Cormorant Garamond, serif",
+                fontSize: "42px",
+                fontWeight: 400,
+                color: "#fff",
+                marginBottom: "1rem",
+              }}
+            >
+              Luxury
+              <span
+                style={{
+                  color: COLORS.gold,
+                }}
+              >
+                Stay
+              </span>
+            </h2>
+
+            <p
+              style={{
+                color: "#999",
+                fontSize: "14px",
+                lineHeight: 1.9,
+              }}
+            >
+              Experience world-class luxury,
+              exceptional hospitality, and
+              unforgettable memories.
+            </p>
+          </div>
+
+          {/* LINKS */}
+          <div>
+            <h3
+              style={{
+                color: COLORS.gold,
+                marginBottom: "1.5rem",
+                letterSpacing: "3px",
+                fontSize: "14px",
+                textTransform: "uppercase",
+              }}
+            >
+              Quick Links
+            </h3>
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "12px",
+              }}
+            >
+              {[
+                { name: "Home", path: "/user" },
+                { name: "About", path: "/about" },
+                { name: "Rooms", path: "/Rooms" },
+                { name: "Restaurant", path: "/restaurant" },
+                { name: "Spa", path: "/spa" },
+                { name: "Services", path: "/services" },
+              ].map((item, i) => (
+                <Link
+                  key={i}
+                  to={item.path}
+                  style={{
+                    textDecoration: "none",
+                    color: "#bbb",
+                    fontSize: "14px",
+                  }}
+                >
+                  → {item.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* CONTACT */}
+          <div>
+            <h3
+              style={{
+                color: COLORS.gold,
+                marginBottom: "1.5rem",
+                letterSpacing: "3px",
+                fontSize: "14px",
+                textTransform: "uppercase",
+              }}
+            >
+              Contact
+            </h3>
+
+            <p
+              style={{
+                color: "#999",
+                lineHeight: 2,
+                fontSize: "14px",
+              }}
+            >
+              Karachi, Pakistan
+              <br />
+              +92 300 1234567
+              <br />
+              info@luxurystay.com
+            </p>
+          </div>
+
+          {/* NEWSLETTER */}
+          <div>
+            <h3
+              style={{
+                color: COLORS.gold,
+                marginBottom: "1.5rem",
+                letterSpacing: "3px",
+                fontSize: "14px",
+                textTransform: "uppercase",
+              }}
+            >
+              Newsletter
+            </h3>
+
+            <input
+              type="email"
+              placeholder="Your Email"
+              style={{
+                width: "100%",
+                padding: "14px",
+                background: COLORS.dark,
+                border:
+                  "1px solid rgba(201,168,76,0.25)",
+                color: "#fff",
+                marginBottom: "1rem",
+                outline: "none",
+              }}
+            />
+
+            <Btn
+              style={{
+                width: "100%",
+              }}
+            >
+              Subscribe
+            </Btn>
+          </div>
+        </div>
+
+        {/* BOTTOM */}
+        <div
+          style={{
+            maxWidth: "1250px",
+            margin: "0 auto",
+            paddingTop: "2rem",
+            textAlign: "center",
+            color: "#666",
+            fontSize: "12px",
+            letterSpacing: "1px",
+          }}
+        >
+          © 2026 LuxuryStay Hotel —
+          All Rights Reserved
+        </div>
+      </footer>
     </div>
   );
 }

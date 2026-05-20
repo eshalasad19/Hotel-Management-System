@@ -1,60 +1,71 @@
 import { useState } from "react";
-import { COLORS, GoldLine, SectionTag, Btn } from "./Shared";
+import {
+  COLORS,
+  GoldLine,
+  SectionTag,
+  Btn,
+} from "./Shared";
 
 const POSTS = [
   {
     cat: "Travel",
     date: "March 2025",
+    read: "8 min",
+    img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1200&auto=format&fit=crop",
     title:
       "The Art of Slow Travel: Finding Meaning in Every Journey",
     excerpt:
       "In an age of rushed itineraries, we explore why the most transformative travel is measured not in destinations, but in depth of experience.",
-    read: "8 min",
   },
   {
     cat: "Wellness",
     date: "February 2025",
+    read: "6 min",
+    img: "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?q=80&w=1200&auto=format&fit=crop",
     title:
       "Ancient Wisdom, Modern Healing: A Guide to Ayurvedic Retreats",
     excerpt:
       "From Himalayan herbs to copper vessel rituals, discover how ancient traditions are finding new relevance in contemporary wellness culture.",
-    read: "6 min",
   },
   {
     cat: "Gastronomy",
     date: "January 2025",
+    read: "5 min",
+    img: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?q=80&w=1200&auto=format&fit=crop",
     title:
       "The Zero-Food-Waste Philosophy Behind Our Kitchen",
     excerpt:
-      "Chef Laurent Martin explains how sustainability and haute cuisine are not merely compatible — they are inseparable in the modern kitchen.",
-    read: "5 min",
+      "Chef Laurent Martin explains how sustainability and haute cuisine are inseparable in the modern kitchen.",
   },
   {
     cat: "Culture",
     date: "December 2024",
+    read: "7 min",
+    img: "https://images.unsplash.com/photo-1494526585095-c41746248156?q=80&w=1200&auto=format&fit=crop",
     title:
       "Architecture of Serenity: Designing Spaces That Heal",
     excerpt:
-      "Our lead architect on the invisible decisions that make a room feel like a sanctuary rather than simply a place to sleep.",
-    read: "7 min",
+      "The invisible design decisions that transform spaces into sanctuaries of peace and comfort.",
   },
   {
     cat: "Travel",
     date: "November 2024",
+    read: "4 min",
+    img: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop",
     title:
       "Hidden Corners: The Secret Gardens of Our Properties",
     excerpt:
-      "Beyond the lobby and the spa lies a world of curated green spaces — each one a small wilderness within the city.",
-    read: "4 min",
+      "A journey through our curated green sanctuaries hidden within the city skyline.",
   },
   {
     cat: "Wellness",
     date: "October 2024",
+    read: "6 min",
+    img: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?q=80&w=1200&auto=format&fit=crop",
     title:
       "Sleep as Luxury: The Science Behind Our Rest Protocols",
     excerpt:
-      "From pillow menus to circadian-responsive lighting — a deep dive into the sleep architecture of the world's finest hotels.",
-    read: "6 min",
+      "Discover how circadian lighting, pillow menus and soundscapes redefine luxury sleep.",
   },
 ];
 
@@ -81,57 +92,98 @@ export default function BlogPage() {
     <div
       style={{
         paddingTop: "80px",
-        minHeight: "100vh",
         background: COLORS.cream,
       }}
     >
-      {/* HEADER */}
+      {/* HERO */}
       <div
         style={{
-          background: COLORS.darker,
-          padding: "5rem 2rem 4rem",
-          textAlign: "center",
+          position: "relative",
+          height: "75vh",
+          overflow: "hidden",
         }}
       >
-        <SectionTag>Journal</SectionTag>
-
-        <h1
+        <img
+          src="https://images.unsplash.com/photo-1496417263034-38ec4f0b665a?q=80&w=1600&auto=format&fit=crop"
+          alt=""
           style={{
-            fontFamily: "Cormorant Garamond, serif",
-            fontSize: "clamp(40px,5vw,72px)",
-            fontWeight: 300,
-            color: "#f0ead8",
-            marginBottom: "1rem",
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
+        />
+
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background:
+              "linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.75))",
+          }}
+        />
+
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            textAlign: "center",
+            padding: "2rem",
           }}
         >
-          The <em>LuxuryStay</em> Journal
-        </h1>
+          <div>
+            <SectionTag>
+              Journal
+            </SectionTag>
 
-        <GoldLine />
+            <h1
+              style={{
+                fontFamily:
+                  "Cormorant Garamond, serif",
+                fontSize:
+                  "clamp(48px,7vw,90px)",
+                fontWeight: 300,
+                color: "#fff",
+                lineHeight: 1.1,
+                marginBottom: "1rem",
+              }}
+            >
+              The LuxuryStay
+              <br />
+              <em>Journal</em>
+            </h1>
 
-        <p
-          style={{
-            color: "#999",
-            fontSize: "14px",
-            maxWidth: "500px",
-            margin: "0 auto",
-            lineHeight: 1.9,
-          }}
-        >
-          Stories of travel, wellness,
-          gastronomy and the art of living
-          extraordinarily.
-        </p>
+            <GoldLine />
+
+            <p
+              style={{
+                color: "#ccc",
+                maxWidth: "700px",
+                margin: "0 auto",
+                lineHeight: 1.9,
+                fontSize: "15px",
+              }}
+            >
+              Stories of travel,
+              wellness, gastronomy
+              and extraordinary
+              living from around the
+              world.
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* CATEGORY FILTER */}
+      {/* FILTERS */}
       <div
         style={{
           display: "flex",
           justifyContent: "center",
-          gap: "8px",
-          padding: "2.5rem 2rem 0",
+          gap: "10px",
           flexWrap: "wrap",
+          padding: "3rem 2rem 1rem",
         }}
       >
         {CATEGORIES.map((c) => (
@@ -139,10 +191,13 @@ export default function BlogPage() {
             key={c}
             onClick={() => setFilter(c)}
             style={{
-              padding: "9px 22px",
-              fontSize: "10px",
-              letterSpacing: "2px",
-              textTransform: "uppercase",
+              padding: "10px 22px",
+              borderRadius: "30px",
+              border: `1px solid ${
+                filter === c
+                  ? COLORS.gold
+                  : "rgba(201,168,76,0.3)"
+              }`,
               background:
                 filter === c
                   ? COLORS.gold
@@ -151,13 +206,11 @@ export default function BlogPage() {
                 filter === c
                   ? COLORS.dark
                   : COLORS.muted,
-              border: `1px solid ${
-                filter === c
-                  ? COLORS.gold
-                  : "rgba(201,168,76,0.3)"
-              }`,
-              transition: "all 0.3s",
               cursor: "pointer",
+              fontSize: "11px",
+              letterSpacing: "2px",
+              textTransform: "uppercase",
+              transition: "0.3s",
             }}
           >
             {c}
@@ -165,49 +218,62 @@ export default function BlogPage() {
         ))}
       </div>
 
-      {/* MAIN CONTENT */}
-      <div
-        style={{
-          padding: "2.5rem 2rem 5rem",
-          maxWidth: "1150px",
-          margin: "0 auto",
-        }}
-      >
-        {/* FEATURED POST */}
-        {featured && (
+      {/* FEATURED */}
+      {featured && (
+        <div
+          style={{
+            maxWidth: "1200px",
+            margin: "2rem auto",
+            padding: "0 2rem",
+          }}
+        >
           <div
             style={{
-              background: COLORS.dark,
-              padding: "3rem",
-              border:
-                "1px solid rgba(201,168,76,0.2)",
-              marginBottom: "2rem",
               display: "grid",
               gridTemplateColumns:
                 "repeat(auto-fit,minmax(320px,1fr))",
-              gap: "3rem",
-              alignItems: "center",
+              background: COLORS.dark,
+              borderRadius: "24px",
+              overflow: "hidden",
+              boxShadow:
+                "0 15px 40px rgba(0,0,0,0.18)",
             }}
           >
-            <div>
+            <img
+              src={featured.img}
+              alt=""
+              style={{
+                width: "100%",
+                height: "100%",
+                minHeight: "350px",
+                objectFit: "cover",
+              }}
+            />
+
+            <div
+              style={{
+                padding: "3rem",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent:
+                  "center",
+              }}
+            >
               <div
                 style={{
                   display: "flex",
                   gap: "12px",
-                  alignItems: "center",
                   marginBottom: "1rem",
                   flexWrap: "wrap",
                 }}
               >
                 <span
                   style={{
-                    fontSize: "9px",
-                    letterSpacing: "3px",
-                    textTransform: "uppercase",
                     color: COLORS.gold,
-                    border:
-                      "1px solid rgba(201,168,76,0.4)",
-                    padding: "3px 8px",
+                    fontSize: "10px",
+                    letterSpacing: "3px",
+                    textTransform:
+                      "uppercase",
                   }}
                 >
                   {featured.cat}
@@ -215,20 +281,11 @@ export default function BlogPage() {
 
                 <span
                   style={{
+                    color: "#777",
                     fontSize: "11px",
-                    color: "#666",
                   }}
                 >
                   {featured.date}
-                </span>
-
-                <span
-                  style={{
-                    fontSize: "11px",
-                    color: "#555",
-                  }}
-                >
-                  · {featured.read} read
                 </span>
               </div>
 
@@ -237,11 +294,11 @@ export default function BlogPage() {
                   fontFamily:
                     "Cormorant Garamond, serif",
                   fontSize:
-                    "clamp(24px,2.5vw,34px)",
+                    "clamp(28px,3vw,42px)",
                   fontWeight: 300,
-                  color: "#f0ead8",
+                  color: "#fff",
                   lineHeight: 1.3,
-                  marginBottom: "1.25rem",
+                  marginBottom: "1rem",
                 }}
               >
                 {featured.title}
@@ -249,10 +306,10 @@ export default function BlogPage() {
 
               <p
                 style={{
-                  fontSize: "14px",
-                  color: "#888",
+                  color: "#aaa",
                   lineHeight: 1.9,
-                  marginBottom: "1.5rem",
+                  marginBottom: "2rem",
+                  fontSize: "14px",
                 }}
               >
                 {featured.excerpt}
@@ -260,94 +317,103 @@ export default function BlogPage() {
 
               <Btn
                 style={{
-                  padding: "10px 24px",
-                  fontSize: "10px",
+                  width: "fit-content",
+                  padding:
+                    "12px 28px",
+                  fontSize: "11px",
                 }}
               >
                 Read Article →
               </Btn>
             </div>
+          </div>
+        </div>
+      )}
 
-            {/* FEATURE IMAGE */}
+      {/* BLOG GRID */}
+      <div
+        style={{
+          maxWidth: "1200px",
+          margin: "0 auto",
+          padding: "2rem",
+          display: "grid",
+          gridTemplateColumns:
+            "repeat(auto-fit,minmax(320px,1fr))",
+          gap: "2rem",
+        }}
+      >
+        {rest.map((p, i) => {
+          const hov = hovered === i;
+
+          return (
             <div
+              key={i}
+              onMouseEnter={() =>
+                setHovered(i)
+              }
+              onMouseLeave={() =>
+                setHovered(null)
+              }
               style={{
-                height: "280px",
-                background:
-                  "rgba(201,168,76,0.05)",
-                border:
-                  "1px solid rgba(201,168,76,0.1)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                background: "#fff",
+                borderRadius: "22px",
+                overflow: "hidden",
+                boxShadow: hov
+                  ? "0 18px 40px rgba(0,0,0,0.15)"
+                  : "0 8px 24px rgba(0,0,0,0.06)",
+                transform: hov
+                  ? "translateY(-8px)"
+                  : "translateY(0)",
+                transition: "0.4s",
+                cursor: "pointer",
               }}
             >
               <div
                 style={{
-                  fontFamily:
-                    "Cormorant Garamond, serif",
-                  fontSize: "72px",
-                  fontWeight: 300,
-                  color:
-                    "rgba(201,168,76,0.15)",
+                  height: "230px",
+                  overflow: "hidden",
                 }}
               >
-                ✦
+                <img
+                  src={p.img}
+                  alt=""
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                    transform: hov
+                      ? "scale(1.08)"
+                      : "scale(1)",
+                    transition:
+                      "0.5s",
+                  }}
+                />
               </div>
-            </div>
-          </div>
-        )}
 
-        {/* BLOG GRID */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit,minmax(280px,1fr))",
-            gap: "1.5rem",
-          }}
-        >
-          {rest.map((p, i) => {
-            const hov = hovered === i;
-
-            return (
               <div
-                key={i}
-                onMouseEnter={() =>
-                  setHovered(i)
-                }
-                onMouseLeave={() =>
-                  setHovered(null)
-                }
                 style={{
-                  background: hov
-                    ? COLORS.dark
-                    : COLORS.light,
-                  border: `1px solid rgba(201,168,76,${
-                    hov ? 0.3 : 0.15
-                  })`,
-                  padding: "1.75rem",
-                  transition: "all 0.4s",
-                  cursor: "pointer",
-                  transform: hov
-                    ? "translateY(-4px)"
-                    : "translateY(0)",
+                  padding: "1.8rem",
                 }}
               >
                 <div
                   style={{
                     display: "flex",
-                    gap: "10px",
-                    marginBottom: "1rem",
-                    alignItems: "center",
+                    justifyContent:
+                      "space-between",
+                    marginBottom:
+                      "1rem",
                     flexWrap: "wrap",
+                    gap: "8px",
                   }}
                 >
                   <span
                     style={{
-                      fontSize: "9px",
-                      letterSpacing: "2px",
-                      textTransform: "uppercase",
                       color: COLORS.gold,
+                      fontSize: "10px",
+                      letterSpacing:
+                        "2px",
+                      textTransform:
+                        "uppercase",
                     }}
                   >
                     {p.cat}
@@ -355,11 +421,11 @@ export default function BlogPage() {
 
                   <span
                     style={{
-                      fontSize: "10px",
                       color: "#999",
+                      fontSize: "11px",
                     }}
                   >
-                    {p.date}
+                    {p.read} read
                   </span>
                 </div>
 
@@ -367,13 +433,13 @@ export default function BlogPage() {
                   style={{
                     fontFamily:
                       "Cormorant Garamond, serif",
-                    fontSize: "22px",
+                    fontSize: "28px",
                     fontWeight: 400,
-                    color: hov
-                      ? "#f0ead8"
-                      : COLORS.dark,
-                    lineHeight: 1.4,
-                    marginBottom: "0.75rem",
+                    lineHeight: 1.3,
+                    color:
+                      COLORS.dark,
+                    marginBottom:
+                      "1rem",
                   }}
                 >
                   {p.title}
@@ -381,100 +447,135 @@ export default function BlogPage() {
 
                 <p
                   style={{
-                    fontSize: "13px",
-                    color: hov
-                      ? "#888"
-                      : COLORS.muted,
-                    lineHeight: 1.8,
-                    marginBottom: "1rem",
+                    color:
+                      COLORS.muted,
+                    fontSize: "14px",
+                    lineHeight: 1.9,
+                    marginBottom:
+                      "1.5rem",
                   }}
                 >
-                  {p.excerpt.slice(0, 100)}…
+                  {p.excerpt}
                 </p>
 
                 <div
                   style={{
-                    fontSize: "11px",
-                    color: COLORS.gold,
-                    letterSpacing: "1px",
+                    display: "flex",
+                    justifyContent:
+                      "space-between",
+                    alignItems:
+                      "center",
                   }}
                 >
-                  {p.read} read →
+                  <span
+                    style={{
+                      color: "#999",
+                      fontSize: "12px",
+                    }}
+                  >
+                    {p.date}
+                  </span>
+
+                  <span
+                    style={{
+                      color: COLORS.gold,
+                      fontSize: "12px",
+                      letterSpacing:
+                        "1px",
+                    }}
+                  >
+                    Read More →
+                  </span>
                 </div>
               </div>
-            );
-          })}
-        </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* NEWSLETTER */}
       <div
         style={{
           background: COLORS.dark,
-          padding: "4rem 2rem",
-          textAlign: "center",
+          padding: "5rem 2rem",
+          marginTop: "3rem",
         }}
       >
-        <SectionTag>Newsletter</SectionTag>
-
-        <h2
-          style={{
-            fontFamily: "Cormorant Garamond, serif",
-            fontSize: "clamp(30px,4vw,42px)",
-            fontWeight: 300,
-            color: "#f0ead8",
-            marginBottom: "0.75rem",
-          }}
-        >
-          Stories Delivered to Your <em>Inbox</em>
-        </h2>
-
-        <p
-          style={{
-            color: "#666",
-            fontSize: "13px",
-            marginBottom: "2rem",
-          }}
-        >
-          Monthly dispatches from the world of
-          LuxuryStay
-        </p>
-
         <div
           style={{
-            display: "flex",
-            maxWidth: "500px",
+            maxWidth: "700px",
             margin: "0 auto",
-            flexWrap: "wrap",
+            textAlign: "center",
           }}
         >
-          <input
-            type="email"
-            placeholder="your@email.com"
-            style={{
-              flex: 1,
-              minWidth: "240px",
-              padding: "13px 16px",
-              border:
-                "1px solid rgba(201,168,76,0.3)",
-              borderRight: "none",
-              background:
-                "rgba(255,255,255,0.05)",
-              fontSize: "13px",
-              color: "#e0d8c8",
-              outline: "none",
-            }}
-          />
+          <SectionTag>
+            Newsletter
+          </SectionTag>
 
-          <Btn
+          <h2
             style={{
-              padding: "13px 24px",
-              fontSize: "10px",
-              borderRadius: 0,
+              fontFamily:
+                "Cormorant Garamond, serif",
+              fontSize:
+                "clamp(34px,4vw,54px)",
+              fontWeight: 300,
+              color: "#fff",
+              marginBottom: "1rem",
             }}
           >
-            Subscribe
-          </Btn>
+            Stay Inspired
+          </h2>
+
+          <p
+            style={{
+              color: "#888",
+              lineHeight: 1.8,
+              marginBottom: "2rem",
+            }}
+          >
+            Receive curated travel
+            stories, wellness
+            insights and exclusive
+            LuxuryStay updates.
+          </p>
+
+          <div
+            style={{
+              display: "flex",
+              gap: "1rem",
+              flexWrap: "wrap",
+              justifyContent:
+                "center",
+            }}
+          >
+            <input
+              type="email"
+              placeholder="Enter your email"
+              style={{
+                padding:
+                  "15px 18px",
+                minWidth: "280px",
+                border:
+                  "1px solid rgba(201,168,76,0.3)",
+                background:
+                  "rgba(255,255,255,0.05)",
+                color: "#fff",
+                outline: "none",
+                borderRadius:
+                  "12px",
+              }}
+            />
+
+            <Btn
+              style={{
+                padding:
+                  "15px 28px",
+                fontSize: "11px",
+              }}
+            >
+              Subscribe
+            </Btn>
+          </div>
         </div>
       </div>
     </div>
