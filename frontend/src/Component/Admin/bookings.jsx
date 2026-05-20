@@ -75,19 +75,32 @@ const Bookings = () => {
     setSelectedBooking(b);
     setShowViewModal(true);
   };
-  const confirmBooking = async (id) => {
-    try {
-      await axios.put(
-        `${API_URL}/bookings/${id}`,
-        { bookingStatus: "confirmed" },
-        { headers },
-      );
+ const confirmBooking = async (id, roomId) => {
 
-      loadBookings();
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  try {
+
+    // Booking confirm
+    await axios.put(
+      `${API_URL}/bookings/${id}`,
+      { bookingStatus: "confirmed" },
+      { headers }
+    );
+
+    // Room occupied
+    await axios.put(
+      `${API_URL}/rooms/${roomId}`,
+      { status: "occupied" },
+      { headers }
+    );
+
+    loadBookings();
+
+  } catch (err) {
+
+    console.error(err);
+
+  }
+};
   const cancelBooking = async (id) => {
     try {
       await axios.put(
@@ -292,7 +305,12 @@ const Bookings = () => {
                               <>
                                 <button
                                   className="btn btn-soft-success btn-sm"
-                                  onClick={() => confirmBooking(b._id)}
+                                  onClick={() =>
+  confirmBooking(
+    b._id,
+    b.roomId._id
+  )
+}
                                 >
                                   Confirm
                                 </button>

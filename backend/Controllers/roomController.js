@@ -64,15 +64,52 @@ const getRoomById = async (req, res) => {
 
 // Update Room
 const updateRoom = async (req, res) => {
+
   try {
-    const room = await Room.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!room) {
-      return res.status(404).json({ message: 'Room not found' });
+
+    const room = await Room.findById(
+      req.params.id
+    );
+
+    const imagePaths = req.files?.map(
+      (file) => file.filename
+    );
+
+    const updatedData = {
+      ...req.body
+    };
+
+    if (imagePaths?.length > 0) {
+
+      updatedData.images = imagePaths;
+
+    } else {
+
+      updatedData.images = room.images;
+
     }
-    res.status(200).json({ message: 'Room updated successfully', room });
+
+    const updatedRoom =
+      await Room.findByIdAndUpdate(
+        req.params.id,
+        updatedData,
+        { new: true }
+      );
+
+    res.status(200).json({
+      message: 'Room updated successfully',
+      room: updatedRoom
+    });
+
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+
+    res.status(500).json({
+      message: 'Server error',
+      error: err.message
+    });
+
   }
+
 };
 
 // Delete Room

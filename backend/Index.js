@@ -13,10 +13,11 @@ app.use(cors());
 app.use(express.json());
 
 connectDB();
+
 app.use(
   '/Uploads',
   express.static(
-    path.join(__dirname, 'uploads')
+    path.join(__dirname, 'Uploads')
   )
 );
 

@@ -37,31 +37,15 @@ images: {
   status: {
     type: String,
     enum: [
-      "available",
-      "reserved",
-      "occupied",
-      "maintenance"
-    ],
+  "available",
+  "reserved",
+  "occupied",
+  "cleaning",
+  "maintenance"
+],
     default: "available",
   },
 }, { timestamps: true });
 // AUTO PREFIX MIDDLEWARE
-roomSchema.pre("save", function (next) {
-
-  if (this.floor === "Ground Floor") {
-    this.roomPrefix = "GF";
-  }
-
-  if (this.floor === "First Floor") {
-    this.roomPrefix = "FF";
-  }
-
-  if (this.floor === "Second Floor") {
-    this.roomPrefix = "SF";
-  }
-
-  next();
-});
-
 
 module.exports = mongoose.model('Room', roomSchema);
