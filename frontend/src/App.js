@@ -24,6 +24,15 @@ import Settings from './Component/Admin/Settings';
 import RestaurantMenu from './Component/Admin/RestaurantMenu';
 import RestaurantOrders from './Component/Admin/RestaurantOrders';
 import Services from './Component/Admin/Services';
+import HomePage from './Component/UserPanel/Home';
+import ContactPage from './Component/UserPanel/Contact';
+import AboutPage from './Component/UserPanel/About';
+import RoomsPage from './Component/UserPanel/Room';
+import ServicesPage from './Component/UserPanel/Services';
+import RestaurantPage from './Component/UserPanel/Restaurant';
+import SpaPage from './Component/UserPanel/Spa';
+import BlogPage from './Component/UserPanel/Blog';
+import Navbar from './Component/UserPanel/Navbar';
 
 // User pages
 // import Home from './Component/User/Home/Home';
@@ -47,24 +56,90 @@ import Services from './Component/Admin/Services';
 function App() {
   return (
     <BrowserRouter>
-       <Routes>
-        {/* <Route path="/" element={<UserLayout />}>
-          <Route index element={<Home />} />
-          <Route path="/contact-us" element={<ContactUs />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/Rooms" element={<RoomsPage />} />
-          <Route path="/services" element={<ServicesPage />} />
-          <Route path="/restaurant" element={<RestaurantPage />} />
-          <Route path="/gallery" element={<Gallery />} />
-          <Route path="/spa" element={<Spa />} />
-          <Route path="/faq" element={<Faq />} />
-          <Route path="/roomsdetails/:id" element={<RoomDetailsPage />} />
-          <Route path="/blog" element={<BlogPage/>} />
-<<<<<<< Updated upstream
-          <Route path="/blog/:id" element={<BlogDetailsPage />} />  */}
+      <Routes>
 
-          {/* Default route */}
-  <Route path="/" element={<Navigate to="/login" replace />} />
+        {/* USER HOME */}
+        <Route
+          path="/user"
+          element={
+            <>
+              <Navbar />
+              <HomePage />
+            </>
+          }
+        />
+
+        {/* CONTACT */}
+        <Route
+          path="/contact-us"
+          element={
+            <>
+              <Navbar />
+              <ContactPage />
+            </>
+          }
+        />
+
+        {/* ABOUT */}
+        <Route
+          path="/about"
+          element={
+            <>
+              <Navbar />
+              <AboutPage />
+            </>
+          }
+        />
+
+        {/* ROOMS */}
+        <Route
+          path="/Rooms"
+          element={
+            <>
+              <Navbar />
+              <RoomsPage />
+            </>
+          }
+        />
+
+        {/* SERVICES */}
+        <Route
+          path="/services"
+          element={
+            <>
+              <Navbar />
+              <ServicesPage />
+            </>
+          }
+        />
+
+        {/* RESTAURANT */}
+        <Route
+          path="/restaurant"
+          element={
+            <>
+              <Navbar />
+              <RestaurantPage />
+            </>
+          }
+        />
+
+        {/* SPA */}
+        <Route
+          path="/spa"
+          element={
+            <>
+              <Navbar />
+              <SpaPage />
+            </>
+          }
+        />
+        {/* <Route path="/roomsdetails/:id" element={<RoomDetailsPage />} /> */}
+        <Route path="/blog" element={<BlogPage />} />
+        {/* <Route path="/blog/:id" element={<BlogDetailsPage />} />   */}
+
+
+        <Route path="/" element={<Navigate to="/login" replace />} />
 
         {/* Auth */}
         <Route path="/login" element={<Login />} />
@@ -92,7 +167,7 @@ function App() {
 
         {/* Unknown URLs → home */}
         <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes> 
+      </Routes>
     </BrowserRouter>
   );
 }
