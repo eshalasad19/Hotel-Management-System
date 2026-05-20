@@ -68,6 +68,15 @@ function App() {
             </>
           }
         />
+         <Route
+          path="/blog"
+          element={
+            <>
+              <Navbar />
+              <BlogPage />
+            </>
+          }
+        />
 
         {/* CONTACT */}
         <Route

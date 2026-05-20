@@ -1,4 +1,5 @@
-// pages/RoomsPage.jsx
+// PREMIUM ROOMS PAGE UI
+// Add room images + luxury hover + badges + gallery feel
 
 import { useState, useEffect } from "react";
 import {
@@ -19,7 +20,8 @@ function BookingModal({
         position: "fixed",
         inset: 0,
         background:
-          "rgba(0,0,0,0.85)",
+          "rgba(0,0,0,0.88)",
+        backdropFilter: "blur(8px)",
         zIndex: 1000,
         display: "flex",
         alignItems: "center",
@@ -36,173 +38,209 @@ function BookingModal({
           background:
             COLORS.cream,
           width: "100%",
-          maxWidth: "520px",
-          padding: "2.5rem",
+          maxWidth: "620px",
+          overflow: "hidden",
+          borderRadius: "12px",
           border:
             "1px solid rgba(201,168,76,0.2)",
+          boxShadow:
+            "0 25px 80px rgba(0,0,0,0.4)",
         }}
       >
+        {/* IMAGE */}
         <div
           style={{
-            display: "flex",
-            justifyContent:
-              "space-between",
-            alignItems:
-              "flex-start",
-            marginBottom:
-              "1.5rem",
+            height: "260px",
+            background:
+              room.images &&
+              room.images.length > 0
+                ? `url(${room.images[0]}) center/cover`
+                : COLORS.dark,
+            position: "relative",
           }}
         >
-          <div>
-            <h2
-              style={{
-                fontFamily:
-                  "Cormorant Garamond, serif",
-                fontSize:
-                  "32px",
-                fontWeight: 400,
-                color:
-                  COLORS.dark,
-                marginBottom:
-                  "0.4rem",
-              }}
-            >
-              {room.type}
-            </h2>
-
-            <div
-              style={{
-                fontSize:
-                  "11px",
-                letterSpacing:
-                  "2px",
-                textTransform:
-                  "uppercase",
-                color:
-                  COLORS.gold,
-              }}
-            >
-              {room.floor} · $
-              {room.price}
-              /night
-            </div>
-          </div>
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background:
+                "linear-gradient(to top, rgba(0,0,0,0.75), transparent)",
+            }}
+          />
 
           <button
             onClick={onClose}
             style={{
+              position: "absolute",
+              top: "18px",
+              right: "18px",
+              width: "42px",
+              height: "42px",
+              borderRadius: "50%",
               border: "none",
               background:
-                "transparent",
-              fontSize: "20px",
+                "rgba(255,255,255,0.1)",
+              color: "#fff",
               cursor: "pointer",
-              color:
-                COLORS.muted,
+              fontSize: "18px",
             }}
           >
             ✕
           </button>
+
+          <div
+            style={{
+              position: "absolute",
+              bottom: "25px",
+              left: "25px",
+            }}
+          >
+            <div
+              style={{
+                fontSize: "11px",
+                letterSpacing: "3px",
+                color: COLORS.gold,
+                textTransform:
+                  "uppercase",
+                marginBottom: "8px",
+              }}
+            >
+              Luxury Collection
+            </div>
+
+            <h2
+              style={{
+                fontFamily:
+                  "Cormorant Garamond, serif",
+                fontSize: "42px",
+                color: "#fff",
+                fontWeight: 300,
+              }}
+            >
+              {room.type}
+            </h2>
+          </div>
         </div>
 
-        <GoldLine
-          width="70px"
-          margin="0 0 2rem"
-        />
+        {/* CONTENT */}
+        <div style={{ padding: "2rem" }}>
+          <GoldLine
+            width="70px"
+            margin="0 0 2rem"
+          />
 
-        <div
-          style={{
-            marginBottom: "1rem",
-          }}
-        >
-          <strong>
-            Room Number:
-          </strong>{" "}
-          {room.roomNumber}
-        </div>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns:
+                "repeat(auto-fit,minmax(180px,1fr))",
+              gap: "1rem",
+              marginBottom: "2rem",
+            }}
+          >
+            {[
+              [
+                "Room Number",
+                room.roomNumber,
+              ],
+              [
+                "Capacity",
+                `${room.capacity} Guests`,
+              ],
+              ["Floor", room.floor],
+              ["Status", room.status],
+            ].map(([k, v]) => (
+              <div
+                key={k}
+                style={{
+                  padding: "1rem",
+                  background:
+                    "rgba(201,168,76,0.05)",
+                  border:
+                    "1px solid rgba(201,168,76,0.15)",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: "10px",
+                    letterSpacing: "2px",
+                    textTransform:
+                      "uppercase",
+                    color:
+                      COLORS.gold,
+                    marginBottom: "8px",
+                  }}
+                >
+                  {k}
+                </div>
 
-        <div
-          style={{
-            marginBottom: "1rem",
-          }}
-        >
-          <strong>
-            Capacity:
-          </strong>{" "}
-          {room.capacity} Guests
-        </div>
+                <div
+                  style={{
+                    fontSize: "14px",
+                    color:
+                      COLORS.dark,
+                  }}
+                >
+                  {v}
+                </div>
+              </div>
+            ))}
+          </div>
 
-        <div
-          style={{
-            marginBottom: "1rem",
-          }}
-        >
-          <strong>Status:</strong>{" "}
-          {room.status}
-        </div>
-
-        <div
-          style={{
-            marginBottom: "1.5rem",
-          }}
-        >
-          <strong>
-            Description:
-          </strong>
           <p
             style={{
-              marginTop: "8px",
+              fontSize: "14px",
               color:
                 COLORS.muted,
-              lineHeight: 1.8,
+              lineHeight: 1.9,
+              marginBottom: "2rem",
             }}
           >
             {room.description}
           </p>
-        </div>
 
-        {/* Amenities */}
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "8px",
-            marginBottom:
-              "1.5rem",
-          }}
-        >
-          {room.amenities?.map(
-            (item, index) => (
-              <span
-                key={index}
-                style={{
-                  fontSize:
-                    "10px",
-                  letterSpacing:
-                    "1px",
-                  textTransform:
-                    "uppercase",
-                  color:
-                    COLORS.gold,
-                  border:
-                    "1px solid rgba(201,168,76,0.3)",
-                  padding:
-                    "4px 8px",
-                }}
-              >
-                {item}
-              </span>
-            )
-          )}
-        </div>
+          {/* Amenities */}
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "10px",
+              marginBottom: "2rem",
+            }}
+          >
+            {room.amenities?.map(
+              (item, index) => (
+                <span
+                  key={index}
+                  style={{
+                    fontSize: "10px",
+                    letterSpacing:
+                      "1.5px",
+                    textTransform:
+                      "uppercase",
+                    color:
+                      COLORS.gold,
+                    border:
+                      "1px solid rgba(201,168,76,0.35)",
+                    padding:
+                      "6px 12px",
+                  }}
+                >
+                  {item}
+                </span>
+              )
+            )}
+          </div>
 
-        <Btn
-          style={{
-            width: "100%",
-            padding: "14px",
-          }}
-        >
-          Confirm Reservation
-        </Btn>
+          <Btn
+            style={{
+              width: "100%",
+              padding: "14px",
+            }}
+          >
+            Confirm Reservation
+          </Btn>
+        </div>
       </div>
     </div>
   );
@@ -221,7 +259,6 @@ export default function RoomsPage() {
   const [loading, setLoading] =
     useState(true);
 
-  // FETCH API DATA
   useEffect(() => {
     fetchRooms();
   }, []);
@@ -241,7 +278,6 @@ export default function RoomsPage() {
         setLoading(false);
       } catch (error) {
         console.log(error);
-
         setLoading(false);
       }
     };
@@ -259,10 +295,12 @@ export default function RoomsPage() {
             COLORS.cream,
           color:
             COLORS.gold,
-          fontSize: "24px",
+          fontSize: "28px",
+          fontFamily:
+            "Cormorant Garamond, serif",
         }}
       >
-        Loading Rooms...
+        Loading Luxury Rooms...
       </div>
     );
   }
@@ -276,377 +314,376 @@ export default function RoomsPage() {
           COLORS.cream,
       }}
     >
-      {/* HEADER */}
+      {/* HERO */}
       <div
         style={{
+          height: "70vh",
           background:
-            COLORS.darker,
-          padding:
-            "5rem 2rem 4rem",
-          textAlign:
+            "linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)), url('https://images.unsplash.com/photo-1566665797739-1674de7a421a?q=80&w=1600&auto=format&fit=crop') center/cover",
+          display: "flex",
+          alignItems: "center",
+          justifyContent:
             "center",
+          textAlign: "center",
+          padding: "2rem",
         }}
       >
-        <SectionTag>
-          Accommodations
-        </SectionTag>
+        <div>
+          <SectionTag>
+            Accommodations
+          </SectionTag>
 
-        <h1
-          style={{
-            fontFamily:
-              "Cormorant Garamond, serif",
-            fontSize:
-              "clamp(40px,5vw,72px)",
-            fontWeight: 300,
-            color:
-              "#f0ead8",
-            marginBottom:
-              "1rem",
-          }}
-        >
-          Our{" "}
-          <em>
-            Rooms & Suites
-          </em>
-        </h1>
+          <h1
+            style={{
+              fontFamily:
+                "Cormorant Garamond, serif",
+              fontSize:
+                "clamp(46px,6vw,90px)",
+              fontWeight: 300,
+              color: "#fff",
+              lineHeight: 1.1,
+              marginBottom: "1rem",
+            }}
+          >
+            Rooms & <em>Suites</em>
+          </h1>
 
-        <GoldLine />
+          <GoldLine />
 
-        <p
-          style={{
-            color: "#999",
-            fontSize: "14px",
-            maxWidth: "520px",
-            margin: "0 auto",
-            lineHeight: 1.9,
-          }}
-        >
-          Experience luxury,
-          comfort and
-          elegance in every
-          stay.
-        </p>
+          <p
+            style={{
+              maxWidth: "650px",
+              margin: "0 auto",
+              color: "#ddd",
+              lineHeight: 1.9,
+              fontSize: "15px",
+            }}
+          >
+            Elegant interiors,
+            handcrafted luxury and
+            breathtaking comfort in
+            every stay.
+          </p>
+        </div>
       </div>
 
-      {/* ROOMS GRID */}
+      {/* ROOMS */}
       <div
         style={{
-          padding: "4rem 2rem",
-          display: "grid",
-          gridTemplateColumns:
-            "repeat(auto-fit,minmax(280px,1fr))",
-          gap: "1.5rem",
-          maxWidth: "1250px",
+          padding: "5rem 2rem",
+          maxWidth: "1300px",
           margin: "0 auto",
         }}
       >
-        {rooms.map((r, i) => {
-          const hov =
-            hovered === i;
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns:
+              "repeat(auto-fit,minmax(320px,1fr))",
+            gap: "2rem",
+          }}
+        >
+          {rooms.map((r, i) => {
+            const hov =
+              hovered === i;
 
-          return (
-            <div
-              key={r._id}
-              onMouseEnter={() =>
-                setHovered(i)
-              }
-              onMouseLeave={() =>
-                setHovered(
-                  null
-                )
-              }
-              style={{
-                background: hov
-                  ? COLORS.mid
-                  : COLORS.light,
-                transition:
-                  "all 0.4s ease",
-                border: `1px solid rgba(201,168,76,${
-                  hov
-                    ? 0.35
-                    : 0.15
-                })`,
-                transform: hov
-                  ? "translateY(-6px)"
-                  : "translateY(0)",
-                overflow:
-                  "hidden",
-              }}
-            >
-              {/* IMAGE */}
+            return (
               <div
+                key={r._id}
+                onMouseEnter={() =>
+                  setHovered(i)
+                }
+                onMouseLeave={() =>
+                  setHovered(null)
+                }
                 style={{
-                  height:
-                    "220px",
                   background:
-                    r.images &&
-                    r.images.length >
-                      0
-                      ? `url(${r.images[0]}) center/cover`
-                      : COLORS.dark,
-                  position:
-                    "relative",
-                  display:
-                    "flex",
-                  alignItems:
-                    "center",
-                  justifyContent:
-                    "center",
+                    "#fff",
+                  overflow:
+                    "hidden",
+                  borderRadius:
+                    "18px",
+                  transition:
+                    "all 0.45s ease",
+                  transform: hov
+                    ? "translateY(-10px)"
+                    : "translateY(0)",
+                  boxShadow: hov
+                    ? "0 30px 60px rgba(0,0,0,0.15)"
+                    : "0 8px 20px rgba(0,0,0,0.06)",
                 }}
               >
-                {!r.images ||
-                  (r.images
-                    .length ===
-                    0 && (
-                    <div
-                      style={{
-                        fontFamily:
-                          "Cormorant Garamond, serif",
-                        fontSize:
-                          "60px",
-                        color:
-                          "rgba(201,168,76,0.2)",
-                      }}
-                    >
-                      0{i + 1}
-                    </div>
-                  ))}
-
+                {/* IMAGE */}
                 <div
                   style={{
+                    height: "260px",
+                    overflow:
+                      "hidden",
                     position:
-                      "absolute",
-                    top: "1rem",
-                    right:
-                      "1rem",
-                    border: `1px solid ${COLORS.gold}`,
-                    background:
-                      "rgba(201,168,76,0.12)",
-                    padding:
-                      "5px 10px",
+                      "relative",
                   }}
                 >
-                  <span
+                  <img
+                    src={
+                      r.images &&
+                      r.images.length > 0
+                        ? r.images[0]
+                        : "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1200&auto=format&fit=crop"
+                    }
+                    alt={r.type}
                     style={{
-                      fontSize:
-                        "10px",
-                      color:
-                        COLORS.gold,
-                      letterSpacing:
-                        "2px",
+                      width: "100%",
+                      height: "100%",
+                      objectFit:
+                        "cover",
+                      transition:
+                        "transform 0.7s ease",
+                      transform: hov
+                        ? "scale(1.08)"
+                        : "scale(1)",
+                    }}
+                  />
+
+                  <div
+                    style={{
+                      position:
+                        "absolute",
+                      inset: 0,
+                      background:
+                        "linear-gradient(to top, rgba(0,0,0,0.65), transparent)",
+                    }}
+                  />
+
+                  <div
+                    style={{
+                      position:
+                        "absolute",
+                      top: "18px",
+                      right: "18px",
+                      background:
+                        "rgba(0,0,0,0.45)",
+                      backdropFilter:
+                        "blur(4px)",
+                      padding:
+                        "7px 12px",
+                      border:
+                        "1px solid rgba(255,255,255,0.2)",
                     }}
                   >
-                    {
-                      r.capacity
-                    }{" "}
-                    Guests
-                  </span>
-                </div>
-              </div>
+                    <span
+                      style={{
+                        fontSize:
+                          "10px",
+                        letterSpacing:
+                          "2px",
+                        color:
+                          "#fff",
+                      }}
+                    >
+                      {r.capacity} Guests
+                    </span>
+                  </div>
 
-              {/* CONTENT */}
-              <div
-                style={{
-                  padding:
-                    "1.8rem",
-                }}
-              >
-                <div
-                  style={{
-                    display:
-                      "flex",
-                    justifyContent:
-                      "space-between",
-                    gap: "1rem",
-                    marginBottom:
-                      "1rem",
-                  }}
-                >
-                  <div>
+                  <div
+                    style={{
+                      position:
+                        "absolute",
+                      bottom: "20px",
+                      left: "20px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize:
+                          "11px",
+                        color:
+                          COLORS.gold,
+                        letterSpacing:
+                          "2px",
+                        textTransform:
+                          "uppercase",
+                        marginBottom:
+                          "6px",
+                      }}
+                    >
+                      {r.floor} Floor
+                    </div>
+
                     <h3
                       style={{
                         fontFamily:
                           "Cormorant Garamond, serif",
                         fontSize:
-                          "26px",
+                          "34px",
+                        color:
+                          "#fff",
                         fontWeight:
-                          400,
-                        color: hov
-                          ? "#f0ead8"
-                          : COLORS.dark,
-                        marginBottom:
-                          "0.4rem",
-                        textTransform:
-                          "capitalize",
+                          300,
                       }}
                     >
                       {r.type}
                     </h3>
+                  </div>
+                </div>
 
+                {/* CONTENT */}
+                <div
+                  style={{
+                    padding:
+                      "2rem",
+                  }}
+                >
+                  <div
+                    style={{
+                      display:
+                        "flex",
+                      justifyContent:
+                        "space-between",
+                      marginBottom:
+                        "1rem",
+                      alignItems:
+                        "center",
+                    }}
+                  >
                     <div
                       style={{
                         fontSize:
                           "11px",
-                        color: hov
-                          ? "#999"
-                          : COLORS.muted,
                         letterSpacing:
-                          "1px",
+                          "2px",
                         textTransform:
-                          "capitalize",
+                          "uppercase",
+                        color:
+                          COLORS.gold,
                       }}
                     >
-                      {r.floor} Floor
+                      Luxury Suite
                     </div>
-                  </div>
 
-                  <div
-                    style={{
-                      textAlign:
-                        "right",
-                    }}
-                  >
                     <div
                       style={{
                         fontFamily:
                           "Cormorant Garamond, serif",
                         fontSize:
-                          "28px",
+                          "34px",
                         color:
                           COLORS.gold,
                       }}
                     >
-                    Rs
-                      {r.price}
-                    </div>
-
-                    <div
-                      style={{
-                        fontSize:
-                          "9px",
-                        color:
-                          "#999",
-                        letterSpacing:
-                          "2px",
-                      }}
-                    >
-                      PER NIGHT
+                      Rs {r.price}
                     </div>
                   </div>
-                </div>
 
-                <p
-                  style={{
-                    fontSize:
-                      "13px",
-                    lineHeight:
-                      1.9,
-                    color: hov
-                      ? "#bbb"
-                      : COLORS.muted,
-                    marginBottom:
-                      "1.5rem",
-                  }}
-                >
-                  {
-                    r.description
-                  }
-                </p>
-
-                {/* FEATURES */}
-                <div
-                  style={{
-                    display:
-                      "flex",
-                    flexWrap:
-                      "wrap",
-                    gap: "8px",
-                    marginBottom:
-                      "1.5rem",
-                  }}
-                >
-                  {r.amenities?.map(
-                    (
-                      item,
-                      index
-                    ) => (
-                      <span
-                        key={
-                          index
-                        }
-                        style={{
-                          fontSize:
-                            "10px",
-                          letterSpacing:
-                            "1.5px",
-                          textTransform:
-                            "uppercase",
-                          color:
-                            COLORS.gold,
-                          border:
-                            "1px solid rgba(201,168,76,0.3)",
-                          padding:
-                            "4px 8px",
-                        }}
-                      >
-                        {item}
-                      </span>
-                    )
-                  )}
-                </div>
-
-                {/* BUTTONS */}
-                <div
-                  style={{
-                    display:
-                      "flex",
-                    gap: "10px",
-                  }}
-                >
-                  <Btn
-                    onClick={() =>
-                      setSelected(
-                        r
-                      )
-                    }
+                  <p
                     style={{
-                      flex: 1,
-                      padding:
-                        "11px",
                       fontSize:
-                        "10px",
+                        "14px",
+                      lineHeight:
+                        1.9,
+                      color:
+                        COLORS.muted,
+                      marginBottom:
+                        "1.5rem",
                     }}
                   >
-                    Reserve
-                  </Btn>
+                    {r.description}
+                  </p>
 
-                  <Btn
-                    variant="outline"
-                    onClick={() =>
-                      setSelected(
-                        r
-                      )
-                    }
+                  {/* AMENITIES */}
+                  <div
                     style={{
-                      flex: 1,
-                      padding:
-                        "11px",
-                      fontSize:
-                        "10px",
-                      border:
-                        "1px solid rgba(201,168,76,0.35)",
-                      color: hov
-                        ? "#f0ead8"
-                        : COLORS.dark,
+                      display:
+                        "flex",
+                      flexWrap:
+                        "wrap",
+                      gap: "8px",
+                      marginBottom:
+                        "1.8rem",
                     }}
                   >
-                    Details
-                  </Btn>
+                    {r.amenities?.slice(
+                      0,
+                      4
+                    ).map(
+                      (
+                        item,
+                        index
+                      ) => (
+                        <span
+                          key={
+                            index
+                          }
+                          style={{
+                            fontSize:
+                              "10px",
+                            letterSpacing:
+                              "1px",
+                            textTransform:
+                              "uppercase",
+                            color:
+                              COLORS.gold,
+                            border:
+                              "1px solid rgba(201,168,76,0.25)",
+                            padding:
+                              "5px 10px",
+                            borderRadius:
+                              "20px",
+                          }}
+                        >
+                          {item}
+                        </span>
+                      )
+                    )}
+                  </div>
+
+                  {/* BUTTONS */}
+                  <div
+                    style={{
+                      display:
+                        "flex",
+                      gap: "12px",
+                    }}
+                  >
+                    <Btn
+                      onClick={() =>
+                        setSelected(
+                          r
+                        )
+                      }
+                      style={{
+                        flex: 1,
+                        padding:
+                          "12px",
+                        fontSize:
+                          "10px",
+                      }}
+                    >
+                      Reserve
+                    </Btn>
+
+                    <Btn
+                      variant="outline"
+                      onClick={() =>
+                        setSelected(
+                          r
+                        )
+                      }
+                      style={{
+                        flex: 1,
+                        padding:
+                          "12px",
+                        fontSize:
+                          "10px",
+                      }}
+                    >
+                      Details
+                    </Btn>
+                  </div>
                 </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       {/* MODAL */}
