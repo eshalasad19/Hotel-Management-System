@@ -103,8 +103,17 @@ const BookingNew = () => {
     const maxGuests = room.capacity || room.maxGuests || 1;
 
     if (Number(guests) > maxGuests) {
-      setGuestError(`This room allows maximum ${maxGuests} guest(s) only.`);
+
+      setGuestError(
+        `Maximum ${maxGuests} guests allowed`
+      );
+    
+      return alert(
+        `Maximum ${maxGuests} guests allowed`
+      );
+    
     } else {
+    
       setGuestError("");
     }
   };

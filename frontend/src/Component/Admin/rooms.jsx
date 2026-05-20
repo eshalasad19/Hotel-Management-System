@@ -17,8 +17,15 @@ const Rooms = () => {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [error, setError] = useState('');
   const [form, setForm] = useState({
-    roomNumber: '', type: '', price: '', capacity: '',
-    amenities: '', description: '', status: 'available'
+    floor: "",
+    roomNumber: "",
+    type: "",
+    price: "",
+    capacity: "",
+    amenities: "",
+    description: "",
+    status: "available",
+    images: [],
   });
 
   useEffect(() => { loadRooms(); }, []);
@@ -65,24 +72,83 @@ const Rooms = () => {
   };
 
   const handleAdd = async () => {
+
     setError('');
-    if (!form.roomNumber || !form.type || !form.price || !form.capacity) {
-      setError('Please fill all required fields.'); return;
+  
+    if (
+      !form.roomNumber ||
+      !form.type ||
+      !form.price ||
+      !form.capacity
+    ) {
+      setError('Please fill all required fields.');
+      return;
     }
+  
     try {
-      await axios.post(`${API_URL}/rooms`, {
-        ...form,
-        amenities: form.amenities.split(',').map(a => a.trim()).filter(Boolean),
-        status: 'available'
-      }, { headers });
+  
+      const formData = new FormData();
+  
+      formData.append('roomNumber', form.roomNumber);
+  
+      formData.append('floor', form.floor);
+  
+      formData.append('type', form.type);
+  
+      formData.append('price', form.price);
+  
+      formData.append('capacity', form.capacity);
+  
+      formData.append('description', form.description);
+  
+      formData.append('status', 'available');
+  
+      form.amenities
+        .split(',')
+        .forEach(a =>
+          formData.append('amenities', a.trim())
+        );
+  
+      form.images.forEach((img) => {
+        formData.append('images', img);
+      });
+  
+      await axios.post(
+        `${API_URL}/rooms`,
+        formData,
+        {
+          headers: {
+            ...headers,
+            'Content-Type': 'multipart/form-data'
+          }
+        }
+      );
+  
       setShowAddModal(false);
-      setForm({ roomNumber: '', type: '', price: '', capacity: '', amenities: '', description: '', status: 'available' });
+  
+      setForm({
+        floor: "",
+        roomNumber: "",
+        type: "",
+        price: "",
+        capacity: "",
+        amenities: "",
+        description: "",
+        status: "available",
+        images: [],
+      });
+  
       loadRooms();
+  
     } catch (err) {
-      setError(err.response?.data?.message || 'Error adding room');
+  
+      setError(
+        err.response?.data?.message ||
+        'Error adding room'
+      );
+  
     }
   };
-
   const handleEdit = async () => {
     setError('');
     try {
@@ -238,19 +304,98 @@ const Rooms = () => {
               <div className="modal-body">
                 {error && <div className="alert alert-danger">{error}</div>}
                 <div className="row g-3">
-                  <div className="col-md-6">
-                    <label className="form-label">Room Number <span className="text-danger">*</span></label>
-                    <input className="form-control" value={form.roomNumber} onChange={e => setForm({ ...form, roomNumber: e.target.value })} placeholder="e.g. 101" />
-                  </div>
+                <div className="col-md-6">
+  <label className="form-label">
+    Floor <span className="text-danger">*</span>
+  </label>
+
+  <select
+    className="form-select"
+    value={form.floor}
+    onChange={(e) =>
+      setForm({
+        ...form,
+        floor: e.target.value,
+      })
+    }
+  >
+    <option value="">Select Floor</option>
+
+    <option value="Ground Floor">
+      Ground Floor
+    </option>
+
+    <option value="First Floor">
+      First Floor
+    </option>
+
+    <option value="Second Floor">
+      Second Floor
+    </option>
+  </select>
+</div>
+<div className="col-md-6">
+  <label className="form-label">
+    Room Number
+  </label>
+
+  <div className="input-group">
+
+    <span className="input-group-text">
+
+      {form.floor === "Ground Floor" && "GF"}
+
+      {form.floor === "First Floor" && "FF"}
+
+      {form.floor === "Second Floor" && "SF"}
+
+    </span>
+
+    <input
+      className="form-control"
+      value={form.roomNumber}
+      onChange={(e) =>
+        setForm({
+          ...form,
+          roomNumber: e.target.value,
+        })
+      }
+      placeholder="101"
+    />
+  </div>
+</div>
                   <div className="col-md-6">
                     <label className="form-label">Type <span className="text-danger">*</span></label>
-                    <select className="form-select" value={form.type} onChange={e => setForm({ ...form, type: e.target.value })}>
-                      <option value="">Select Type</option>
-                      <option value="single">Single</option>
-                      <option value="double">Double</option>
-                      <option value="suite">Suite</option>
-                      <option value="deluxe">Deluxe</option>
-                    </select>
+                    <select
+  className="form-select"
+  value={form.type}
+  onChange={(e) => {
+
+    const type = e.target.value;
+
+    let capacity = "";
+
+    if (type === "single") capacity = 1;
+
+    if (type === "double") capacity = 2;
+
+    if (type === "suite") capacity = 4;
+
+    if (type === "deluxe") capacity = 3;
+
+    setForm({
+      ...form,
+      type,
+      capacity,
+    });
+  }}
+>
+  <option value="">Select Type</option>
+  <option value="single">Single</option>
+  <option value="double">Double</option>
+  <option value="suite">Suite</option>
+  <option value="deluxe">Deluxe</option>
+</select>
                   </div>
                   <div className="col-md-6">
                     <label className="form-label">Price/Night (PKR) <span className="text-danger">*</span></label>
@@ -258,7 +403,12 @@ const Rooms = () => {
                   </div>
                   <div className="col-md-6">
                     <label className="form-label">Capacity <span className="text-danger">*</span></label>
-                    <input className="form-control" type="number" value={form.capacity} onChange={e => setForm({ ...form, capacity: e.target.value })} placeholder="e.g. 2" />
+                    <input
+  className="form-control"
+  type="number"
+  value={form.capacity}
+  readOnly
+/>
                   </div>
                   <div className="col-12">
                     <label className="form-label">Amenities <span className="text-muted fs-12">(comma separated)</span></label>
@@ -328,6 +478,25 @@ const Rooms = () => {
                     <label className="form-label">Description</label>
                     <textarea className="form-control" rows="2" value={form.description} onChange={e => setForm({ ...form, description: e.target.value })}></textarea>
                   </div>
+                  <div className="col-12">
+
+  <label className="form-label">
+    Room Images
+  </label>
+
+  <input
+    type="file"
+    className="form-control"
+    multiple
+    onChange={(e) =>
+      setForm({
+        ...form,
+        images: [...e.target.files]
+      })
+    }
+  />
+
+</div>
                 </div>
               </div>
               <div className="modal-footer">

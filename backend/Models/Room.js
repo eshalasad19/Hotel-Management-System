@@ -28,17 +28,39 @@ const roomSchema = new mongoose.Schema({
   images: {
     type: [String]
   },
- status: {
-  type: String,
-  enum: [
-    'available',
-    'reserved',
-    'occupied',
-    'cleaning',
-    'maintenance'
-  ],
-  default: 'available'
-},
+  floor: {
+    type: String,
+    enum: ['ground', 'first', 'second'],
+    required: true
+  },
+  status: {
+    type: String,
+    enum: [
+      "available",
+      "reserved",
+      "occupied",
+      "maintenance"
+    ],
+    default: "available",
+  },
 }, { timestamps: true });
+// AUTO PREFIX MIDDLEWARE
+roomSchema.pre("save", function (next) {
+
+  if (this.floor === "Ground Floor") {
+    this.roomPrefix = "GF";
+  }
+
+  if (this.floor === "First Floor") {
+    this.roomPrefix = "FF";
+  }
+
+  if (this.floor === "Second Floor") {
+    this.roomPrefix = "SF";
+  }
+
+  next();
+});
+
 
 module.exports = mongoose.model('Room', roomSchema);

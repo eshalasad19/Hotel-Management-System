@@ -2,11 +2,33 @@ const Room = require('../models/Room');
 
 // Add Room
 const addRoom = async (req, res) => {
+
   try {
-    const room = await Room.create(req.body);
-    res.status(201).json({ message: 'Room added successfully', room });
+
+    const imagePaths = req.files?.map(
+      (file) => file.filename
+    );
+
+    const room = await Room.create({
+
+      ...req.body,
+
+      images: imagePaths,
+
+    });
+
+    res.status(201).json({
+      message: 'Room added successfully',
+      room
+    });
+
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+
+    res.status(500).json({
+      message: 'Server error',
+      error: err.message
+    });
+
   }
 };
 
