@@ -1,18 +1,27 @@
 import { useState, useEffect } from "react";
-import { COLORS, GoldLine, SectionTag, Btn } from "./Shared";
+import { Link } from "react-router-dom";
+import {
+  COLORS,
+  GoldLine,
+  SectionTag,
+  Btn,
+} from "./Shared";
 
 const HERO_SLIDES = [
   {
     heading: "Timeless Luxury,\nUnforgettable Stays",
     sub: "Experience the art of refined hospitality",
+    img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1600&auto=format&fit=crop",
   },
   {
     heading: "Where Comfort\nMeets Elegance",
     sub: "Each room a sanctuary crafted for you",
+    img: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1600&auto=format&fit=crop",
   },
   {
     heading: "Indulge in\nPure Serenity",
     sub: "World-class amenities at every turn",
+    img: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1600&auto=format&fit=crop",
   },
 ];
 
@@ -21,47 +30,31 @@ const FEATURES = [
     icon: "✦",
     title: "Luxury Rooms",
     desc: "Handcrafted suites with panoramic views and bespoke furnishings.",
-    page: "Rooms",
+    path: "/Rooms",
   },
   {
     icon: "◈",
     title: "Fine Dining",
     desc: "Culinary journeys curated by award-winning chefs.",
-    page: "Restaurant",
+    path: "/restaurant",
   },
   {
     icon: "❧",
     title: "Serenity Spa",
     desc: "Holistic treatments drawn from ancient wellness traditions.",
-    page: "Spa",
+    path: "/spa",
   },
   {
     icon: "⬡",
     title: "Concierge",
     desc: "24/7 personalised service for every guest desire.",
-    page: "Services",
+    path: "/services",
   },
 ];
 
-const TESTIMONIALS = [
-  {
-    name: "Amelia Thornton",
-    role: "London",
-    text: "An experience beyond imagination. Every detail spoke of extraordinary care.",
-  },
-  {
-    name: "Reza Ahmadi",
-    role: "Dubai",
-    text: "LuxuryStay redefined what a hotel could be. Absolutely magnificent.",
-  },
-  {
-    name: "Priya Kapoor",
-    role: "Mumbai",
-    text: "The spa, the food, the rooms — perfection in every sense.",
-  },
-];
 
-export default function HomePage({ setPage }) {
+
+export default function HomePage() {
   const [slide, setSlide] = useState(0);
   const [hovered, setHovered] = useState(null);
 
@@ -81,209 +74,200 @@ export default function HomePage({ setPage }) {
       <div
         style={{
           height: "100vh",
-          background: COLORS.darker,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
           position: "relative",
           overflow: "hidden",
         }}
       >
-        {/* Background Glow */}
+        {/* BACKGROUND IMAGE */}
+        <img
+          src={s.img}
+          alt="Luxury Hotel"
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            transition: "all 1s ease",
+          }}
+        />
+
+        {/* DARK OVERLAY */}
         <div
           style={{
             position: "absolute",
             inset: 0,
             background:
-              "radial-gradient(ellipse at center, rgba(201,168,76,0.06) 0%, transparent 70%)",
+              "linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75))",
           }}
         />
 
-        {/* Decorative Lines */}
+        {/* GOLD GLOW */}
         <div
           style={{
             position: "absolute",
-            top: "80px",
+            inset: 0,
+            background:
+              "radial-gradient(circle at center, rgba(201,168,76,0.12) 0%, transparent 70%)",
+          }}
+        />
+
+        {/* TOP LINE */}
+        <div
+          style={{
+            position: "absolute",
+            top: "90px",
             left: 0,
             right: 0,
             height: "1px",
             background:
-              "linear-gradient(90deg,transparent 0%,rgba(201,168,76,0.3) 50%,transparent 100%)",
+              "linear-gradient(90deg,transparent,rgba(201,168,76,0.4),transparent)",
           }}
         />
 
+        {/* CONTENT */}
         <div
           style={{
-            position: "absolute",
-            bottom: "80px",
-            left: 0,
-            right: 0,
-            height: "1px",
-            background:
-              "linear-gradient(90deg,transparent 0%,rgba(201,168,76,0.3) 50%,transparent 100%)",
-          }}
-        />
-
-        <div
-          style={{
-            position: "absolute",
-            left: "60px",
-            top: 0,
-            bottom: 0,
-            width: "1px",
-            background:
-              "linear-gradient(180deg,transparent 0%,rgba(201,168,76,0.2) 50%,transparent 100%)",
-          }}
-        />
-
-        <div
-          style={{
-            position: "absolute",
-            right: "60px",
-            top: 0,
-            bottom: 0,
-            width: "1px",
-            background:
-              "linear-gradient(180deg,transparent 0%,rgba(201,168,76,0.2) 50%,transparent 100%)",
-          }}
-        />
-
-        {/* Hero Content */}
-        <div
-          style={{
+            position: "relative",
+            zIndex: 5,
+            height: "100%",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             textAlign: "center",
-            zIndex: 2,
             padding: "0 2rem",
           }}
         >
-          <p
-            style={{
-              fontSize: "10px",
-              letterSpacing: "6px",
-              textTransform: "uppercase",
-              color: COLORS.gold,
-              marginBottom: "2rem",
-              fontWeight: 400,
-            }}
-          >
-            LuxuryStay Hospitality
-          </p>
-
-          {s.heading.split("\n").map((ln, i) => (
-            <h1
-              key={i}
+          <div>
+            <p
               style={{
-                fontFamily: "Cormorant Garamond, serif",
-                fontSize: "clamp(48px,7vw,96px)",
-                fontWeight: 300,
-                color: "#f0ead8",
-                letterSpacing: "2px",
-                lineHeight: 1.1,
+                fontSize: "11px",
+                letterSpacing: "6px",
+                textTransform: "uppercase",
+                color: COLORS.goldLight,
+                marginBottom: "2rem",
               }}
             >
-              {ln}
-            </h1>
-          ))}
+              LuxuryStay Hospitality
+            </p>
 
-          <GoldLine />
-
-          <p
-            style={{
-              fontSize: "14px",
-              color: "#aaa",
-              letterSpacing: "3px",
-              marginBottom: "2.5rem",
-            }}
-          >
-            {s.sub}
-          </p>
-
-          <div
-            style={{
-              display: "flex",
-              gap: "1.5rem",
-              justifyContent: "center",
-              flexWrap: "wrap",
-            }}
-          >
-            <Btn onClick={() => setPage("Rooms")}>
-              Reserve a Room
-            </Btn>
-
-            <Btn
-              variant="outline"
-              onClick={() => setPage("About")}
-            >
-              Discover More
-            </Btn>
-          </div>
-
-          {/* Slider Dots */}
-          <div
-            style={{
-              display: "flex",
-              gap: "12px",
-              justifyContent: "center",
-              marginTop: "3rem",
-            }}
-          >
-            {HERO_SLIDES.map((_, i) => (
-              <div
+            {s.heading.split("\n").map((ln, i) => (
+              <h1
                 key={i}
-                onClick={() => setSlide(i)}
                 style={{
-                  width: i === slide ? 24 : 8,
-                  height: "2px",
-                  background:
-                    i === slide
-                      ? COLORS.gold
-                      : "rgba(255,255,255,0.3)",
-                  cursor: "pointer",
-                  transition: "all 0.4s",
+                  fontFamily:
+                    "Cormorant Garamond, serif",
+                  fontSize:
+                    "clamp(48px,7vw,100px)",
+                  fontWeight: 300,
+                  color: "#fff",
+                  lineHeight: 1.05,
+                  textShadow:
+                    "0 4px 20px rgba(0,0,0,0.4)",
                 }}
-              />
+              >
+                {ln}
+              </h1>
             ))}
+
+            <GoldLine />
+
+            <p
+              style={{
+                fontSize: "15px",
+                color: "#ddd",
+                letterSpacing: "2px",
+                marginBottom: "2.5rem",
+              }}
+            >
+              {s.sub}
+            </p>
+
+            {/* BUTTONS */}
+            <div
+              style={{
+                display: "flex",
+                gap: "1rem",
+                justifyContent: "center",
+                flexWrap: "wrap",
+              }}
+            >
+              <Link to="/Rooms">
+                <Btn
+                  style={{
+                    padding: "15px 42px",
+                    fontSize: "11px",
+                  }}
+                >
+                  Reserve a Room
+                </Btn>
+              </Link>
+
+              <Link to="/about">
+                <Btn
+                  variant="outline"
+                  style={{
+                    padding: "15px 42px",
+                    fontSize: "11px",
+                  }}
+                >
+                  Discover More
+                </Btn>
+              </Link>
+            </div>
+
+            {/* SLIDER DOTS */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "12px",
+                marginTop: "3rem",
+              }}
+            >
+              {HERO_SLIDES.map((_, i) => (
+                <div
+                  key={i}
+                  onClick={() => setSlide(i)}
+                  style={{
+                    width: i === slide ? "30px" : "8px",
+                    height: "3px",
+                    borderRadius: "10px",
+                    background:
+                      i === slide
+                        ? COLORS.gold
+                        : "rgba(255,255,255,0.4)",
+                    cursor: "pointer",
+                    transition: "0.4s",
+                  }}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Scroll Indicator */}
+        {/* SCROLL TEXT */}
         <div
           style={{
             position: "absolute",
-            bottom: "2rem",
+            bottom: "30px",
             left: "50%",
             transform: "translateX(-50%)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "6px",
+            color: COLORS.gold,
+            fontSize: "10px",
+            letterSpacing: "4px",
+            textTransform: "uppercase",
+            zIndex: 5,
           }}
         >
-          <div
-            style={{
-              width: "1px",
-              height: "40px",
-              background: `linear-gradient(180deg,transparent,${COLORS.gold})`,
-            }}
-          />
-
-          <span
-            style={{
-              fontSize: "9px",
-              letterSpacing: "3px",
-              color: COLORS.gold,
-              textTransform: "uppercase",
-            }}
-          >
-            Scroll
-          </span>
+          Scroll Down
         </div>
       </div>
 
       {/* FEATURES */}
       <div
         style={{
-          padding: "6rem 4rem",
+          padding: "6rem 2rem",
           background: COLORS.cream,
         }}
       >
@@ -291,8 +275,10 @@ export default function HomePage({ setPage }) {
 
         <h2
           style={{
-            fontFamily: "Cormorant Garamond, serif",
-            fontSize: "clamp(32px,4vw,52px)",
+            fontFamily:
+              "Cormorant Garamond, serif",
+            fontSize:
+              "clamp(32px,4vw,52px)",
             fontWeight: 300,
             textAlign: "center",
             color: COLORS.dark,
@@ -306,9 +292,9 @@ export default function HomePage({ setPage }) {
           style={{
             display: "grid",
             gridTemplateColumns:
-              "repeat(auto-fit,minmax(220px,1fr))",
-            gap: "2px",
-            maxWidth: "1100px",
+              "repeat(auto-fit,minmax(240px,1fr))",
+            gap: "1.5rem",
+            maxWidth: "1200px",
             margin: "0 auto",
           }}
         >
@@ -316,291 +302,79 @@ export default function HomePage({ setPage }) {
             const hov = hovered === i;
 
             return (
-              <div
+              <Link
                 key={i}
-                onClick={() => setPage(f.page)}
-                onMouseEnter={() => setHovered(i)}
-                onMouseLeave={() => setHovered(null)}
+                to={f.path}
                 style={{
-                  background: hov
-                    ? COLORS.dark
-                    : COLORS.light,
-                  padding: "3rem 2rem",
-                  textAlign: "center",
-                  cursor: "pointer",
-                  transition: "all 0.4s",
-                  border: `1px solid rgba(201,168,76,${
-                    hov ? 0.3 : 0.2
-                  })`,
+                  textDecoration: "none",
                 }}
               >
                 <div
+                  onMouseEnter={() =>
+                    setHovered(i)
+                  }
+                  onMouseLeave={() =>
+                    setHovered(null)
+                  }
                   style={{
-                    fontSize: "28px",
-                    color: COLORS.gold,
-                    marginBottom: "1.25rem",
+                    background: hov
+                      ? COLORS.dark
+                      : "#fff",
+                    padding: "3rem 2rem",
+                    borderRadius: "20px",
+                    border:
+                      "1px solid rgba(201,168,76,0.2)",
+                    textAlign: "center",
+                    transition: "0.4s",
+                    transform: hov
+                      ? "translateY(-8px)"
+                      : "translateY(0)",
+                    boxShadow: hov
+                      ? "0 20px 40px rgba(0,0,0,0.18)"
+                      : "0 8px 20px rgba(0,0,0,0.06)",
                   }}
                 >
-                  {f.icon}
+                  <div
+                    style={{
+                      fontSize: "34px",
+                      color: COLORS.gold,
+                      marginBottom: "1rem",
+                    }}
+                  >
+                    {f.icon}
+                  </div>
+
+                  <h3
+                    style={{
+                      fontFamily:
+                        "Cormorant Garamond, serif",
+                      fontSize: "28px",
+                      fontWeight: 400,
+                      color: hov
+                        ? "#fff"
+                        : COLORS.dark,
+                      marginBottom: "1rem",
+                    }}
+                  >
+                    {f.title}
+                  </h3>
+
+                  <p
+                    style={{
+                      fontSize: "14px",
+                      lineHeight: 1.8,
+                      color: hov
+                        ? "#bbb"
+                        : COLORS.muted,
+                    }}
+                  >
+                    {f.desc}
+                  </p>
                 </div>
-
-                <h3
-                  style={{
-                    fontFamily:
-                      "Cormorant Garamond, serif",
-                    fontSize: "22px",
-                    fontWeight: 400,
-                    color: hov
-                      ? "#f0ead8"
-                      : COLORS.dark,
-                    marginBottom: "0.75rem",
-                  }}
-                >
-                  {f.title}
-                </h3>
-
-                <p
-                  style={{
-                    fontSize: "13px",
-                    color: hov
-                      ? "#999"
-                      : COLORS.muted,
-                    lineHeight: 1.8,
-                    fontWeight: 300,
-                  }}
-                >
-                  {f.desc}
-                </p>
-
-                <div
-                  style={{
-                    marginTop: "1.5rem",
-                    fontSize: "11px",
-                    letterSpacing: "2px",
-                    color: COLORS.gold,
-                    textTransform: "uppercase",
-                  }}
-                >
-                  Explore →
-                </div>
-              </div>
+              </Link>
             );
           })}
         </div>
-      </div>
-
-      {/* STATS */}
-      <div
-        style={{
-          background: COLORS.dark,
-          padding: "4rem",
-          display: "flex",
-          justifyContent: "center",
-          flexWrap: "wrap",
-        }}
-      >
-        {[
-          ["15+", "Years of Excellence"],
-          ["48", "Luxury Suites"],
-          ["4", "Signature Restaurants"],
-          ["99%", "Guest Satisfaction"],
-        ].map(([n, l], i) => (
-          <div
-            key={i}
-            style={{
-              flex: 1,
-              minWidth: "200px",
-              maxWidth: "220px",
-              textAlign: "center",
-              borderRight:
-                i < 3
-                  ? "1px solid rgba(201,168,76,0.15)"
-                  : "none",
-              padding: "1rem 2rem",
-            }}
-          >
-            <div
-              style={{
-                fontFamily:
-                  "Cormorant Garamond, serif",
-                fontSize: "52px",
-                fontWeight: 300,
-                color: COLORS.gold,
-                lineHeight: 1,
-              }}
-            >
-              {n}
-            </div>
-
-            <div
-              style={{
-                fontSize: "11px",
-                letterSpacing: "3px",
-                textTransform: "uppercase",
-                color: "#777",
-                marginTop: "0.5rem",
-              }}
-            >
-              {l}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* TESTIMONIALS */}
-      <div
-        style={{
-          padding: "6rem 4rem",
-          background: COLORS.cream,
-          textAlign: "center",
-        }}
-      >
-        <SectionTag>Guest Stories</SectionTag>
-
-        <h2
-          style={{
-            fontFamily: "Cormorant Garamond, serif",
-            fontSize: "clamp(28px,3vw,44px)",
-            fontWeight: 300,
-            color: COLORS.dark,
-            marginBottom: "3rem",
-          }}
-        >
-          What Our <em>Guests</em> Say
-        </h2>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns:
-              "repeat(auto-fit,minmax(280px,1fr))",
-            gap: "1.5rem",
-            maxWidth: "1000px",
-            margin: "0 auto",
-          }}
-        >
-          {TESTIMONIALS.map((t, i) => (
-            <div
-              key={i}
-              style={{
-                background: COLORS.light,
-                padding: "2.5rem",
-                border:
-                  "1px solid rgba(201,168,76,0.2)",
-                textAlign: "left",
-              }}
-            >
-              <div
-                style={{
-                  fontFamily:
-                    "Cormorant Garamond, serif",
-                  fontSize: "48px",
-                  color: COLORS.gold,
-                  lineHeight: 0.5,
-                  marginBottom: "1.5rem",
-                }}
-              >
-                "
-              </div>
-
-              <p
-                style={{
-                  fontSize: "14px",
-                  lineHeight: 1.9,
-                  color: COLORS.muted,
-                  fontStyle: "italic",
-                  marginBottom: "1.5rem",
-                }}
-              >
-                {t.text}
-              </p>
-
-              <div
-                style={{
-                  borderTop:
-                    "1px solid rgba(201,168,76,0.2)",
-                  paddingTop: "1rem",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: "13px",
-                    fontWeight: 500,
-                    color: COLORS.dark,
-                  }}
-                >
-                  {t.name}
-                </div>
-
-                <div
-                  style={{
-                    fontSize: "11px",
-                    letterSpacing: "2px",
-                    color: COLORS.gold,
-                    textTransform: "uppercase",
-                  }}
-                >
-                  {t.role}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* CTA */}
-      <div
-        style={{
-          background: COLORS.dark,
-          padding: "5rem 4rem",
-          textAlign: "center",
-          position: "relative",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-              "radial-gradient(ellipse at center, rgba(201,168,76,0.07) 0%,transparent 70%)",
-          }}
-        />
-
-        <SectionTag>Reserve Now</SectionTag>
-
-        <h2
-          style={{
-            fontFamily: "Cormorant Garamond, serif",
-            fontSize: "clamp(32px,4vw,56px)",
-            fontWeight: 300,
-            color: "#f0ead8",
-            marginBottom: "1rem",
-          }}
-        >
-          Begin Your <em>Journey</em>
-        </h2>
-
-        <p
-          style={{
-            fontSize: "13px",
-            color: "#777",
-            letterSpacing: "2px",
-            marginBottom: "2.5rem",
-          }}
-        >
-          Extraordinary experiences await
-        </p>
-
-        <Btn
-          onClick={() => setPage("Rooms")}
-          style={{
-            padding: "15px 48px",
-            fontSize: "12px",
-          }}
-        >
-          Book Your Stay
-        </Btn>
       </div>
     </div>
   );

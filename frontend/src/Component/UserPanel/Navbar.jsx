@@ -1,68 +1,123 @@
 // components/Navbar.jsx
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { COLORS, Btn } from "./Shared";
 
 const NAV_ITEMS = [
   { name: "Home", path: "/user" },
+  { name: "About", path: "/about" },
   { name: "Rooms", path: "/Rooms" },
   { name: "Restaurant", path: "/restaurant" },
   { name: "Services", path: "/services" },
+  { name: "Spa", path: "/spa" },
   { name: "Blog", path: "/blog" },
   { name: "Contact", path: "/contact-us" },
 ];
 
 export default function Navbar() {
   const location = useLocation();
+
   const [mobileMenu, setMobileMenu] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  // ───── SCROLL EFFECT ─────
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 40);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () =>
+      window.removeEventListener(
+        "scroll",
+        handleScroll
+      );
+  }, []);
 
   return (
     <>
-      {/* ───── NAVBAR ───── */}
+      {/* ───────────────── NAVBAR ───────────────── */}
       <header
         style={{
           position: "fixed",
           top: 0,
           left: 0,
           width: "100%",
-          zIndex: 1000,
-          background: "rgba(13,13,13,0.96)",
-          backdropFilter: "blur(12px)",
-          borderBottom: "1px solid rgba(201,168,76,0.12)",
+          zIndex: 9999,
+          transition: "all 0.4s ease",
+          background: scrolled
+            ? "rgba(10,10,10,0.96)"
+            : "rgba(13,13,13,0.72)",
+          backdropFilter: "blur(14px)",
+          borderBottom: scrolled
+            ? "1px solid rgba(201,168,76,0.18)"
+            : "1px solid rgba(255,255,255,0.05)",
+          boxShadow: scrolled
+            ? "0 10px 40px rgba(0,0,0,0.35)"
+            : "none",
         }}
       >
         <div
           style={{
-            maxWidth: "1300px",
+            maxWidth: "1380px",
             margin: "0 auto",
-            padding: "1rem 2rem",
+            padding: scrolled
+              ? "0.9rem 2.5rem"
+              : "1.3rem 2.5rem",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            transition: "all 0.4s ease",
           }}
         >
-          {/* ───── LOGO ───── */}
-          <Link to="/user" style={{ textDecoration: "none", color: "inherit" }}>
-            <div style={{ cursor: "pointer", userSelect: "none" }}>
+          {/* ───────────────── LOGO ───────────────── */}
+          <Link
+            to="/user"
+            style={{
+              textDecoration: "none",
+            }}
+          >
+            <div
+              style={{
+                cursor: "pointer",
+                userSelect: "none",
+              }}
+            >
               <h1
                 style={{
-                  fontFamily: "Cormorant Garamond, serif",
-                  fontSize: "34px",
-                  fontWeight: 400,
-                  color: "#f0ead8",
+                  fontFamily:
+                    "Cormorant Garamond, serif",
+                  fontSize: scrolled
+                    ? "30px"
+                    : "36px",
+                  fontWeight: 500,
+                  color: "#f5f1e8",
                   lineHeight: 1,
+                  transition: "0.3s ease",
+                  letterSpacing: "1px",
                 }}
               >
                 Luxury
-                <span style={{ color: COLORS.gold }}>Stay</span>
+                <span
+                  style={{
+                    color: COLORS.gold,
+                    marginLeft: "2px",
+                  }}
+                >
+                  Stay
+                </span>
               </h1>
+
               <p
                 style={{
                   fontSize: "8px",
-                  letterSpacing: "4px",
+                  letterSpacing: "5px",
                   color: COLORS.gold,
                   textTransform: "uppercase",
-                  marginTop: "2px",
+                  marginTop: "4px",
+                  opacity: 0.9,
                 }}
               >
                 Premium Hospitality
@@ -70,111 +125,248 @@ export default function Navbar() {
             </div>
           </Link>
 
-          {/* ───── DESKTOP MENU ───── */}
+          {/* ───────────────── DESKTOP MENU ───────────────── */}
           <nav
             className="desktopMenu"
-            style={{ display: "flex", alignItems: "center", gap: "2rem" }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "2.2rem",
+            }}
           >
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                style={{
-                  position: "relative",
-                  textDecoration: "none",
-                  color: location.pathname === item.path ? COLORS.gold : "#ddd",
-                  fontSize: "11px",
-                  letterSpacing: "2px",
-                  textTransform: "uppercase",
-                  transition: "0.3s",
-                }}
-              >
-                {item.name}
-                {location.pathname === item.path && (
-                  <div
+            {NAV_ITEMS.map((item) => {
+              const active =
+                location.pathname ===
+                item.path;
+
+              return (
+                <Link
+                  key={item.name}
+                  to={item.path}
+                  style={{
+                    position: "relative",
+                    textDecoration: "none",
+                    color: active
+                      ? COLORS.gold
+                      : "#e5e5e5",
+                    fontSize: "11px",
+                    letterSpacing: "2.5px",
+                    textTransform:
+                      "uppercase",
+                    fontWeight: active
+                      ? 500
+                      : 400,
+                    transition:
+                      "all 0.3s ease",
+                    paddingBottom: "6px",
+                  }}
+                >
+                  {item.name}
+
+                  {/* ACTIVE LINE */}
+                  <span
                     style={{
-                      position: "absolute",
+                      position:
+                        "absolute",
                       left: 0,
-                      right: 0,
-                      bottom: "-8px",
+                      bottom: 0,
+                      width: active
+                        ? "100%"
+                        : "0%",
                       height: "1px",
-                      background: COLORS.gold,
+                      background:
+                        COLORS.gold,
+                      transition:
+                        "0.35s ease",
                     }}
                   />
-                )}
-              </Link>
-            ))}
 
-            <Link to="/Rooms">
-              <Btn style={{ padding: "10px 24px", fontSize: "10px" }}>
+                  {/* HOVER LINE */}
+                  <span
+                    className="hoverLine"
+                    style={{
+                      position:
+                        "absolute",
+                      left: 0,
+                      bottom: 0,
+                      width: "0%",
+                      height: "1px",
+                      background:
+                        "rgba(201,168,76,0.6)",
+                      transition:
+                        "0.35s ease",
+                    }}
+                  />
+                </Link>
+              );
+            })}
+
+            {/* BOOK BUTTON */}
+            <Link
+              to="/Rooms"
+              style={{
+                textDecoration: "none",
+              }}
+            >
+              <Btn
+                style={{
+                  padding:
+                    "11px 28px",
+                  fontSize: "10px",
+                  letterSpacing:
+                    "3px",
+                  boxShadow:
+                    "0 10px 25px rgba(201,168,76,0.25)",
+                }}
+              >
                 Book Now
               </Btn>
             </Link>
           </nav>
 
-          {/* ───── MOBILE BUTTON ───── */}
+          {/* ───────────────── MOBILE BUTTON ───────────────── */}
           <button
             className="mobileBtn"
-            onClick={() => setMobileMenu(!mobileMenu)}
+            onClick={() =>
+              setMobileMenu(
+                !mobileMenu
+              )
+            }
             style={{
-              background: "transparent",
+              background:
+                "transparent",
               border: "none",
               color: COLORS.gold,
-              fontSize: "28px",
+              fontSize: "30px",
               cursor: "pointer",
               display: "none",
             }}
           >
-            ☰
+            {mobileMenu
+              ? "✕"
+              : "☰"}
           </button>
         </div>
 
-        {/* ───── MOBILE MENU ───── */}
-        {mobileMenu && (
+        {/* ───────────────── MOBILE MENU ───────────────── */}
+        <div
+          style={{
+            maxHeight: mobileMenu
+              ? "700px"
+              : "0px",
+            overflow: "hidden",
+            transition:
+              "all 0.45s ease",
+            background:
+              "rgba(8,8,8,0.98)",
+            borderTop:
+              mobileMenu
+                ? "1px solid rgba(201,168,76,0.08)"
+                : "none",
+          }}
+        >
           <div
             style={{
-              background: COLORS.darker,
-              padding: "1rem 2rem 2rem",
-              borderTop: "1px solid rgba(201,168,76,0.08)",
+              padding:
+                "1rem 2rem 2rem",
             }}
           >
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.name}
-                to={item.path}
-                onClick={() => setMobileMenu(false)}
+            {NAV_ITEMS.map(
+              (item) => {
+                const active =
+                  location.pathname ===
+                  item.path;
+
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.path}
+                    onClick={() =>
+                      setMobileMenu(
+                        false
+                      )
+                    }
+                    style={{
+                      display:
+                        "block",
+                      padding:
+                        "1rem 0",
+                      borderBottom:
+                        "1px solid rgba(255,255,255,0.06)",
+                      textDecoration:
+                        "none",
+                      color: active
+                        ? COLORS.gold
+                        : "#ddd",
+                      fontSize:
+                        "12px",
+                      letterSpacing:
+                        "2px",
+                      textTransform:
+                        "uppercase",
+                    }}
+                  >
+                    {item.name}
+                  </Link>
+                );
+              }
+            )}
+
+            <Link
+              to="/Rooms"
+              onClick={() =>
+                setMobileMenu(
+                  false
+                )
+              }
+              style={{
+                textDecoration:
+                  "none",
+              }}
+            >
+              <Btn
                 style={{
-                  display: "block",
-                  padding: "1rem 0",
-                  borderBottom: "1px solid rgba(201,168,76,0.08)",
-                  color: location.pathname === item.path ? COLORS.gold : "#ddd",
-                  fontSize: "12px",
-                  letterSpacing: "2px",
-                  textTransform: "uppercase",
-                  textDecoration: "none",
+                  width: "100%",
+                  marginTop:
+                    "1.8rem",
+                  padding:
+                    "14px",
                 }}
               >
-                {item.name}
-              </Link>
-            ))}
-
-            <Link to="/Rooms" onClick={() => setMobileMenu(false)}>
-              <Btn style={{ width: "100%", marginTop: "1.5rem" }}>Reserve Room</Btn>
+                Reserve Room
+              </Btn>
             </Link>
           </div>
-        )}
+        </div>
       </header>
 
-      {/* ───── RESPONSIVE CSS ───── */}
+      {/* ───────────────── CSS ───────────────── */}
       <style>{`
-        @media (max-width: 900px) {
-          .desktopMenu {
-            display: none !important;
+        .desktopMenu a:hover .hoverLine{
+          width:100%;
+        }
+
+        .desktopMenu a:hover{
+          color:${COLORS.gold};
+        }
+
+        @media (max-width: 980px){
+
+          .desktopMenu{
+            display:none !important;
           }
 
-          .mobileBtn {
-            display: block !important;
+          .mobileBtn{
+            display:block !important;
           }
+        }
+
+        @media (max-width: 600px){
+
+          header h1{
+            font-size:28px !important;
+          }
+
         }
       `}</style>
     </>
