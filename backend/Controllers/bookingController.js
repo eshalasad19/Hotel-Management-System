@@ -1,6 +1,6 @@
 const Booking = require("../models/Booking");
 const Room = require("../models/Room");
-
+const User = require('../models/User');
 // Create Booking
 // Create Booking
 const createBooking = async (req, res) => {
@@ -76,6 +76,15 @@ const createBooking = async (req, res) => {
       paymentMethod,
       paymentStatus: finalPaymentStatus,
     });
+    const userId = booking.userId;
+    await User.findByIdAndUpdate(
+  userId,
+  {
+    $push: {
+      bookings: booking._id
+    }
+  }
+);
     await Room.findByIdAndUpdate(
   roomId,
   {

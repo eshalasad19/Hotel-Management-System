@@ -55,13 +55,16 @@ const BookingNew = () => {
 
       const blockedRoomIds = allBookings
         .filter((b) => activeStatuses.includes(b.bookingStatus))
-        .map((b) => b.roomId?._id || b.roomId);
+        .map((b) => String(b.roomId?._id || b.roomId));
 
       const availableRooms = allRooms.filter(
         (room) =>
-          room.status === "available" && !blockedRoomIds.includes(room._id),
+          room.status === "available" &&
+          !blockedRoomIds.includes(String(room._id)),
       );
-
+      console.log(allRooms);
+      console.log(allBookings);
+      console.log(availableRooms);
       setRooms(availableRooms);
     } catch (err) {
       console.error(err);
@@ -103,17 +106,10 @@ const BookingNew = () => {
     const maxGuests = room.capacity || room.maxGuests || 1;
 
     if (Number(guests) > maxGuests) {
+      setGuestError(`Maximum ${maxGuests} guests allowed`);
 
-      setGuestError(
-        `Maximum ${maxGuests} guests allowed`
-      );
-    
-      return alert(
-        `Maximum ${maxGuests} guests allowed`
-      );
-    
+      return alert(`Maximum ${maxGuests} guests allowed`);
     } else {
-    
       setGuestError("");
     }
   };
@@ -201,40 +197,35 @@ const BookingNew = () => {
 
     try {
       const paymentStatus =
-  form.paymentMethod === "online"
-    ? "paid"
-    : form.paymentStatus;
+        form.paymentMethod === "online" ? "paid" : form.paymentStatus;
 
-const bookingStatus =
-  form.paymentMethod === "online"
-    ? "confirmed"
-    : "pending";
+      const bookingStatus =
+        form.paymentMethod === "online" ? "confirmed" : "pending";
 
-      
       // Create booking
-     await axios.post(
-  `${API_URL}/bookings`,
-  {
-    roomId: form.roomId,
+      await axios.post(
+        `${API_URL}/bookings`,
+        {
+          roomId: form.roomId,
 
-    guestName: form.guestName,
-    guestPhone: form.guestPhone,
-    guestEmail: form.guestEmail,
+          guestName: form.guestName,
+          guestPhone: form.guestPhone,
+          guestEmail: form.guestEmail,
 
-    checkInDate: form.checkIn,
-    checkOutDate: form.checkOut,
-    guests: form.guests,
+          checkInDate: form.checkIn,
+          checkOutDate: form.checkOut,
+          guests: form.guests,
 
-    totalAmount: summary.total,
+          totalAmount: summary.total,
 
-    paymentMethod: form.paymentMethod,
-    paymentStatus: paymentStatus,
+          paymentMethod: form.paymentMethod,
+          paymentStatus: paymentStatus,
 
-    specialRequests: form.specialRequests,
-    bookingStatus: bookingStatus,
-  },
-  { headers }
-);
+          specialRequests: form.specialRequests,
+          bookingStatus: bookingStatus,
+        },
+        { headers },
+      );
 
       setSuccess(
         `Booking created successfully! Room ${summary.room.roomNumber} booked for ${form.guestName}`,
@@ -464,32 +455,28 @@ const bookingStatus =
                       </select>
                     </div>
                     {form.paymentMethod === "cash" && (
-  <div className="col-12">
-    <label className="form-label">
-      Cash Payment Status
-    </label>
+                      <div className="col-12">
+                        <label className="form-label">
+                          Cash Payment Status
+                        </label>
 
-    <select
-      className="form-select"
-      value={form.paymentStatus}
-      onChange={(e) =>
-        handleChange("paymentStatus", e.target.value)
-      }
-    >
-      <option value="pending">
-        Pending
-      </option>
+                        <select
+                          className="form-select"
+                          value={form.paymentStatus}
+                          onChange={(e) =>
+                            handleChange("paymentStatus", e.target.value)
+                          }
+                        >
+                          <option value="pending">Pending</option>
 
-      <option value="paid">
-        Paid
-      </option>
-    </select>
+                          <option value="paid">Paid</option>
+                        </select>
 
-    <small className="text-muted">
-      Select paid if guest already paid cash.
-    </small>
-  </div>
-)}
+                        <small className="text-muted">
+                          Select paid if guest already paid cash.
+                        </small>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

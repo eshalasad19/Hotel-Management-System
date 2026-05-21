@@ -9,7 +9,8 @@
     "mongodb": "^7.2.0",
     "mongoose": "^9.6.2",
     "multer": "^2.1.1",
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "recharts": "^3.8.1"
   },
   "name": "backend",
   "version": "1.0.0",

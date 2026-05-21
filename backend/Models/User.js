@@ -25,7 +25,11 @@ const userSchema = new mongoose.Schema({
   },
   address: {
     type: String
-  }
+  },
+  bookings: [{
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'Booking'
+}],
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
