@@ -166,7 +166,6 @@ const colors = [
                 <tr>
                   <th>#</th>
                   <th>Name</th>
-                  <th>Email</th>
                   <th>Phone</th>
                   <th>Type</th>
                   <th>Registered</th>
@@ -226,13 +225,6 @@ const colors = [
                               )}
                             </div>
                           </div>
-                        </td>
-                        <td>
-                          {isWalkin ? (
-                            <span className="text-muted">—</span>
-                          ) : (
-                            u.email
-                          )}
                         </td>
                         <td>{u.phone || "—"}</td>
                         <td>

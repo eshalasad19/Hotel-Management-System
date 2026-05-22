@@ -11,9 +11,7 @@ const Payments = () => {
   const [filtered, setFiltered] = useState([]);
   const [filterPayment, setFilterPayment] = useState('');
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
-  const [paymentStatus, setPaymentStatus] = useState('paid');
   const [selectedIds, setSelectedIds] = useState([]);
 
   useEffect(() => { loadBookings(); }, []);
@@ -41,21 +39,13 @@ const Payments = () => {
   };
 
   const paymentBadge = (status) => (
-    <span className={`badge ${status === 'paid' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'}`}>{status}</span>
+    <span className={`badge ${status === 'paid' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'}`}>
+      {status}
+    </span>
   );
 
-  const handleUpdatePayment = async () => {
-    try {
-      await axios.put(`${API_URL}/bookings/${selectedBooking._id}`, { paymentStatus }, { headers });
-      setShowUpdateModal(false);
-      loadBookings();
-    } catch (err) { console.error(err); }
-  };
-
-  // Hotel info from settings
   const getHotelInfo = () => JSON.parse(localStorage.getItem('hotel_info') || '{}');
 
-  // Generate one invoice HTML
   const generateInvoiceHTML = (b, idx) => {
     const nights = Math.ceil((new Date(b.checkOutDate) - new Date(b.checkInDate)) / (1000 * 60 * 60 * 24));
     const hotel = getHotelInfo();
@@ -90,9 +80,9 @@ const Payments = () => {
             <td width="50%" style="vertical-align:top;padding-right:10px;">
               <div style="background:#f8f9fa;padding:12px;border-radius:6px;">
                 <h4 style="margin:0 0 8px 0;color:#405189;font-size:14px;">GUEST INFORMATION</h4>
-                <p style="margin:3px 0;font-size:13px;"><strong>${b.userId?.name || 'Guest'}</strong></p>
-                <p style="margin:3px 0;font-size:13px;color:#666;">📞 ${b.userId?.phone || '—'}</p>
-                <p style="margin:3px 0;font-size:13px;color:#666;">✉️ ${b.userId?.email?.includes('@walkin.hotel') ? '—' : b.userId?.email || '—'}</p>
+                <p style="margin:3px 0;font-size:13px;"><strong>${b.guestName || b.userId?.name || 'Guest'}</strong></p>
+                <p style="margin:3px 0;font-size:13px;color:#666;">📞 ${b.guestPhone || b.userId?.phone || '—'}</p>
+                <p style="margin:3px 0;font-size:13px;color:#666;">✉️ ${b.guestEmail || (b.userId?.email?.includes('@walkin.hotel') ? '—' : b.userId?.email) || '—'}</p>
               </div>
             </td>
             <td width="50%" style="vertical-align:top;padding-left:10px;">
@@ -161,7 +151,6 @@ const Payments = () => {
     `;
   };
 
-  // Open print window
   const openPrintWindow = (html, title) => {
     const win = window.open('', '_blank');
     win.document.write(`
@@ -188,19 +177,16 @@ const Payments = () => {
     win.document.close();
   };
 
-  // Single print
   const printInvoice = (b) => {
     const idx = bookings.indexOf(b);
     openPrintWindow(generateInvoiceHTML(b, idx), `Invoice INV-${String(idx + 1).padStart(4, '0')}`);
   };
 
-  // Print multiple
   const printMultiple = (list) => {
     const allHTML = list.map(b => generateInvoiceHTML(b, bookings.indexOf(b))).join('');
     openPrintWindow(allHTML, `Invoices — Hotel Management System`);
   };
 
-  // Select toggle
   const toggleSelect = (id) => {
     setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
@@ -225,9 +211,9 @@ const Payments = () => {
       <div className="row mb-3">
         {[
           { label: 'Total Revenue', value: formatPKR(stats.total), icon: 'bx bx-dollar-circle', color: 'success' },
-          { label: 'Paid', value: formatPKR(stats.paid), icon: 'bx bx-check-circle', color: 'info' },
-          { label: 'Unpaid', value: formatPKR(stats.unpaid), icon: 'bx bx-time', color: 'warning' },
-          { label: 'Total Bookings', value: stats.count, icon: 'bx bx-receipt', color: 'primary' },
+          { label: 'Paid',          value: formatPKR(stats.paid),  icon: 'bx bx-check-circle',  color: 'info' },
+          { label: 'Unpaid',        value: formatPKR(stats.unpaid),icon: 'bx bx-time',           color: 'warning' },
+          { label: 'Total Bookings',value: stats.count,            icon: 'bx bx-receipt',        color: 'primary' },
         ].map((s, i) => (
           <div className="col-xl-3 col-md-6" key={i}>
             <div className="card card-animate">
@@ -265,9 +251,6 @@ const Payments = () => {
               <button className="btn btn-sm btn-outline-primary" onClick={() => printMultiple(selectedBookings)}>
                 <i className="ri-printer-line me-1"></i>Print Selected ({selectedIds.length})
               </button>
-              <button className="btn btn-sm btn-outline-success" onClick={() => printMultiple(selectedBookings)}>
-                <i className="ri-download-line me-1"></i>Download Selected
-              </button>
             </div>
           )}
 
@@ -279,9 +262,6 @@ const Payments = () => {
             </select>
             <button className="btn btn-sm btn-primary" onClick={() => printMultiple(filtered)}>
               <i className="ri-printer-line me-1"></i>Print All
-            </button>
-            <button className="btn btn-sm btn-success" onClick={() => printMultiple(filtered)}>
-              <i className="ri-download-line me-1"></i>Download All
             </button>
           </div>
         </div>
@@ -296,9 +276,15 @@ const Payments = () => {
                       checked={selectedIds.length === filtered.length && filtered.length > 0}
                       onChange={toggleSelectAll} />
                   </th>
-                  <th>Invoice #</th><th>Guest</th><th>Room</th>
-                  <th>Check In</th><th>Check Out</th><th>Nights</th>
-                  <th>Amount</th><th>Status</th><th>Actions</th>
+                  <th>Invoice #</th>
+                  <th>Guest</th>
+                  <th>Room</th>
+                  <th>Check In</th>
+                  <th>Check Out</th>
+                  <th>Nights</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -315,8 +301,8 @@ const Payments = () => {
                       </td>
                       <td><span className="fw-medium text-primary">INV-{String(i + 1).padStart(4, '0')}</span></td>
                       <td>
-                        <div className="fw-medium">{b.userId?.name || 'Guest'}</div>
-                        <small className="text-muted">{b.userId?.phone || ''}</small>
+                        <div className="fw-medium">{b.guestName || b.userId?.name || 'Guest'}</div>
+                        <small className="text-muted">{b.guestPhone || b.userId?.phone || ''}</small>
                       </td>
                       <td>{b.roomId ? `Room ${b.roomId.roomNumber}` : '—'}</td>
                       <td>{new Date(b.checkInDate).toLocaleDateString('en-PK')}</td>
@@ -326,21 +312,15 @@ const Payments = () => {
                       <td>{paymentBadge(b.paymentStatus)}</td>
                       <td>
                         <div className="d-flex gap-1">
-                          <button className="btn btn-soft-info btn-sm" title="View"
+                          {/* View Invoice */}
+                          <button className="btn btn-soft-info btn-sm" title="View Invoice"
                             onClick={() => { setSelectedBooking(b); setShowInvoiceModal(true); }}>
                             <i className="ri-eye-line"></i>
                           </button>
-                          <button className="btn btn-soft-primary btn-sm" title="Print"
+                          {/* Print Invoice */}
+                          <button className="btn btn-soft-primary btn-sm" title="Print Invoice"
                             onClick={() => printInvoice(b)}>
                             <i className="ri-printer-line"></i>
-                          </button>
-                          <button className="btn btn-soft-success btn-sm" title="Download PDF"
-                            onClick={() => printInvoice(b)}>
-                            <i className="ri-download-line"></i>
-                          </button>
-                          <button className="btn btn-soft-warning btn-sm" title="Update Payment"
-                            onClick={() => { setSelectedBooking(b); setPaymentStatus(b.paymentStatus); setShowUpdateModal(true); }}>
-                            <i className="ri-edit-line"></i>
                           </button>
                         </div>
                       </td>
@@ -384,9 +364,9 @@ const Payments = () => {
                     <div className="col-md-6">
                       <div className="p-3 bg-light rounded">
                         <h6 className="fw-semibold mb-2 text-primary">Guest Information</h6>
-                        <p className="mb-1">Name: <strong>{b.userId?.name || 'Guest'}</strong></p>
-                        <p className="mb-1">Phone: {b.userId?.phone || '—'}</p>
-                        <p className="mb-0">Email: {b.userId?.email?.includes('@walkin.hotel') ? '—' : b.userId?.email || '—'}</p>
+                        <p className="mb-1">Name: <strong>{b.guestName || b.userId?.name || 'Guest'}</strong></p>
+                        <p className="mb-1">Phone: {b.guestPhone || b.userId?.phone || '—'}</p>
+                        <p className="mb-0">Email: {b.guestEmail || (b.userId?.email?.includes('@walkin.hotel') ? '—' : b.userId?.email) || '—'}</p>
                       </div>
                     </div>
                     <div className="col-md-6">
@@ -397,13 +377,33 @@ const Payments = () => {
                         <p className="mb-0">Price/Night: {formatPKR(b.roomId?.price || 0)}</p>
                       </div>
                     </div>
-                    <div className="col-md-4"><div className="p-3 bg-light rounded text-center"><p className="text-muted mb-1 fs-12">CHECK IN</p><h6 className="text-success">{new Date(b.checkInDate).toLocaleDateString('en-PK')}</h6></div></div>
-                    <div className="col-md-4"><div className="p-3 bg-light rounded text-center"><p className="text-muted mb-1 fs-12">CHECK OUT</p><h6 className="text-warning">{new Date(b.checkOutDate).toLocaleDateString('en-PK')}</h6></div></div>
-                    <div className="col-md-4"><div className="p-3 bg-light rounded text-center"><p className="text-muted mb-1 fs-12">DURATION</p><h6 className="text-info">{nights} Night(s)</h6></div></div>
+                    <div className="col-md-4">
+                      <div className="p-3 bg-light rounded text-center">
+                        <p className="text-muted mb-1 fs-12">CHECK IN</p>
+                        <h6 className="text-success">{new Date(b.checkInDate).toLocaleDateString('en-PK')}</h6>
+                      </div>
+                    </div>
+                    <div className="col-md-4">
+                      <div className="p-3 bg-light rounded text-center">
+                        <p className="text-muted mb-1 fs-12">CHECK OUT</p>
+                        <h6 className="text-warning">{new Date(b.checkOutDate).toLocaleDateString('en-PK')}</h6>
+                      </div>
+                    </div>
+                    <div className="col-md-4">
+                      <div className="p-3 bg-light rounded text-center">
+                        <p className="text-muted mb-1 fs-12">DURATION</p>
+                        <h6 className="text-info">{nights} Night(s)</h6>
+                      </div>
+                    </div>
                   </div>
                   <table className="table table-bordered mb-3">
                     <thead className="table-light">
-                      <tr><th>Description</th><th className="text-center">Nights</th><th className="text-end">Rate/Night</th><th className="text-end">Amount</th></tr>
+                      <tr>
+                        <th>Description</th>
+                        <th className="text-center">Nights</th>
+                        <th className="text-end">Rate/Night</th>
+                        <th className="text-end">Amount</th>
+                      </tr>
                     </thead>
                     <tbody>
                       <tr>
@@ -427,40 +427,12 @@ const Payments = () => {
                   <button className="btn btn-primary" onClick={() => printInvoice(selectedBooking)}>
                     <i className="ri-printer-line me-1"></i>Print
                   </button>
-                  <button className="btn btn-success" onClick={() => printInvoice(selectedBooking)}>
-                    <i className="ri-download-line me-1"></i>Download PDF
-                  </button>
                 </div>
               </div>
             </div>
           </div>
         );
       })()}
-
-      {/* Update Payment Modal */}
-      {showUpdateModal && (
-        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-sm">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Update Payment</h5>
-                <button className="btn-close" onClick={() => setShowUpdateModal(false)}></button>
-              </div>
-              <div className="modal-body">
-                <label className="form-label">Payment Status</label>
-                <select className="form-select" value={paymentStatus} onChange={e => setPaymentStatus(e.target.value)}>
-                  <option value="paid">Paid ✅</option>
-                  <option value="unpaid">Unpaid ❌</option>
-                </select>
-              </div>
-              <div className="modal-footer">
-                <button className="btn btn-light" onClick={() => setShowUpdateModal(false)}>Cancel</button>
-                <button className="btn btn-success" onClick={handleUpdatePayment}>Update</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

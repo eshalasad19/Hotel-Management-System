@@ -89,9 +89,10 @@ const getAllUsers = async (req, res) => {
 // Update User (Admin)
 const updateUser = async (req, res) => {
   try {
-    const { name, phone, role, address } = req.body;
+    const { name, phone, role, address, status } = req.body;
     const updates = { name, phone, role };
     if (address !== undefined) updates.address = address;
+    if (status !== undefined) updates.status = status;
 
     const user = await User.findByIdAndUpdate(
       req.params.id,

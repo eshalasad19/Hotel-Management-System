@@ -36,6 +36,11 @@ const userSchema = new mongoose.Schema({
     enum: ['walk-in', 'online'],
     default: 'online'
   },
+  status: {
+    type: String,
+    enum: ['active', 'inactive', 'on_leave', 'suspended'],
+    default: 'active'
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

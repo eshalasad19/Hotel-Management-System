@@ -10,24 +10,37 @@ const Staff = () => {
   const [staff, setStaff] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [filterRole, setFilterRole] = useState('');
+  const [search, setSearch] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [showDeactivateModal, setShowDeactivateModal] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [error, setError] = useState('');
   const [addForm, setAddForm] = useState({ name: '', email: '', phone: '', role: '', password: '' });
-  const [editForm, setEditForm] = useState({ name: '', phone: '', role: '' });
+  const [editForm, setEditForm] = useState({ name: '', phone: '', role: '', status: '' });
 
   useEffect(() => { loadStaff(); }, []);
 
   useEffect(() => {
-    setFiltered(filterRole ? staff.filter(u => u.role === filterRole) : staff);
-  }, [filterRole, staff]);
+    let result = staff;
+    if (filterRole) result = result.filter(u => u.role === filterRole);
+    if (search) {
+      const q = search.toLowerCase();
+      result = result.filter(u =>
+        u.name.toLowerCase().includes(q) ||
+        u.email.toLowerCase().includes(q)
+      );
+    }
+    setFiltered(result);
+  }, [filterRole, search, staff]);
 
   const loadStaff = async () => {
     try {
       const res = await axios.get(`${API_URL}/auth/users`, { headers });
-      const staffOnly = res.data.filter(u => ['manager', 'receptionist', 'housekeeping', 'maintenance'].includes(u.role));
+      const staffOnly = res.data.filter(u =>
+        ['manager', 'receptionist', 'housekeeping', 'maintenance'].includes(u.role)
+      );
       setStaff(staffOnly);
       setFiltered(staffOnly);
     } catch (err) { console.error(err); }
@@ -35,6 +48,7 @@ const Staff = () => {
 
   const stats = {
     total: staff.length,
+    active: staff.filter(u => u.status === 'active' || !u.status).length,
     receptionist: staff.filter(u => u.role === 'receptionist').length,
     housekeeping: staff.filter(u => u.role === 'housekeeping').length,
     maintenance: staff.filter(u => u.role === 'maintenance').length,
@@ -42,18 +56,49 @@ const Staff = () => {
 
   const roleBadge = (role) => {
     const map = {
-      manager:      'bg-purple-subtle text-purple',
-      receptionist: 'bg-info-subtle text-info',
-      housekeeping: 'bg-success-subtle text-success',
-      maintenance:  'bg-warning-subtle text-warning'
+      manager:      { backgroundColor: '#6f42c1', color: '#fff' },
+      receptionist: { backgroundColor: '#0dcaf0', color: '#000' },
+      housekeeping: { backgroundColor: '#198754', color: '#fff' },
+      maintenance:  { backgroundColor: '#fd7e14', color: '#fff' },
     };
-    return <span className={`badge ${map[role] || 'bg-secondary'}`}>{role}</span>;
+    const style = map[role] || { backgroundColor: '#6c757d', color: '#fff' };
+    return <span className="badge" style={style}>{role}</span>;
+  };
+
+  const statusBadge = (status) => {
+    const map = {
+      active:     { cls: 'bg-success-subtle text-success', label: 'Active' },
+      inactive:   { cls: 'bg-secondary-subtle text-secondary', label: 'Inactive' },
+      on_leave:   { cls: 'bg-info-subtle text-info', label: 'On Leave' },
+      suspended:  { cls: 'bg-danger-subtle text-danger', label: 'Suspended' },
+    };
+    const s = map[status] || map['active'];
+    return <span className={`badge ${s.cls}`}>{s.label}</span>;
+  };
+
+  const phoneRegex = /^03\d{9}$/;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+  const handlePhoneInput = (val) => {
+    // Sirf numbers allow karo, max 11 digits
+    const onlyNums = val.replace(/\D/g, '').slice(0, 11);
+    return onlyNums;
   };
 
   const handleAdd = async () => {
     setError('');
     const { name, email, phone, role, password } = addForm;
-    if (!name || !email || !phone || !role || !password) { setError('All fields are required.'); return; }
+
+    if (!name.trim())               { setError('Full name is required.');         return; }
+    if (!email.trim())              { setError('Email is required.');              return; }
+    if (!emailRegex.test(email))    { setError('Enter a valid email address.');    return; }
+    if (!phone.trim())              { setError('Phone number is required.');       return; }
+    if (!phoneRegex.test(phone))    { setError('Enter valid Pakistani phone number (03XXXXXXXXX — 11 digits).'); return; }
+    if (!password.trim())           { setError('Password is required.');           return; }
+    if (!passwordRegex.test(password)) { setError('Password must be at least 8 characters with 1 uppercase, 1 lowercase, and 1 number.'); return; }
+    if (!role)                      { setError('Please select a role.');           return; }
+
     try {
       await axios.post(`${API_URL}/auth/register`, { name, email, phone, password, role }, { headers });
       setShowAddModal(false);
@@ -71,19 +116,29 @@ const Staff = () => {
     } catch (err) { setError(err.response?.data?.message || 'Error updating staff.'); }
   };
 
-  const handleDelete = async () => {
+  // Deactivate instead of delete
+  const handleDeactivate = async () => {
     try {
-      await axios.delete(`${API_URL}/auth/users/${selectedStaff._id}`, { headers });
-      setShowDeleteModal(false);
+      await axios.put(
+        `${API_URL}/auth/users/${selectedStaff._id}`,
+        { status: 'inactive' },
+        { headers }
+      );
+      setShowDeactivateModal(false);
       loadStaff();
     } catch (err) { console.error(err); }
   };
 
   const openEdit = (u) => {
     setSelectedStaff(u);
-    setEditForm({ name: u.name, phone: u.phone || '', role: u.role });
+    setEditForm({ name: u.name, phone: u.phone || '', role: u.role, status: u.status || 'active' });
     setError('');
     setShowEditModal(true);
+  };
+
+  const openView = (u) => {
+    setSelectedStaff(u);
+    setShowViewModal(true);
   };
 
   const colors = ['bg-primary', 'bg-success', 'bg-warning', 'bg-info', 'bg-danger'];
@@ -94,7 +149,11 @@ const Staff = () => {
         <div className="col-12">
           <div className="page-title-box d-sm-flex align-items-center justify-content-between">
             <h4 className="mb-sm-0">Manage Staff</h4>
-            <button className="btn btn-success" onClick={() => { setAddForm({ name: '', email: '', phone: '', role: '', password: '' }); setError(''); setShowAddModal(true); }}>
+            <button className="btn btn-success" onClick={() => {
+              setAddForm({ name: '', email: '', phone: '', role: '', password: '' });
+              setError('');
+              setShowAddModal(true);
+            }}>
               <i className="ri-user-add-line me-1"></i> Add Staff Member
             </button>
           </div>
@@ -104,10 +163,10 @@ const Staff = () => {
       {/* Stats */}
       <div className="row mb-3">
         {[
-          { label: 'Total Staff', value: stats.total, icon: 'bx bx-group', color: 'primary' },
-          { label: 'Receptionists', value: stats.receptionist, icon: 'bx bx-headphone', color: 'info' },
-          { label: 'Housekeeping', value: stats.housekeeping, icon: 'bx bx-brush', color: 'success' },
-          { label: 'Maintenance', value: stats.maintenance, icon: 'bx bx-wrench', color: 'warning' },
+          { label: 'Total Staff',    value: stats.total,        icon: 'bx bx-group',    color: 'primary' },
+          { label: 'Active',         value: stats.active,       icon: 'bx bx-user-check', color: 'success' },
+          { label: 'Housekeeping',   value: stats.housekeeping, icon: 'bx bx-brush',    color: 'info' },
+          { label: 'Maintenance',    value: stats.maintenance,  icon: 'bx bx-wrench',   color: 'warning' },
         ].map((s, i) => (
           <div className="col-md-3 col-6" key={i}>
             <div className="card card-animate">
@@ -131,8 +190,19 @@ const Staff = () => {
 
       {/* Table */}
       <div className="card">
-        <div className="card-header d-flex align-items-center">
+        <div className="card-header d-flex align-items-center gap-2">
           <h5 className="card-title mb-0 flex-grow-1">Staff Members</h5>
+
+          {/* Search */}
+          <input
+            type="text"
+            className="form-control form-control-sm w-auto"
+            placeholder="Search by name or email..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+
+          {/* Role Filter */}
           <select className="form-select form-select-sm w-auto" value={filterRole} onChange={e => setFilterRole(e.target.value)}>
             <option value="">All Roles</option>
             <option value="manager">Manager</option>
@@ -145,20 +215,32 @@ const Staff = () => {
           <div className="table-responsive">
             <table className="table table-hover align-middle mb-0">
               <thead className="table-light">
-                <tr><th>#</th><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Joined</th><th>Actions</th></tr>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Role</th>
+                  <th>Status</th>
+                  <th>Joined</th>
+                  <th>Actions</th>
+                </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
-                  <tr><td colSpan="7" className="text-center py-4 text-muted">No staff members found.</td></tr>
+                  <tr><td colSpan="8" className="text-center py-4 text-muted">No staff members found.</td></tr>
                 ) : filtered.map((u, i) => {
                   const initials = u.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                  const isInactive = u.status === 'inactive';
                   return (
-                    <tr key={u._id}>
+                    <tr key={u._id} className={isInactive ? 'opacity-75' : ''}>
                       <td>{i + 1}</td>
                       <td>
                         <div className="d-flex align-items-center gap-2">
                           <div className="avatar-xs">
-                            <span className={`avatar-title rounded-circle ${colors[i % colors.length]} text-white`} style={{ fontSize: '11px' }}>{initials}</span>
+                            <span className={`avatar-title rounded-circle ${colors[i % colors.length]} text-white`} style={{ fontSize: '11px' }}>
+                              {initials}
+                            </span>
                           </div>
                           <div className="fw-medium">{u.name}</div>
                         </div>
@@ -166,11 +248,41 @@ const Staff = () => {
                       <td>{u.email}</td>
                       <td>{u.phone || '—'}</td>
                       <td>{roleBadge(u.role)}</td>
+                      <td>{statusBadge(u.status || 'active')}</td>
                       <td><small className="text-muted">{new Date(u.createdAt).toLocaleDateString('en-PK')}</small></td>
                       <td>
                         <div className="d-flex gap-1">
-                          <button className="btn btn-soft-primary btn-sm" onClick={() => openEdit(u)}><i className="ri-edit-line"></i></button>
-                          <button className="btn btn-soft-danger btn-sm" onClick={() => { setSelectedStaff(u); setShowDeleteModal(true); }}><i className="ri-delete-bin-line"></i></button>
+                          {/* View */}
+                          <button className="btn btn-soft-info btn-sm" onClick={() => openView(u)} title="View Profile">
+                            <i className="ri-eye-line"></i>
+                          </button>
+                          {/* Edit */}
+                          <button className="btn btn-soft-primary btn-sm" onClick={() => openEdit(u)} title="Edit">
+                            <i className="ri-edit-line"></i>
+                          </button>
+                          {/* Deactivate — sirf active staff ke liye */}
+                          {(u.status === 'active' || !u.status) && (
+                            <button
+                              className="btn btn-soft-danger btn-sm"
+                              title="Deactivate"
+                              onClick={() => { setSelectedStaff(u); setShowDeactivateModal(true); }}
+                            >
+                              <i className="ri-user-unfollow-line"></i>
+                            </button>
+                          )}
+                          {/* Reactivate — sirf inactive staff ke liye */}
+                          {u.status === 'inactive' && (
+                            <button
+                              className="btn btn-soft-success btn-sm"
+                              title="Reactivate"
+                              onClick={async () => {
+                                await axios.put(`${API_URL}/auth/users/${u._id}`, { status: 'active' }, { headers });
+                                loadStaff();
+                              }}
+                            >
+                              <i className="ri-user-follow-line"></i>
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -181,6 +293,58 @@ const Staff = () => {
           </div>
         </div>
       </div>
+
+      {/* View Profile Modal */}
+      {showViewModal && selectedStaff && (
+        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Staff Profile</h5>
+                <button className="btn-close" onClick={() => setShowViewModal(false)}></button>
+              </div>
+              <div className="modal-body">
+                {/* Avatar + Name Header */}
+                <div className="text-center mb-4">
+                  <div className="avatar-lg mx-auto mb-3">
+                    <span className="avatar-title rounded-circle bg-primary text-white fs-3">
+                      {selectedStaff.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                    </span>
+                  </div>
+                  <h5 className="mb-1">{selectedStaff.name}</h5>
+                  <div className="d-flex justify-content-center gap-2">
+                    {roleBadge(selectedStaff.role)}
+                    {statusBadge(selectedStaff.status || 'active')}
+                  </div>
+                </div>
+
+                <div className="row g-3">
+                  {[
+                    { label: 'Email',       value: selectedStaff.email },
+                    { label: 'Phone',       value: selectedStaff.phone || '—' },
+                    { label: 'Role',        value: selectedStaff.role },
+                    { label: 'Status',      value: selectedStaff.status || 'active' },
+                    { label: 'Joined Date', value: new Date(selectedStaff.createdAt).toLocaleDateString('en-PK') },
+                  ].map((item, i) => (
+                    <div className="col-md-6" key={i}>
+                      <div className="p-3 bg-light rounded">
+                        <p className="text-muted mb-1 fs-12">{item.label}</p>
+                        <h6 className="mb-0">{item.value}</h6>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-light" onClick={() => setShowViewModal(false)}>Close</button>
+                <button className="btn btn-primary" onClick={() => { setShowViewModal(false); openEdit(selectedStaff); }}>
+                  <i className="ri-edit-line me-1"></i> Edit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Add Modal */}
       {showAddModal && (
@@ -194,18 +358,68 @@ const Staff = () => {
               <div className="modal-body">
                 {error && <div className="alert alert-danger">{error}</div>}
                 <div className="row g-3">
-                  {[
-                    { label: 'Full Name', key: 'name', type: 'text', placeholder: 'Enter full name' },
-                    { label: 'Email', key: 'email', type: 'email', placeholder: 'Enter email' },
-                    { label: 'Phone', key: 'phone', type: 'text', placeholder: '03001234567' },
-                    { label: 'Password', key: 'password', type: 'password', placeholder: 'Set password' },
-                  ].map(f => (
-                    <div className="col-12" key={f.key}>
-                      <label className="form-label">{f.label} <span className="text-danger">*</span></label>
-                      <input type={f.type} className="form-control" placeholder={f.placeholder}
-                        value={addForm[f.key]} onChange={e => setAddForm({ ...addForm, [f.key]: e.target.value })} />
-                    </div>
-                  ))}
+                  {/* Name */}
+                  <div className="col-12">
+                    <label className="form-label">Full Name <span className="text-danger">*</span></label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter full name"
+                      value={addForm.name}
+                      onChange={e => setAddForm({ ...addForm, name: e.target.value })}
+                    />
+                  </div>
+
+                  {/* Email */}
+                  <div className="col-12">
+                    <label className="form-label">Email <span className="text-danger">*</span></label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      placeholder="Enter email"
+                      value={addForm.email}
+                      onChange={e => setAddForm({ ...addForm, email: e.target.value })}
+                    />
+                  </div>
+
+                  {/* Phone — sirf numbers, max 11, Pakistani format */}
+                  <div className="col-12">
+                    <label className="form-label">Phone <span className="text-danger">*</span></label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="03XXXXXXXXX"
+                      maxLength={11}
+                      value={addForm.phone}
+                      onChange={e => setAddForm({ ...addForm, phone: handlePhoneInput(e.target.value) })}
+                      onKeyDown={e => {
+                        // 11 digits ho jayen to aur type na ho — backspace/delete/arrows allow karo
+                        const allowedKeys = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab'];
+                        if (addForm.phone.length >= 11 && !allowedKeys.includes(e.key) && !/^[0-9]$/.test(e.key) === false) {
+                          // already handled by maxLength + handlePhoneInput
+                        }
+                        if (!/^[0-9]$/.test(e.key) && !allowedKeys.includes(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+                    <small className="text-muted">Pakistani number — 03XXXXXXXXX (11 digits)</small>
+                  </div>
+
+                  {/* Password */}
+                  <div className="col-12">
+                    <label className="form-label">Password <span className="text-danger">*</span></label>
+                    <input
+                      type="password"
+                      className="form-control"
+                      placeholder="Min 8 chars, 1 uppercase, 1 number"
+                      value={addForm.password}
+                      onChange={e => setAddForm({ ...addForm, password: e.target.value })}
+                    />
+                    <small className="text-muted">Min 8 characters · 1 uppercase · 1 lowercase · 1 number</small>
+                  </div>
+
+                  {/* Role */}
                   <div className="col-12">
                     <label className="form-label">Role <span className="text-danger">*</span></label>
                     <select className="form-select" value={addForm.role} onChange={e => setAddForm({ ...addForm, role: e.target.value })}>
@@ -241,19 +455,45 @@ const Staff = () => {
                 <div className="row g-3">
                   <div className="col-12">
                     <label className="form-label">Full Name</label>
-                    <input className="form-control" value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} />
+                    <input className="form-control" value={editForm.name}
+                      onChange={e => setEditForm({ ...editForm, name: e.target.value })} />
                   </div>
                   <div className="col-12">
                     <label className="form-label">Phone</label>
-                    <input className="form-control" value={editForm.phone} onChange={e => setEditForm({ ...editForm, phone: e.target.value })} />
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="03XXXXXXXXX"
+                      maxLength={11}
+                      value={editForm.phone}
+                      onChange={e => setEditForm({ ...editForm, phone: handlePhoneInput(e.target.value) })}
+                      onKeyDown={e => {
+                        const allowedKeys = ['Backspace','Delete','ArrowLeft','ArrowRight','Tab'];
+                        if (!/^[0-9]$/.test(e.key) && !allowedKeys.includes(e.key)) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+                    <small className="text-muted">Pakistani number — 03XXXXXXXXX (11 digits)</small>
                   </div>
                   <div className="col-12">
                     <label className="form-label">Role</label>
-                    <select className="form-select" value={editForm.role} onChange={e => setEditForm({ ...editForm, role: e.target.value })}>
+                    <select className="form-select" value={editForm.role}
+                      onChange={e => setEditForm({ ...editForm, role: e.target.value })}>
                       <option value="manager">Manager</option>
                       <option value="receptionist">Receptionist</option>
                       <option value="housekeeping">Housekeeping</option>
                       <option value="maintenance">Maintenance</option>
+                    </select>
+                  </div>
+                  <div className="col-12">
+                    <label className="form-label">Status</label>
+                    <select className="form-select" value={editForm.status}
+                      onChange={e => setEditForm({ ...editForm, status: e.target.value })}>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                      <option value="on_leave">On Leave</option>
+                      <option value="suspended">Suspended</option>
                     </select>
                   </div>
                 </div>
@@ -267,22 +507,23 @@ const Staff = () => {
         </div>
       )}
 
-      {/* Delete Modal */}
-      {showDeleteModal && (
+      {/* Deactivate Modal */}
+      {showDeactivateModal && selectedStaff && (
         <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog modal-sm">
             <div className="modal-content">
               <div className="modal-body text-center p-4">
                 <div className="avatar-md mx-auto mb-3">
-                  <span className="avatar-title bg-danger-subtle rounded-circle fs-1">
-                    <i className="ri-delete-bin-line text-danger"></i>
+                  <span className="avatar-title bg-warning-subtle rounded-circle fs-1">
+                    <i className="ri-user-unfollow-line text-warning"></i>
                   </span>
                 </div>
-                <h5>Delete Staff Member?</h5>
-                <p className="text-muted">This action cannot be undone.</p>
-                <div className="d-flex gap-2 justify-content-center">
-                  <button className="btn btn-light" onClick={() => setShowDeleteModal(false)}>Cancel</button>
-                  <button className="btn btn-danger" onClick={handleDelete}>Delete</button>
+                <h5>Deactivate Staff Member?</h5>
+                <p className="text-muted mb-1">{selectedStaff.name}</p>
+                <p className="text-muted fs-13">Staff record rehega — sirf inactive ho jaayega. Baad mein reactivate kar sakte ho.</p>
+                <div className="d-flex gap-2 justify-content-center mt-3">
+                  <button className="btn btn-light" onClick={() => setShowDeactivateModal(false)}>Cancel</button>
+                  <button className="btn btn-warning" onClick={handleDeactivate}>Deactivate</button>
                 </div>
               </div>
             </div>
