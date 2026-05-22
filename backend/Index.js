@@ -14,12 +14,8 @@ app.use(express.json());
 
 connectDB();
 
-app.use(
-  '/Uploads',
-  express.static(
-    path.join(__dirname, 'Uploads')
-  )
-);
+app.use("/Uploads", 
+  express.static(path.join(__dirname, "Uploads")));
 
 // Static files 
 app.use(express.static('Public'));

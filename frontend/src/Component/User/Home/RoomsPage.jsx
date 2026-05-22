@@ -32,11 +32,7 @@ const RoomsPage = () => {
           <RoomsList rooms={rooms} loading={loading} />
         )}
 
-        {/* 3. Reusable Amenities Section */}
-        <HomeAmenities />
-
-        {/* 4. Reusable Availability Section */}
-        <AvailabilitySection />
+       
       </div>
     </div>
   );

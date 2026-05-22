@@ -38,7 +38,12 @@ const addRoom = async (req, res) => {
   }
 
 };
-
+ const getSingleRoom = async (id) => {
+  const res = await fetch(`${BASE_URL}/api/rooms/${id}`);
+  if (!res.ok) throw new Error("Room not found");
+  const data = await res.json();
+  return data; // backend seedha room object return karta hai
+};
 // Get All Rooms
 const getAllRooms = async (req, res) => {
   try {

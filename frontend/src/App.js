@@ -39,6 +39,7 @@ import ContactUs from './Component/User/Home/ContactUs';
 import RoomDetailsPage from './Component/User/Home/RoomDetailsPage';
 import BlogPage from './Component/User/Home/BlogPage';
 import BlogDetailsPage from './Component/User/Home/BlogDetailsPage';
+import BookingPage from './Component/User/Home/sections/Booking';
 
 function App() {
   return (
@@ -64,6 +65,7 @@ function App() {
           <Route path="roomsdetails/:id" element={<RoomDetailsPage />} />
           <Route path="blog" element={<BlogPage />} />
           <Route path="blog/:id" element={<BlogDetailsPage />} />
+          <Route path="/booking/:roomId" element={<BookingPage />} />
         </Route>
 
         {/* Admin routes */}
