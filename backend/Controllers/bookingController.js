@@ -1,12 +1,15 @@
-const Booking = require("../models/Booking");
-const Room = require("../models/Room");
-
+const Booking = require("../Models/Booking");
+const Room = require("../Models/Room");
+const User = require('../Models/User');
 // Create Booking
 // Create Booking
 const createBooking = async (req, res) => {
   try {
     const {
       roomId,
+      guestName,
+      guestPhone,
+      guestEmail,
       checkInDate,
       checkOutDate,
       guests,
@@ -47,46 +50,42 @@ const createBooking = async (req, res) => {
       amount = days * room.price;
     }
 
-    // ONLINE PAYMENT
-    // agar online payment he to automatically paid
-    let finalPaymentStatus = "unpaid";
+    // Payment status determine karo
+    let finalPaymentStatus = "pending";
+    if (paymentMethod === "online") finalPaymentStatus = "paid";
+    if (paymentMethod === "cash") finalPaymentStatus = paymentStatus || "pending";
 
-    if (paymentMethod === "online") {
-      finalPaymentStatus = "paid";
+    // FIX 1: Agar payment paid hai to room "occupied" warna "reserved"
+    let finalRoomStatus = "reserved";
+    let finalBookingStatus = bookingStatus || "pending";
+    if (finalPaymentStatus === "paid") {
+      finalRoomStatus = "occupied";
+      finalBookingStatus = "confirmed";
     }
 
-    // CASH PAYMENT
-    // manager baad me paid karega
-    if (paymentMethod === "cash") {
-      finalPaymentStatus = paymentStatus || "unpaid";
-    }
-
-    // Booking create
+    // FIX 2: guestName, guestPhone, guestEmail properly save karo
     const booking = await Booking.create({
-      userId: req.body.userId || req.user.id,
+      userId: req.body.userId || (req.user ? req.user.id : undefined),
       roomId,
+      guestName: guestName || "",
+      guestPhone: guestPhone || "",
+      guestEmail: guestEmail || "",
       checkInDate,
       checkOutDate,
       guests,
       totalAmount: amount,
       specialRequests,
-
-      bookingStatus: bookingStatus || "confirmed",
-
+      bookingStatus: finalBookingStatus,
       paymentMethod,
       paymentStatus: finalPaymentStatus,
     });
-    await Room.findByIdAndUpdate(
-  roomId,
-  {
-    status: 'reserved'
-  }
-);
 
-    // Reserve room
-    await Room.findByIdAndUpdate(roomId, {
-      status: "reserved",
-    });
+    const userId = booking.userId;
+    if (userId) {
+      await User.findByIdAndUpdate(userId, { $push: { bookings: booking._id } });
+    }
+
+    await Room.findByIdAndUpdate(roomId, { status: finalRoomStatus });
 
     res.status(201).json({
       message: "Booking created successfully",
@@ -354,12 +353,16 @@ const updatePaymentStatus = async (req, res) => {
 
     booking.paymentStatus = "paid";
 
-// Auto confirm booking on payment
-if (booking.bookingStatus === "pending") {
-  booking.bookingStatus = "confirmed";
-}
+    // FIX 1: Payment paid hone par booking confirmed + room occupied ho jata hai
+    if (booking.bookingStatus === "pending") {
+      booking.bookingStatus = "confirmed";
+    }
 
-await booking.save();
+    await booking.save();
+
+    // FIX 1: Room status "occupied" kar do (reserved se upgrade)
+    await Room.findByIdAndUpdate(booking.roomId, { status: "occupied" });
+
     res.status(200).json({
       success: true,
       message: "Payment marked as paid",

@@ -55,13 +55,16 @@ const BookingNew = () => {
 
       const blockedRoomIds = allBookings
         .filter((b) => activeStatuses.includes(b.bookingStatus))
-        .map((b) => b.roomId?._id || b.roomId);
+        .map((b) => String(b.roomId?._id || b.roomId));
 
       const availableRooms = allRooms.filter(
         (room) =>
-          room.status === "available" && !blockedRoomIds.includes(room._id),
+          room.status === "available" &&
+          !blockedRoomIds.includes(String(room._id)),
       );
-
+      console.log(allRooms);
+      console.log(allBookings);
+      console.log(availableRooms);
       setRooms(availableRooms);
     } catch (err) {
       console.error(err);
@@ -103,17 +106,10 @@ const BookingNew = () => {
     const maxGuests = room.capacity || room.maxGuests || 1;
 
     if (Number(guests) > maxGuests) {
+      setGuestError(`Maximum ${maxGuests} guests allowed`);
 
-      setGuestError(
-        `Maximum ${maxGuests} guests allowed`
-      );
-    
-      return alert(
-        `Maximum ${maxGuests} guests allowed`
-      );
-    
+      return alert(`Maximum ${maxGuests} guests allowed`);
     } else {
-    
       setGuestError("");
     }
   };
@@ -201,40 +197,57 @@ const BookingNew = () => {
 
     try {
       const paymentStatus =
-  form.paymentMethod === "online"
-    ? "paid"
-    : form.paymentStatus;
+        form.paymentMethod === "online" ? "paid" : form.paymentStatus;
 
-const bookingStatus =
-  form.paymentMethod === "online"
-    ? "confirmed"
-    : "pending";
+      const bookingStatus =
+        form.paymentMethod === "online" ? "confirmed" : "pending";
 
-      
+      // FIX 3: Pehle walk-in guest create karo taake users page mein show ho
+      let guestUserId = null;
+      try {
+        const walkinRes = await axios.post(
+          `${API_URL}/auth/walkin-guest`,
+          {
+            name: form.guestName,
+            phone: form.guestPhone,
+            email: form.guestEmail || undefined,
+          },
+          { headers }
+        );
+        guestUserId = walkinRes.data.user?._id;
+      } catch (walkinErr) {
+        console.warn("Walk-in guest create warning:", walkinErr.response?.data);
+        // Booking phir bhi continue karein agar user create fail ho
+      }
+
       // Create booking
-     await axios.post(
-  `${API_URL}/bookings`,
-  {
-    roomId: form.roomId,
+      await axios.post(
+        `${API_URL}/bookings`,
+        {
+          roomId: form.roomId,
 
-    guestName: form.guestName,
-    guestPhone: form.guestPhone,
-    guestEmail: form.guestEmail,
+          // FIX 2: guestName, guestPhone, guestEmail booking mein save karo
+          guestName: form.guestName,
+          guestPhone: form.guestPhone,
+          guestEmail: form.guestEmail,
 
-    checkInDate: form.checkIn,
-    checkOutDate: form.checkOut,
-    guests: form.guests,
+          // FIX 3: walk-in user ka id booking se link karo
+          userId: guestUserId,
 
-    totalAmount: summary.total,
+          checkInDate: form.checkIn,
+          checkOutDate: form.checkOut,
+          guests: form.guests,
 
-    paymentMethod: form.paymentMethod,
-    paymentStatus: paymentStatus,
+          totalAmount: summary.total,
 
-    specialRequests: form.specialRequests,
-    bookingStatus: bookingStatus,
-  },
-  { headers }
-);
+          paymentMethod: form.paymentMethod,
+          paymentStatus: paymentStatus,
+
+          specialRequests: form.specialRequests,
+          bookingStatus: bookingStatus,
+        },
+        { headers },
+      );
 
       setSuccess(
         `Booking created successfully! Room ${summary.room.roomNumber} booked for ${form.guestName}`,
@@ -464,32 +477,28 @@ const bookingStatus =
                       </select>
                     </div>
                     {form.paymentMethod === "cash" && (
-  <div className="col-12">
-    <label className="form-label">
-      Cash Payment Status
-    </label>
+                      <div className="col-12">
+                        <label className="form-label">
+                          Cash Payment Status
+                        </label>
 
-    <select
-      className="form-select"
-      value={form.paymentStatus}
-      onChange={(e) =>
-        handleChange("paymentStatus", e.target.value)
-      }
-    >
-      <option value="pending">
-        Pending
-      </option>
+                        <select
+                          className="form-select"
+                          value={form.paymentStatus}
+                          onChange={(e) =>
+                            handleChange("paymentStatus", e.target.value)
+                          }
+                        >
+                          <option value="pending">Pending</option>
 
-      <option value="paid">
-        Paid
-      </option>
-    </select>
+                          <option value="paid">Paid</option>
+                        </select>
 
-    <small className="text-muted">
-      Select paid if guest already paid cash.
-    </small>
-  </div>
-)}
+                        <small className="text-muted">
+                          Select paid if guest already paid cash.
+                        </small>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

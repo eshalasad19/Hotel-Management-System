@@ -6,8 +6,8 @@ const {
   getMenuByCategory,
   updateMenuItem,
   deleteMenuItem
-} = require('../controllers/restaurantMenuController');
-const { protect, adminOnly, staffRoles } = require('../middleware/authMiddleware');
+} = require('../Controllers/restaurantMenuController');
+const { protect, adminOnly, staffRoles } = require('../Middleware/authMiddleware');
 
 router.get('/', getMenu);
 router.get('/category/:category', getMenuByCategory);

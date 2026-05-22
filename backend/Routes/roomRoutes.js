@@ -6,9 +6,9 @@ const {
     getRoomById,
     updateRoom,
     deleteRoom
-  } = require('../controllers/roomController');
-const { protect, adminOnly } = require('../middleware/authMiddleware');
-const upload = require('../middleware/uploadMiddleware');
+  } = require('../Controllers/roomController');
+const { protect, adminOnly } = require('../Middleware/authMiddleware');
+const upload = require('../Middleware/uploadMiddleware');
 
 router.get('/', getAllRooms);
 router.get('/:id', getRoomById);
