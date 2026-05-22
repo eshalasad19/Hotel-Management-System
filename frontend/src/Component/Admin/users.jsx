@@ -80,7 +80,7 @@ const openView = (u) => {
 };
 
 const walkinCount = users.filter((u) =>
-  u.email?.includes("@walkin.hotel")
+  u.guestType === "walk-in"
 ).length;
 
 const colors = [
@@ -182,7 +182,7 @@ const colors = [
                   </tr>
                 ) : (
                   filtered.map((u, i) => {
-                    const isWalkin = u.email?.includes("@walkin.hotel");
+                    const isWalkin = u.guestType === "walk-in";
                     const initials = u.name
                       .split(" ")
                       .map((n) => n[0])
@@ -298,7 +298,7 @@ const colors = [
                       <p className="text-muted mb-1">Guest Type</p>
 
                       <h5>
-                        {selectedUser.email?.includes("@walkin.hotel")
+                        {selectedUser.guestType === "walk-in"
                           ? "Walk-in Guest"
                           : "Online Guest"}
                       </h5>

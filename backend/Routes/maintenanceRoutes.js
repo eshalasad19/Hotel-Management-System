@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { createMaintenance, getAllMaintenance, updateMaintenanceStatus } = require('../controllers/maintenanceController');
-const { protect, adminOnly, staffRoles } = require('../middleware/authMiddleware');
+const { createMaintenance, getAllMaintenance, updateMaintenanceStatus } = require('../Controllers/maintenanceController');
+const { protect, adminOnly, staffRoles } = require('../Middleware/authMiddleware');
 
 router.post('/', protect, createMaintenance);
 router.get('/', protect, staffRoles('admin', 'manager', 'maintenance'), getAllMaintenance);

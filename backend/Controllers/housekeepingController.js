@@ -1,4 +1,4 @@
-const Housekeeping = require('../models/Housekeeping');
+const Housekeeping = require('../Models/Housekeeping');
 
 // Create Housekeeping Task (Admin)
 const createTask = async (req, res) => {

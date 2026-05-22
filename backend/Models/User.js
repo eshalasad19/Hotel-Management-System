@@ -30,6 +30,12 @@ const userSchema = new mongoose.Schema({
   type: mongoose.Schema.Types.ObjectId,
   ref: 'Booking'
 }],
+  // walk-in = admin ne booking ki, online = user ne website se booking ki
+  guestType: {
+    type: String,
+    enum: ['walk-in', 'online'],
+    default: 'online'
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

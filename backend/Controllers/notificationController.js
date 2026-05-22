@@ -1,4 +1,4 @@
-const Notification = require('../models/Notification');
+const Notification = require('../Models/Notification');
 
 // Create Notification (Admin)
 const createNotification = async (req, res) => {

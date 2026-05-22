@@ -1,4 +1,4 @@
-const RestaurantMenu = require('../models/RestaurantMenu');
+const RestaurantMenu = require('../Models/RestaurantMenu');
 
 const addMenuItem = async (req, res) => {
   try {

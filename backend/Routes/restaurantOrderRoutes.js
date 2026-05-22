@@ -5,8 +5,8 @@ const {
   getOrders,
   updateOrderStatus,
   deleteOrder
-} = require('../controllers/restaurantOrderController');
-const { protect, adminOnly, staffRoles } = require('../middleware/authMiddleware');
+} = require('../Controllers/restaurantOrderController');
+const { protect, adminOnly, staffRoles } = require('../Middleware/authMiddleware');
 
 router.post('/', protect, staffRoles('admin', 'manager', 'receptionist'), createOrder);
 router.get('/', protect, staffRoles('admin', 'manager', 'receptionist'), getOrders);

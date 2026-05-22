@@ -364,15 +364,16 @@ const Bookings = () => {
                   {[
                     {
                       label: "Guest Name",
-                      value: selectedBooking.userId?.name || "Guest",
+                      // FIX 2: pehle guestName dekho, phir userId.name
+                      value: selectedBooking.guestName || selectedBooking.userId?.name || "Guest",
                     },
                     {
                       label: "Email",
-                      value: selectedBooking.userId?.email || "—",
+                      value: selectedBooking.guestEmail || selectedBooking.userId?.email || "—",
                     },
                     {
                       label: "Phone",
-                      value: selectedBooking.userId?.phone || "—",
+                      value: selectedBooking.guestPhone || selectedBooking.userId?.phone || "—",
                     },
                     {
                       label: "Room",

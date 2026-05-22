@@ -1,4 +1,4 @@
-const Maintenance = require('../models/Maintenance');
+const Maintenance = require('../Models/Maintenance');
 
 // Create Maintenance Request
 const createMaintenance = async (req, res) => {

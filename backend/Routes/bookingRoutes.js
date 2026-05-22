@@ -10,13 +10,13 @@ const {
   checkOutBooking,
   completeBooking,
   updatePaymentStatus,
-} = require('../controllers/bookingController');
+} = require('../Controllers/bookingController');
 
 const {
   protect,
   adminOnly,
   staffRoles
-} = require('../middleware/authMiddleware');
+} = require('../Middleware/authMiddleware');
 
 
 // Create Booking

@@ -202,15 +202,37 @@ const BookingNew = () => {
       const bookingStatus =
         form.paymentMethod === "online" ? "confirmed" : "pending";
 
+      // FIX 3: Pehle walk-in guest create karo taake users page mein show ho
+      let guestUserId = null;
+      try {
+        const walkinRes = await axios.post(
+          `${API_URL}/auth/walkin-guest`,
+          {
+            name: form.guestName,
+            phone: form.guestPhone,
+            email: form.guestEmail || undefined,
+          },
+          { headers }
+        );
+        guestUserId = walkinRes.data.user?._id;
+      } catch (walkinErr) {
+        console.warn("Walk-in guest create warning:", walkinErr.response?.data);
+        // Booking phir bhi continue karein agar user create fail ho
+      }
+
       // Create booking
       await axios.post(
         `${API_URL}/bookings`,
         {
           roomId: form.roomId,
 
+          // FIX 2: guestName, guestPhone, guestEmail booking mein save karo
           guestName: form.guestName,
           guestPhone: form.guestPhone,
           guestEmail: form.guestEmail,
+
+          // FIX 3: walk-in user ka id booking se link karo
+          userId: guestUserId,
 
           checkInDate: form.checkIn,
           checkOutDate: form.checkOut,
