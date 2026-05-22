@@ -1,8 +1,9 @@
+// App.jsx
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 // Layouts
 import AdminLayout from './Layouts/AdminLayout';
-// import UserLayout from './Layouts/UserLayout';
+import UserLayout from './Layouts/UserLayout';
 
 // Auth
 import Login from './Component/Admin/login';
@@ -24,138 +25,50 @@ import Settings from './Component/Admin/Settings';
 import RestaurantMenu from './Component/Admin/RestaurantMenu';
 import RestaurantOrders from './Component/Admin/RestaurantOrders';
 import Services from './Component/Admin/Services';
-import HomePage from './Component/UserPanel/Home';
-import ContactPage from './Component/UserPanel/Contact';
-import AboutPage from './Component/UserPanel/About';
-import RoomsPage from './Component/UserPanel/Room';
-import ServicesPage from './Component/UserPanel/Services';
-import RestaurantPage from './Component/UserPanel/Restaurant';
-import SpaPage from './Component/UserPanel/Spa';
-import BlogPage from './Component/UserPanel/Blog';
-import Navbar from './Component/UserPanel/Navbar';
 
 // User pages
-// import Home from './Component/User/Home/Home';
-// import ContactUs from './Component/User/Home/ContactUs';
-// import About from './Component/User/Home/About';
-// import RoomsPage from './Component/User/Home/RoomsPage';
-// import ServicesPage from './Component/User/Home/ServicesPage';
-// import RestaurantPage from './Component/User/Home/RestaurantPage';
-// import Gallery from './Component/User/Home/Gallery';
-// import Spa from './Component/User/Home/Spa';
-// import Faq from './Component/User/Home/Faq';
-// import RoomDetailsPage from './Component/User/Home/RoomDetailsPage';
-// import BlogDetailsPage from './Component/User/Home/BlogDetailsPage';
-// import BlogPage from './Component/User/Home/BlogPage';
-
-
-
-// CSS/JS: public/index.html → /assets (admin), /user-assets (hotel site)
-// Images: use userAsset() from utils/userAssets.js → public/user-assets/images/
+import Home from './Component/User/Home/Home';
+import About from './Component/User/Home/About';
+import RoomsPage from './Component/User/Home/RoomsPage';
+import ServicesPage from './Component/User/Home/ServicesPage';
+import RestaurantPage from './Component/User/Home/RestaurantPage';
+import Gallery from './Component/User/Home/Gallery';
+import Spa from './Component/User/Home/Spa';
+import Faq from './Component/User/Home/Faq';
+import ContactUs from './Component/User/Home/ContactUs';
+import RoomDetailsPage from './Component/User/Home/RoomDetailsPage';
+import BlogPage from './Component/User/Home/BlogPage';
+import BlogDetailsPage from './Component/User/Home/BlogDetailsPage';
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-
-        {/* USER HOME */}
-        <Route
-          path="/user"
-          element={
-            <>
-              <Navbar />
-              <HomePage />
-            </>
-          }
-        />
-         <Route
-          path="/blog"
-          element={
-            <>
-              <Navbar />
-              <BlogPage />
-            </>
-          }
-        />
-
-        {/* CONTACT */}
-        <Route
-          path="/contact-us"
-          element={
-            <>
-              <Navbar />
-              <ContactPage />
-            </>
-          }
-        />
-
-        {/* ABOUT */}
-        <Route
-          path="/about"
-          element={
-            <>
-              <Navbar />
-              <AboutPage />
-            </>
-          }
-        />
-
-        {/* ROOMS */}
-        <Route
-          path="/Rooms"
-          element={
-            <>
-              <Navbar />
-              <RoomsPage />
-            </>
-          }
-        />
-
-        {/* SERVICES */}
-        <Route
-          path="/services"
-          element={
-            <>
-              <Navbar />
-              <ServicesPage />
-            </>
-          }
-        />
-
-        {/* RESTAURANT */}
-        <Route
-          path="/restaurant"
-          element={
-            <>
-              <Navbar />
-              <RestaurantPage />
-            </>
-          }
-        />
-
-        {/* SPA */}
-        <Route
-          path="/spa"
-          element={
-            <>
-              <Navbar />
-              <SpaPage />
-            </>
-          }
-        />
-        {/* <Route path="/roomsdetails/:id" element={<RoomDetailsPage />} /> */}
-        <Route path="/blog" element={<BlogPage />} />
-        {/* <Route path="/blog/:id" element={<BlogDetailsPage />} />   */}
-
-
+        {/* Root redirect to login if not authenticated */}
         <Route path="/" element={<Navigate to="/login" replace />} />
 
-        {/* Auth */}
+        {/* Auth route */}
         <Route path="/login" element={<Login />} />
 
-        {/* Admin panel */}
+        {/* User routes */}
+        <Route path="/" element={<UserLayout />}>
+          <Route path="home" element={<Home />} />
+          <Route path="about" element={<About />} />
+          <Route path="room" element={<RoomsPage />} />
+          <Route path="services" element={<ServicesPage />} />
+          <Route path="restaurant" element={<RestaurantPage />} />
+          <Route path="spa" element={<Spa />} />
+          <Route path="gallery" element={<Gallery />} />
+          <Route path="contact" element={<ContactUs />} />
+          <Route path="faq" element={<Faq />} />
+          <Route path="roomsdetails/:id" element={<RoomDetailsPage />} />
+          <Route path="blog" element={<BlogPage />} />
+          <Route path="blog/:id" element={<BlogDetailsPage />} />
+        </Route>
+
+        {/* Admin routes */}
         <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Navigate to="/admin/dashboard" replace />} />
+          <Route index element={<Navigate to="dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="rooms" element={<Rooms />} />
           <Route path="bookings" element={<Bookings />} />
@@ -174,8 +87,8 @@ function App() {
           <Route path="services" element={<Services />} />
         </Route>
 
-        {/* Unknown URLs → home */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Catch-all redirect for unknown URLs */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </BrowserRouter>
   );
