@@ -273,7 +273,7 @@ const RoomDetails = () => {
 
                   <div className="text-9 fw-600">
 
-                    ${room.price}
+                    Rs{room.price}
 
                     <span className="text-4 text-body-secondary">
                       {" "} / night

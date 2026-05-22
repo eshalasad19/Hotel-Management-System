@@ -1,5 +1,6 @@
 // App.jsx
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Layouts
 import AdminLayout from './Layouts/AdminLayout';
