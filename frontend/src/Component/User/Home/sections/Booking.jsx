@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { getSingleRoom } from "../../../../api/roomApi";
+import { useAuth } from "../../../../Context/AuthContext"; // ✅ ADD
 
 const BookingPage = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
+  const { user, token } = useAuth(); // ✅ ADD
 
   const [room, setRoom] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -22,6 +24,13 @@ const BookingPage = () => {
     specialRequests: ""
   });
 
+  // ✅ LOGIN CHECK — page load hote hi check karo
+  useEffect(() => {
+    if (!user) {
+      navigate("/user-login", { state: { from: `/booking/${roomId}` } });
+    }
+  }, [user, navigate, roomId]);
+
   // 🔥 INLINE CREATE BOOKING FUNCTION
   const createBooking = async (bookingData) => {
     const BASE_URL = "http://localhost:5001/api";
@@ -29,7 +38,7 @@ const BookingPage = () => {
     const response = await axios.post(`${BASE_URL}/bookings`, bookingData, {
       headers: {
         "Content-Type": "application/json",
-        // Authorization: `Bearer ${localStorage.getItem("token")}`, // uncomment if JWT
+        Authorization: `Bearer ${token}`, // ✅ token bhi bhejo
       },
     });
 
@@ -58,10 +67,8 @@ const BookingPage = () => {
 
   const getNights = () => {
     if (!form.checkInDate || !form.checkOutDate) return 0;
-
     const inDate = new Date(form.checkInDate);
     const outDate = new Date(form.checkOutDate);
-
     const diff = (outDate - inDate) / (1000 * 60 * 60 * 24);
     return diff > 0 ? diff : 0;
   };
@@ -88,6 +95,9 @@ const BookingPage = () => {
       setLoading(false);
     }
   };
+
+  // ✅ Login nahi toh kuch render mat karo (redirect ho raha hai)
+  if (!user) return null;
 
   if (fetching) return <h3>Loading room details...</h3>;
   if (!room) return <h3>Room not found</h3>;

@@ -487,7 +487,7 @@ const RoomModal = ({ room, onClose }) => {
                 <i className="fa-solid fa-lock" style={{ fontSize: "10px" }}></i> Fully Booked
               </span>
             ) : (
-              <Link to={`/rooms/${room._id}`} className="rm-btn-book">
+              <Link to={`/booking/${room._id}`} className="rm-btn-book">
                 Book Suite
               </Link>
             )}
