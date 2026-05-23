@@ -39,7 +39,7 @@ const Staff = () => {
     try {
       const res = await axios.get(`${API_URL}/auth/users`, { headers });
       const staffOnly = res.data.filter(u =>
-        ['manager', 'receptionist', 'housekeeping', 'maintenance'].includes(u.role)
+        ['manager', 'receptionist', 'housekeeping', 'maintenance', 'kitchen'].includes(u.role)
       );
       setStaff(staffOnly);
       setFiltered(staffOnly);
@@ -60,6 +60,7 @@ const Staff = () => {
       receptionist: { backgroundColor: '#0dcaf0', color: '#000' },
       housekeeping: { backgroundColor: '#198754', color: '#fff' },
       maintenance:  { backgroundColor: '#fd7e14', color: '#fff' },
+      kitchen:      { backgroundColor: '#d63384', color: '#fff' },
     };
     const style = map[role] || { backgroundColor: '#6c757d', color: '#fff' };
     return <span className="badge" style={style}>{role}</span>;
@@ -209,6 +210,7 @@ const Staff = () => {
             <option value="receptionist">Receptionist</option>
             <option value="housekeeping">Housekeeping</option>
             <option value="maintenance">Maintenance</option>
+            <option value="kitchen">Kitchen Staff</option>
           </select>
         </div>
         <div className="card-body">
@@ -428,6 +430,7 @@ const Staff = () => {
                       <option value="receptionist">Receptionist</option>
                       <option value="housekeeping">Housekeeping</option>
                       <option value="maintenance">Maintenance</option>
+                      <option value="kitchen">Kitchen Staff</option>
                     </select>
                   </div>
                 </div>
@@ -484,6 +487,7 @@ const Staff = () => {
                       <option value="receptionist">Receptionist</option>
                       <option value="housekeeping">Housekeeping</option>
                       <option value="maintenance">Maintenance</option>
+                      <option value="kitchen">Kitchen Staff</option>
                     </select>
                   </div>
                   <div className="col-12">

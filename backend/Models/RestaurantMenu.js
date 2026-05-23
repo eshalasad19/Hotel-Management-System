@@ -25,6 +25,13 @@ const RestaurantMenu = new mongoose.Schema({
   isAvailable: {
     type: Boolean,
     default: true
+  },
+
+  // Dietary tags — spicy, veg, non-veg, halal
+  dietaryTags: {
+    type: [String],
+    enum: ['spicy', 'veg', 'non-veg', 'halal'],
+    default: []
   }
 
 }, { timestamps: true });

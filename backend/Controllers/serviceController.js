@@ -1,16 +1,22 @@
 const Service = require('../Models/Service');
 
-// Create Service Request
+// Create Service Request — user ya admin dono se
 const createService = async (req, res) => {
   try {
-    const { serviceType, description } = req.body;
+    const { serviceType, description, guestName, roomNumber } = req.body;
 
-    const service = await Service.create({
-      userId: req.user.id,
-      serviceType,
-      description
-    });
+    const serviceData = { serviceType, description };
 
+    // Admin se create kar raha hai — guestName/roomNumber use karo
+    if (guestName) {
+      serviceData.guestName  = guestName;
+      serviceData.roomNumber = roomNumber;
+    } else {
+      // User website se — userId use karo
+      serviceData.userId = req.user.id;
+    }
+
+    const service = await Service.create(serviceData);
     res.status(201).json({ message: 'Service request created', service });
 
   } catch (err) {
@@ -22,7 +28,8 @@ const createService = async (req, res) => {
 const getAllServices = async (req, res) => {
   try {
     const services = await Service.find()
-      .populate('userId', 'name email');
+      .populate('userId', 'name email phone')
+      .sort({ createdAt: -1 });
     res.status(200).json(services);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });

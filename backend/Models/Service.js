@@ -4,19 +4,20 @@ const serviceSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: false   // Admin se create karne par userId nahi hoga
   },
+  // Admin se create karne par ye fields use honge
+  guestName: { type: String },
+  roomNumber: { type: String },
   serviceType: {
     type: String,
-    enum: ['room_service', 'laundry', 'wakeup_call', 'transportation'],
+    enum: ['room_service', 'laundry', 'wake_up_call', 'transportation'],
     required: true
   },
-  description: {
-    type: String
-  },
+  description: { type: String },
   status: {
     type: String,
-    enum: ['pending', 'in_progress', 'completed'],
+    enum: ['pending', 'in_progress', 'completed', 'cancelled'],
     default: 'pending'
   }
 }, { timestamps: true });
