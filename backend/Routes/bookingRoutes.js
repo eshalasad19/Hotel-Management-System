@@ -4,6 +4,7 @@ const router = express.Router();
 const {
   createBooking,
   getMyBookings,
+  getBookingsByUserId,  // ✅ naya add kiya
   getAllBookings,
   updateBookingStatus,
   checkInBooking,
@@ -18,14 +19,16 @@ const {
   staffRoles
 } = require('../Middleware/authMiddleware');
 
-
 // Create Booking
 router.post('/', protect, createBooking);
 
-// User Bookings
+// My Bookings (token se)
 router.get('/my', protect, getMyBookings);
 
-// All Bookings
+// ✅ User ki bookings by userId (profile page ke liye)
+router.get('/user/:id', protect, getBookingsByUserId);
+
+// All Bookings (Admin/Staff)
 router.get(
   '/all',
   protect,
@@ -33,7 +36,7 @@ router.get(
   getAllBookings
 );
 
-// Old Generic Update
+// Update Booking Status
 router.put(
   '/:id',
   protect,
@@ -56,6 +59,8 @@ router.put(
   staffRoles('admin', 'manager', 'receptionist'),
   checkOutBooking
 );
+
+// Payment Status Update
 router.put(
   "/:id/payment",
   protect,

@@ -7,13 +7,8 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
-  // ✅ LOGOUT
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-
     logout();
-
     navigate("/user-login");
   };
 
@@ -29,10 +24,7 @@ export default function Navbar() {
             <img
               src={userAsset('images/logo.png')}
               alt="Logo"
-              style={{
-                height: "55px",
-                objectFit: "contain"
-              }}
+              style={{ height: "55px", objectFit: "contain" }}
             />
           </Link>
 
@@ -50,10 +42,7 @@ export default function Navbar() {
           </button>
 
           {/* NAVBAR CONTENT */}
-          <div
-            id="header-nav"
-            className="collapse navbar-collapse"
-          >
+          <div id="header-nav" className="collapse navbar-collapse">
 
             {/* CENTER NAV LINKS */}
             <ul className="navbar-nav mx-auto align-items-lg-center gap-lg-2">
@@ -130,12 +119,14 @@ export default function Navbar() {
             {/* RIGHT SIDE */}
             <div className="d-flex align-items-center gap-3 mt-3 mt-lg-0">
 
-              {/* USER INFO */}
+              {/* ✅ USER INFO — click karo profile pe jao */}
               {user && (
-                <div
-                  className="d-flex align-items-center gap-2 bg-light px-3 py-2 rounded-pill"
+                <Link
+                  to="/profile"
+                  className="d-flex align-items-center gap-2 bg-light px-3 py-2 rounded-pill text-decoration-none"
+                  style={{ cursor: "pointer" }}
                 >
-
+                  {/* Avatar */}
                   <div
                     className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
                     style={{
@@ -148,32 +139,32 @@ export default function Navbar() {
                     {user?.name?.charAt(0)?.toUpperCase()}
                   </div>
 
+                  {/* Name */}
                   <span className="fw-semibold text-dark">
                     {user.name}
                   </span>
 
-                </div>
+                  {/* Profile icon hint */}
+                  <i className="fa-solid fa-chevron-down text-muted" style={{ fontSize: "11px" }}></i>
+                </Link>
               )}
 
               {/* LOGIN / LOGOUT */}
               {user ? (
-
                 <button
                   onClick={handleLogout}
                   className="btn btn-outline-danger rounded-pill px-4"
                 >
+                  <i className="fa-solid fa-right-from-bracket me-2"></i>
                   Logout
                 </button>
-
               ) : (
-
                 <Link
                   to="/user-login"
                   className="btn btn-outline-primary rounded-pill px-4"
                 >
                   Login
                 </Link>
-
               )}
 
               {/* BOOK NOW */}
@@ -182,7 +173,6 @@ export default function Navbar() {
                 className="btn btn-primary rounded-pill px-4 d-flex align-items-center gap-2"
               >
                 <span>Book Now</span>
-
                 <i className="fa-solid fa-arrow-right"></i>
               </Link>
 

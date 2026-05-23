@@ -2,7 +2,9 @@ const User = require('../Models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// Register
+// ========================
+// REGISTER
+// ========================
 const register = async (req, res) => {
   try {
     const { name, email, phone, password, role } = req.body;
@@ -29,7 +31,9 @@ const register = async (req, res) => {
   }
 };
 
-// Login
+// ========================
+// LOGIN
+// ========================
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -54,9 +58,11 @@ const login = async (req, res) => {
       message: 'Login successful',
       token,
       user: {
-        id: user._id,
+        _id: user._id,   // ✅ _id add kiya (pehle sirf id tha)
+        id: user._id,    // ✅ dono bhejo compatibility ke liye
         name: user.name,
         email: user.email,
+        phone: user.phone || "",  // ✅ phone bhi bhejo
         role: user.role
       }
     });
@@ -66,7 +72,9 @@ const login = async (req, res) => {
   }
 };
 
-// Get Profile
+// ========================
+// GET PROFILE (token se)
+// ========================
 const getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
@@ -76,20 +84,67 @@ const getProfile = async (req, res) => {
   }
 };
 
-// Get All Users (Admin)
+// ========================
+// ✅ UPDATE OWN PROFILE (user apna update kare)
+// ========================
+const updateOwnProfile = async (req, res) => {
+  try {
+    const { name, phone } = req.body;
+
+    if (!name?.trim()) {
+      return res.status(400).json({ message: 'Naam required hai' });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,  // token se aata hai — safe hai
+      { name: name.trim(), phone: phone || "" },
+      { new: true }
+    ).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json({
+      message: 'Profile updated successfully',
+      user: {
+        _id: user._id,
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.role
+      }
+    });
+
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+// ========================
+// GET ALL USERS (Admin)
+// ========================
 const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find().populate('bookings').select('-password').sort({ createdAt: -1 });
+    const users = await User.find()
+      .populate('bookings')
+      .select('-password')
+      .sort({ createdAt: -1 });
+
     res.status(200).json(users);
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 
-// Update User (Admin)
+// ========================
+// UPDATE USER (Admin)
+// ========================
 const updateUser = async (req, res) => {
   try {
     const { name, phone, role, address, status } = req.body;
+
     const updates = { name, phone, role };
     if (address !== undefined) updates.address = address;
     if (status !== undefined) updates.status = status;
@@ -105,12 +160,15 @@ const updateUser = async (req, res) => {
     }
 
     res.status(200).json({ message: 'User updated successfully', user });
+
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 
-// Delete User (Admin)
+// ========================
+// DELETE USER (Admin)
+// ========================
 const deleteUser = async (req, res) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
@@ -123,10 +181,9 @@ const deleteUser = async (req, res) => {
   }
 };
 
-// FIX 3: Walk-in Guest Create (Admin panel se)
-// Ye function admin jab naya booking banata hai tab ek temporary user banata hai
-// Walk-in guest create — admin panel se booking hone par
-// guestType: 'walk-in' set hota hai taake users page mein "Walk-in" badge show ho
+// ========================
+// CREATE WALK-IN GUEST (Admin)
+// ========================
 const createWalkInGuest = async (req, res) => {
   try {
     const { name, phone, email } = req.body;
@@ -135,9 +192,7 @@ const createWalkInGuest = async (req, res) => {
       return res.status(400).json({ message: 'Name and phone are required' });
     }
 
-    // Har walk-in guest ka unique internal email banao
-    // Real email ignore karo — guestType se identify karenge ab
-    const walkinEmail = `walkin_${Date.now()}_${Math.floor(Math.random()*1000)}@walkin.hotel`;
+    const walkinEmail = `walkin_${Date.now()}_${Math.floor(Math.random() * 1000)}@walkin.hotel`;
 
     const hashedPassword = await bcrypt.hash('walkin123', 10);
 
@@ -147,7 +202,7 @@ const createWalkInGuest = async (req, res) => {
       phone,
       password: hashedPassword,
       role: 'guest',
-      guestType: 'walk-in'   // KEY FIX: yahi field users page mein Walk-in dikhayega
+      guestType: 'walk-in'
     });
 
     res.status(201).json({ message: 'Walk-in guest created', user });
@@ -157,4 +212,16 @@ const createWalkInGuest = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getProfile, getAllUsers, updateUser, deleteUser, createWalkInGuest };
+// ========================
+// EXPORTS
+// ========================
+module.exports = {
+  register,
+  login,
+  getProfile,
+  updateOwnProfile,  // ✅ naya
+  getAllUsers,
+  updateUser,
+  deleteUser,
+  createWalkInGuest
+};

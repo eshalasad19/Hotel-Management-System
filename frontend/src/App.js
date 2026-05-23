@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// ✅ AuthProvider import karo
 import { AuthProvider } from './Context/AuthContext';
 
 // Layouts
@@ -35,25 +34,21 @@ import Services from './Component/Admin/Services';
 import Home from './Component/User/Home/Home';
 import About from './Component/User/Home/About';
 import RoomsPage from './Component/User/Home/RoomsPage';
-
 import RestaurantPage from './Component/User/Home/RestaurantPage';
-
 import Faq from './Component/User/Home/Faq';
 import ContactUs from './Component/User/Home/ContactUs';
 import RoomDetailsPage from './Component/User/Home/RoomDetailsPage';
-
 import BookingPage from './Component/User/Home/sections/Booking';
-
-// ✅ Naye User Auth Pages
 import UserLogin from './Component/User/Home/UserLogin';
 import Register from './Component/User/Home/Register';
 
+// ✅ Profile Page
+import ProfilePage from './Component/User/Home/ProfilePage';
+
 function App() {
   return (
-    // ✅ AuthProvider sabse bahar wrap karo
     <AuthProvider>
       <BrowserRouter>
-        {/* ✅ Toast notifications */}
         <ToastContainer position="top-right" autoClose={3000} />
 
         <Routes>
@@ -63,7 +58,7 @@ function App() {
           {/* Admin login */}
           <Route path="/login" element={<Login />} />
 
-          {/* ✅ User Auth routes */}
+          {/* User Auth routes */}
           <Route path="/user-login" element={<UserLogin />} />
           <Route path="/register" element={<Register />} />
 
@@ -72,14 +67,14 @@ function App() {
             <Route path="home" element={<Home />} />
             <Route path="about" element={<About />} />
             <Route path="room" element={<RoomsPage />} />
-
             <Route path="restaurant" element={<RestaurantPage />} />
-
             <Route path="contact" element={<ContactUs />} />
             <Route path="faq" element={<Faq />} />
             <Route path="roomsdetails/:id" element={<RoomDetailsPage />} />
-
             <Route path="booking/:roomId" element={<BookingPage />} />
+
+            {/* ✅ Profile Route */}
+            <Route path="profile" element={<ProfilePage />} />
           </Route>
 
           {/* Admin routes */}
