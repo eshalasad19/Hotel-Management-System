@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { userAsset } from "../../../../utils/userAssets";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"
+import "react-toastify/dist/ReactToastify.css";
 
 export default function ContactFormSection() {
 
@@ -14,10 +14,9 @@ export default function ContactFormSection() {
     review: ""
   });
 
-  // ✅ LOAD USER FROM LOCALSTORAGE
+  // ✅ LOAD USER FROM LOCALSTORAGE (key fix: "Hoteluser" consistent)
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("Hoteluser"));
-
     if (storedUser?.name) {
       setForm((prev) => ({
         ...prev,
@@ -27,52 +26,57 @@ export default function ContactFormSection() {
       }));
     }
   }, []);
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-  
-    try {
-      const storedUser = JSON.parse(localStorage.getItem("hotelUser"));
-  
-      // ✅ Prepare payload
-      const payload = {
-        rating: Number(form.rating),   // Must be Number
-        review: form.review,
-        userId: storedUser?.id || "000000000000000000000000" // dummy ObjectId for guest
-      };
-  
-      // Validation
-      if (!payload.rating || payload.rating < 1) {
-        toast.error("Please select a rating");
-        return;
-      }
-      if (!payload.review) {
-        toast.error("Please write a review");
-        return;
-      }
-  
-      const BASE_URL = "http://localhost:5001/api";
-  
-      await axios.post(`${BASE_URL}/feedbacks`, payload);
-  
-      toast.success("Review submitted successfully!");
-  
-      // Reset form
-      setForm({
-        name: storedUser?.name || "Guest",
-        phone: "",
-        email: "",
-        rating: 0,
-        review: "",
-      });
-  
-    } catch (error) {
-      console.log("Feedback error:", error.response?.data || error.message);
-      toast.error(error.response?.data?.error || "Failed to submit review");
+
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!form.rating || form.rating < 1) {
+    toast.error("Please select a rating");
+    return;
+  }
+  if (!form.review.trim()) {
+    toast.error("Please write a review");
+    return;
+  }
+
+  try {
+    const storedUser = JSON.parse(localStorage.getItem("Hoteluser"));
+
+    const payload = {
+      name: form.name,
+      email: form.email,
+      phone: form.phone,
+      rating: Number(form.rating),
+      review: form.review,
+    };
+
+    // ✅ userId sirf tab bhejo jab valid MongoDB ObjectId ho (24 char hex string)
+    const userId = storedUser?._id || storedUser?.id;
+    if (userId && typeof userId === "string" && /^[a-fA-F0-9]{24}$/.test(userId)) {
+      payload.userId = userId;
     }
-  };
+    // agar valid nahi toh userId field hi mat bhejo — backend optional handle kare
+
+    const BASE_URL = "http://localhost:5001/api";
+    await axios.post(`${BASE_URL}/feedbacks`, payload);
+
+    toast.success("Review submitted successfully!");
+
+    setForm((prev) => ({
+      ...prev,
+      rating: 0,
+      review: "",
+    }));
+
+  } catch (error) {
+    console.log("Feedback error:", error.response?.data || error.message);
+    toast.error(error.response?.data?.error || "Failed to submit review");
+  }
+};
+
   return (
     <div className="section pt-0">
-      <ToastContainer/>
+      <ToastContainer />
       <div className="container">
         <div className="row g-5 mt-4">
 
@@ -84,7 +88,6 @@ export default function ContactFormSection() {
                 src={userAsset("images/contact-us.jpg")}
                 alt="Contact Us"
               />
-
               <div className="position-absolute top-0 end-0">
                 <div className="circle-text bg-white border border-2 border-primary mt-5 me-5 wow bounceIn">
                   <svg viewBox="0 0 500 500">
@@ -94,14 +97,12 @@ export default function ContactFormSection() {
                         d="M50,250c0-110.5,89.5-200,200-200s200,89.5,200,200s-89.5,200-200,200S50,360.5,50,250"
                       ></path>
                     </defs>
-
                     <text className="text-uppercase fw-700 ls-4">
                       <textPath xlinkHref="#circlePath">
                         Luxury Hotel ✦ Experience ✦
                       </textPath>
                     </text>
                   </svg>
-
                   <div className="circle-icon text-bg-primary translate-middle">
                     <i className="fa-solid fa-bell-concierge"></i>
                   </div>
@@ -120,58 +121,53 @@ export default function ContactFormSection() {
 
               {/* GUEST NAME */}
               <div className="mb-4">
-                <label className="form-label text-3 fw-600">
-                  Guest Name*
-                </label>
+                <label className="form-label text-3 fw-600">Guest Name*</label>
                 <input
                   type="text"
                   className="form-control rounded-pill"
                   placeholder="Enter your name"
                   value={form.name}
-                  onChange={(e) =>
-                    setForm({ ...form, name: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
                   required
-                  readOnly={form.name !== "Guest"}   // 👈 important
+                  readOnly={form.name !== "Guest"}
                 />
               </div>
 
-            
+              {/* ✅ PHONE — pehle missing tha UI mein */}
+              <div className="mb-4">
+                <label className="form-label text-3 fw-600">Phone</label>
+                <input
+                  type="tel"
+                  className="form-control rounded-pill"
+                  placeholder="Your Phone Number"
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                />
+              </div>
 
               {/* EMAIL */}
               <div className="mb-4">
-                <label className="form-label text-3 fw-600">
-                  Email
-                </label>
+                <label className="form-label text-3 fw-600">Email</label>
                 <input
                   type="email"
                   className="form-control rounded-pill"
                   placeholder="Your Email"
                   value={form.email}
-                  onChange={(e) =>
-                    setForm({ ...form, email: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
                 />
               </div>
 
               {/* ⭐ RATING */}
               <div className="mb-4">
-                <label className="form-label text-3 fw-600">
-                  Rating*
-                </label>
-
+                <label className="form-label text-3 fw-600">Rating*</label>
                 <div style={{ fontSize: "22px", cursor: "pointer" }}>
                   {[1, 2, 3, 4, 5].map((star) => (
                     <i
                       key={star}
                       className={`fa-solid fa-star ${
-                        form.rating >= star
-                          ? "text-warning"
-                          : "text-muted"
+                        form.rating >= star ? "text-warning" : "text-muted"
                       }`}
-                      onClick={() =>
-                        setForm({ ...form, rating: star })
-                      }
+                      onClick={() => setForm({ ...form, rating: star })}
                       style={{ marginRight: "6px" }}
                     ></i>
                   ))}
@@ -180,31 +176,24 @@ export default function ContactFormSection() {
 
               {/* REVIEW */}
               <div className="mb-4">
-                <label className="form-label text-3 fw-600">
-                  Your Review*
-                </label>
-
+                <label className="form-label text-3 fw-600">Your Review*</label>
                 <textarea
                   className="form-control rounded-5"
                   rows="5"
                   placeholder="Write your experience..."
                   value={form.review}
-                  onChange={(e) =>
-                    setForm({ ...form, review: e.target.value })
-                  }
+                  onChange={(e) => setForm({ ...form, review: e.target.value })}
                   required
                 ></textarea>
               </div>
 
-              {/* SUBMIT BUTTON */}
+              {/* SUBMIT */}
               <div className="d-grid">
                 <button
                   className="btn btn-new btn-primary text-nowrap rounded-pill"
                   type="submit"
                 >
-                  <span className="btn-text">
-                    <span>Send Message</span>
-                  </span>
+                  <span className="btn-text"><span>Send Message</span></span>
                   <span className="btn-icon">
                     <i className="fa-solid fa-arrow-right"></i>
                   </span>
@@ -213,7 +202,6 @@ export default function ContactFormSection() {
 
             </form>
           </div>
-
         </div>
       </div>
     </div>
