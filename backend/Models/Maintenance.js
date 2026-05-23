@@ -10,20 +10,33 @@ const maintenanceSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  issueType: {
+    type: String,
+    enum: ['ac', 'plumbing', 'electrical', 'furniture', 'appliance', 'internet', 'other'],
+    default: 'other'
+  },
+  priority: {
+    type: String,
+    enum: ['low', 'medium', 'high', 'emergency'],
+    default: 'medium'
+  },
   reportedBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: 'User'
+  },
+  assignedTo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   },
   status: {
     type: String,
     enum: ['pending', 'in_progress', 'resolved'],
     default: 'pending'
   },
-  assignedTo: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }
+  dueDate:    { type: Date },
+  notes:      { type: String },
+  resolution: { type: String },
+  resolvedAt: { type: Date },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Maintenance', maintenanceSchema);

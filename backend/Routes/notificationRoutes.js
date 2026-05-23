@@ -1,16 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const {
-  createNotification, getMyNotifications, getAllNotifications,
-  markAsRead, markAllAsRead, deleteNotification
-} = require('../Controllers/notificationController');
+  createMaintenance, getAllMaintenance,
+  updateMaintenanceStatus, deleteMaintenance
+} = require('../Controllers/maintenanceController');
 const { protect, adminOnly, staffRoles } = require('../Middleware/authMiddleware');
 
-router.post('/', protect, adminOnly, createNotification);
-router.get('/my', protect, getMyNotifications);
-router.get('/all', protect, staffRoles('admin', 'manager'), getAllNotifications);
-router.put('/mark-all-read', protect, markAllAsRead);
-router.put('/:id/read', protect, markAsRead);
-router.delete('/:id', protect, deleteNotification);
+router.post('/',    protect, createMaintenance);
+router.get('/',     protect, staffRoles('admin', 'manager', 'maintenance'), getAllMaintenance);
+router.put('/:id',  protect, staffRoles('admin', 'manager', 'maintenance'), updateMaintenanceStatus);
+router.delete('/:id', protect, adminOnly, deleteMaintenance);
 
 module.exports = router;
