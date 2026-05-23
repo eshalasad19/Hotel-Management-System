@@ -13,175 +13,302 @@ export default function Navbar() {
   };
 
   return (
-    <header id="header" className="sticky-top-slide">
+    <>
+      <style>{`
+        .luxury-nav {
+          background: rgba(15, 12, 10, 0.92) !important;
+          backdrop-filter: blur(12px);
+          border-bottom: 1px solid rgba(201, 169, 110, 0.15);
+          padding: 0;
+        }
 
-      <nav className="primary-menu navbar navbar-expand-lg navbar-light bg-white shadow-sm py-3">
+        .luxury-nav .nav-link-item {
+          color: #e8e0d5 !important;
+          font-size: 15px;
+          font-weight: 500;
+          padding: 28px 16px !important;
+          letter-spacing: 0.3px;
+          transition: color 0.25s;
+          position: relative;
+          text-decoration: none;
+          display: block;
+        }
 
-        <div className="container">
+        .luxury-nav .nav-link-item:hover {
+          color: #c9a96e !important;
+        }
 
-          {/* LOGO */}
-          <Link className="navbar-brand" to="/">
-            <img
-              src={userAsset('images/logo.png')}
-              alt="Logo"
-              style={{ height: "55px", objectFit: "contain" }}
-            />
-          </Link>
+        .luxury-nav .nav-link-item.active-link {
+          color: #c9a96e !important;
+          font-weight: 600;
+        }
 
-          {/* MOBILE TOGGLER */}
-          <button
-            className="navbar-toggler border-0 shadow-none"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#header-nav"
-            aria-controls="header-nav"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <i className="fa-solid fa-bars fs-4"></i>
-          </button>
+        .luxury-nav .nav-link-item.active-link::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 16px;
+          right: 16px;
+          height: 2px;
+          background: #c9a96e;
+          border-radius: 2px 2px 0 0;
+        }
 
-          {/* NAVBAR CONTENT */}
-          <div id="header-nav" className="collapse navbar-collapse">
+        .logo-text-main {
+          font-size: 20px;
+          font-weight: 800;
+          color: #fff;
+          letter-spacing: 0.5px;
+          line-height: 1.1;
+        }
 
-            {/* CENTER NAV LINKS */}
-            <ul className="navbar-nav mx-auto align-items-lg-center gap-lg-2">
+        .logo-text-sub {
+          font-size: 9px;
+          font-weight: 600;
+          color: #c9a96e;
+          letter-spacing: 4px;
+          text-transform: uppercase;
+        }
 
-              <li className="nav-item">
-                <NavLink
-                  to="/"
-                  end
-                  className={({ isActive }) =>
-                    `nav-link px-3 ${isActive ? 'active fw-bold text-primary' : 'text-dark'}`
-                  }
-                >
-                  Home
-                </NavLink>
-              </li>
+        .logo-icon {
+          width: 42px;
+          height: 42px;
+          background: linear-gradient(135deg, #c9a96e, #a67c45);
+          border-radius: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 18px;
+          color: #fff;
+          flex-shrink: 0;
+        }
 
-              <li className="nav-item">
-                <NavLink
-                  to="/about"
-                  className={({ isActive }) =>
-                    `nav-link px-3 ${isActive ? 'active fw-bold text-primary' : 'text-dark'}`
-                  }
-                >
-                  About
-                </NavLink>
-              </li>
+        .book-now-btn {
+          background: linear-gradient(135deg, #c9a96e, #a67c45) !important;
+          color: #fff !important;
+          border: none !important;
+          border-radius: 50px !important;
+          padding: 10px 24px !important;
+          font-size: 14px !important;
+          font-weight: 600 !important;
+          letter-spacing: 0.3px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          transition: all 0.25s !important;
+          box-shadow: 0 4px 18px rgba(201, 169, 110, 0.35);
+          text-decoration: none;
+        }
 
-              <li className="nav-item">
-                <NavLink
-                  to="/room"
-                  className={({ isActive }) =>
-                    `nav-link px-3 ${isActive ? 'active fw-bold text-primary' : 'text-dark'}`
-                  }
-                >
-                  Rooms
-                </NavLink>
-              </li>
+        .book-now-btn:hover {
+          box-shadow: 0 6px 24px rgba(201, 169, 110, 0.55) !important;
+          transform: translateY(-1px);
+          color: #fff !important;
+        }
 
-              <li className="nav-item">
-                <NavLink
-                  to="/restaurant"
-                  className={({ isActive }) =>
-                    `nav-link px-3 ${isActive ? 'active fw-bold text-primary' : 'text-dark'}`
-                  }
-                >
-                  Restaurant
-                </NavLink>
-              </li>
+        .book-now-btn .arrow-box {
+          width: 26px;
+          height: 26px;
+          background: rgba(255,255,255,0.2);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 11px;
+        }
 
-              <li className="nav-item">
-                <NavLink
-                  to="/faq"
-                  className={({ isActive }) =>
-                    `nav-link px-3 ${isActive ? 'active fw-bold text-primary' : 'text-dark'}`
-                  }
-                >
-                  FAQs
-                </NavLink>
-              </li>
+        .user-pill {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: rgba(201, 169, 110, 0.1);
+          border: 1px solid rgba(201, 169, 110, 0.3);
+          border-radius: 50px;
+          padding: 6px 14px 6px 6px;
+          text-decoration: none;
+          transition: all 0.25s;
+        }
 
-              <li className="nav-item">
-                <NavLink
-                  to="/contact"
-                  className={({ isActive }) =>
-                    `nav-link px-3 ${isActive ? 'active fw-bold text-primary' : 'text-dark'}`
-                  }
-                >
-                  Contact
-                </NavLink>
-              </li>
+        .user-pill:hover {
+          background: rgba(201, 169, 110, 0.2);
+          border-color: rgba(201, 169, 110, 0.5);
+        }
 
-            </ul>
+        .user-avatar {
+          width: 30px;
+          height: 30px;
+          background: linear-gradient(135deg, #c9a96e, #a67c45);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 13px;
+          font-weight: 700;
+          color: #fff;
+          flex-shrink: 0;
+        }
 
-            {/* RIGHT SIDE */}
-            <div className="d-flex align-items-center gap-3 mt-3 mt-lg-0">
+        .user-name {
+          font-size: 13px;
+          font-weight: 600;
+          color: #e8e0d5;
+        }
 
-              {/* ✅ USER INFO — click karo profile pe jao */}
-              {user && (
-                <Link
-                  to="/profile"
-                  className="d-flex align-items-center gap-2 bg-light px-3 py-2 rounded-pill text-decoration-none"
-                  style={{ cursor: "pointer" }}
-                >
-                  {/* Avatar */}
-                  <div
-                    className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center"
-                    style={{
-                      width: "35px",
-                      height: "35px",
-                      fontSize: "14px",
-                      fontWeight: "bold"
-                    }}
-                  >
-                    {user?.name?.charAt(0)?.toUpperCase()}
+        .logout-btn {
+          background: transparent !important;
+          border: 1px solid rgba(255,255,255,0.15) !important;
+          color: #aaa !important;
+          border-radius: 50px !important;
+          padding: 8px 18px !important;
+          font-size: 13px !important;
+          font-weight: 500 !important;
+          transition: all 0.25s !important;
+        }
+
+        .logout-btn:hover {
+          border-color: rgba(220, 80, 80, 0.5) !important;
+          color: #e07070 !important;
+          background: rgba(220, 80, 80, 0.08) !important;
+        }
+
+        .login-btn {
+          background: transparent !important;
+          border: 1px solid rgba(201, 169, 110, 0.5) !important;
+          color: #c9a96e !important;
+          border-radius: 50px !important;
+          padding: 8px 20px !important;
+          font-size: 13px !important;
+          font-weight: 600 !important;
+          transition: all 0.25s !important;
+          text-decoration: none;
+        }
+
+        .login-btn:hover {
+          background: rgba(201, 169, 110, 0.12) !important;
+          border-color: #c9a96e !important;
+          color: #c9a96e !important;
+        }
+
+        .navbar-toggler-icon-custom {
+          color: #e8e0d5;
+          font-size: 20px;
+        }
+
+        @media (max-width: 991px) {
+          .luxury-nav .nav-link-item {
+            padding: 12px 0 !important;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+          }
+          .luxury-nav .nav-link-item.active-link::after {
+            display: none;
+          }
+          .luxury-nav .navbar-collapse {
+            padding: 12px 0 20px;
+          }
+        }
+      `}</style>
+
+      <header id="header" className="sticky-top">
+        <nav className="luxury-nav navbar navbar-expand-lg">
+          <div className="container">
+
+            {/* ===== LOGO ===== */}
+            <Link
+              className="navbar-brand d-flex align-items-center gap-2 text-decoration-none py-2"
+              to="/"
+            >
+              <div className="logo-icon">
+                <i className="fa-solid fa-bell-concierge"></i>
+              </div>
+              <div className="d-flex flex-column lh-1">
+                <span className="logo-text-main">Luxury Stay</span>
+                <span className="logo-text-sub">Hotel</span>
+              </div>
+            </Link>
+
+            {/* ===== MOBILE TOGGLER ===== */}
+            <button
+              className="navbar-toggler border-0 shadow-none p-1"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#header-nav"
+              aria-controls="header-nav"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
+              <i className="fa-solid fa-bars navbar-toggler-icon-custom"></i>
+            </button>
+
+            {/* ===== NAVBAR CONTENT ===== */}
+            <div id="header-nav" className="collapse navbar-collapse">
+
+              {/* CENTER NAV LINKS */}
+              <ul className="navbar-nav mx-auto align-items-lg-center">
+                {[
+                  { to: "/home", label: "Home", end: true },
+                  { to: "/about", label: "About" },
+                  { to: "/room", label: "Rooms" },
+                  { to: "/restaurant", label: "Restaurant" },
+                  { to: "/faq", label: "FAQs" },
+                  { to: "/contact", label: "Contact" },
+                ].map((item) => (
+                  <li className="nav-item" key={item.to}>
+                    <NavLink
+                      to={item.to}
+                      end={item.end}
+                      className={({ isActive }) =>
+                        `nav-link-item ${isActive ? "active-link" : ""}`
+                      }
+                    >
+                      {item.label}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+
+              {/* ===== RIGHT SIDE ===== */}
+              <div className="d-flex align-items-center gap-2 mt-3 mt-lg-0">
+
+                {/* USER PILL */}
+                {user && (
+                  <Link to="/profile" className="user-pill">
+                    <div className="user-avatar">
+                      {user?.name?.charAt(0)?.toUpperCase()}
+                    </div>
+                    <span className="user-name">{user.name}</span>
+                    <i
+                      className="fa-solid fa-chevron-down"
+                      style={{ fontSize: "9px", color: "#c9a96e" }}
+                    ></i>
+                  </Link>
+                )}
+
+                {/* LOGIN / LOGOUT */}
+                {user ? (
+                  <button onClick={handleLogout} className="btn logout-btn">
+                    <i className="fa-solid fa-right-from-bracket me-1"></i>
+                    Logout
+                  </button>
+                ) : (
+                  <Link to="/user-login" className="btn login-btn">
+                    Login
+                  </Link>
+                )}
+
+                {/* BOOK NOW */}
+                <Link to="/contact-us" className="book-now-btn">
+                  <span>Book Now</span>
+                  <div className="arrow-box">
+                    <i className="fa-solid fa-arrow-right"></i>
                   </div>
-
-                  {/* Name */}
-                  <span className="fw-semibold text-dark">
-                    {user.name}
-                  </span>
-
-                  {/* Profile icon hint */}
-                  <i className="fa-solid fa-chevron-down text-muted" style={{ fontSize: "11px" }}></i>
                 </Link>
-              )}
 
-              {/* LOGIN / LOGOUT */}
-              {user ? (
-                <button
-                  onClick={handleLogout}
-                  className="btn btn-outline-danger rounded-pill px-4"
-                >
-                  <i className="fa-solid fa-right-from-bracket me-2"></i>
-                  Logout
-                </button>
-              ) : (
-                <Link
-                  to="/user-login"
-                  className="btn btn-outline-primary rounded-pill px-4"
-                >
-                  Login
-                </Link>
-              )}
-
-              {/* BOOK NOW */}
-              <Link
-                to="/contact-us"
-                className="btn btn-primary rounded-pill px-4 d-flex align-items-center gap-2"
-              >
-                <span>Book Now</span>
-                <i className="fa-solid fa-arrow-right"></i>
-              </Link>
-
+              </div>
             </div>
 
           </div>
-
-        </div>
-      </nav>
-    </header>
+        </nav>
+      </header>
+    </>
   );
 }

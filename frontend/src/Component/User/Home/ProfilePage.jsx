@@ -15,7 +15,7 @@ export default function ProfilePage() {
   const [loadingBookings, setLoadingBookings] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [updating, setUpdating] = useState(false);
-  const [activeTab, setActiveTab] = useState("bookings"); // bookings | all
+  const [activeTab, setActiveTab] = useState("all");
 
   const [form, setForm] = useState({
     name: "",
@@ -23,7 +23,6 @@ export default function ProfilePage() {
     phone: "",
   });
 
-  // ✅ Login check
   useEffect(() => {
     if (!user) {
       navigate("/user-login");
@@ -36,7 +35,6 @@ export default function ProfilePage() {
     });
   }, [user]);
 
-  // ✅ Bookings fetch
   useEffect(() => {
     if (!user?._id && !user?.id) return;
 
@@ -58,28 +56,22 @@ export default function ProfilePage() {
     fetchBookings();
   }, [user]);
 
-  // ✅ Profile update
   const handleUpdate = async (e) => {
     e.preventDefault();
-
     if (!form.name.trim()) {
       toast.error("Naam required hai");
       return;
     }
-
     try {
       setUpdating(true);
-
       const res = await axios.put(
         `${BASE_URL}/auth/profile/update`,
         { name: form.name, phone: form.phone },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
       login(res.data.user, token);
       toast.success("Profile update ho gayi!");
       setEditMode(false);
-
     } catch (err) {
       toast.error(err.response?.data?.message || "Update failed");
     } finally {
@@ -87,7 +79,6 @@ export default function ProfilePage() {
     }
   };
 
-  // ✅ Status badge color
   const statusBadge = (status) => {
     const map = {
       pending: "warning",
@@ -100,7 +91,6 @@ export default function ProfilePage() {
     return map[status] || "secondary";
   };
 
-  // ✅ Date format
   const formatDate = (date) => {
     if (!date) return "—";
     return new Date(date).toLocaleDateString("en-PK", {
@@ -110,18 +100,11 @@ export default function ProfilePage() {
     });
   };
 
-  // ✅ Filter bookings by tab
   const filteredBookings = bookings.filter((b) => {
-    if (activeTab === "upcoming") {
-      return ["pending", "confirmed"].includes(b.bookingStatus);
-    }
-    if (activeTab === "active") {
-      return b.bookingStatus === "checked_in";
-    }
-    if (activeTab === "past") {
-      return ["checked_out", "completed", "cancelled"].includes(b.bookingStatus);
-    }
-    return true; // all
+    if (activeTab === "upcoming") return ["pending", "confirmed"].includes(b.bookingStatus);
+    if (activeTab === "active") return b.bookingStatus === "checked_in";
+    if (activeTab === "past") return ["checked_out", "completed", "cancelled"].includes(b.bookingStatus);
+    return true;
   });
 
   if (!user) return null;
@@ -131,7 +114,7 @@ export default function ProfilePage() {
       <ToastContainer />
       <div className="container">
 
-        {/* ===== PAGE TITLE ===== */}
+        {/* PAGE TITLE */}
         <div className="text-center mb-5">
           <h2 className="fw-700 text-8">
             My <span className="text-primary">Profile</span>
@@ -148,12 +131,7 @@ export default function ProfilePage() {
               {/* Avatar */}
               <div
                 className="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
-                style={{
-                  width: "80px",
-                  height: "80px",
-                  fontSize: "32px",
-                  fontWeight: "bold"
-                }}
+                style={{ width: "80px", height: "80px", fontSize: "32px", fontWeight: "bold" }}
               >
                 {user?.name?.charAt(0)?.toUpperCase()}
               </div>
@@ -167,46 +145,35 @@ export default function ProfilePage() {
 
               <hr />
 
-              {/* ===== VIEW MODE ===== */}
               {!editMode ? (
-
                 <div className="text-start">
-
                   <div className="mb-3">
                     <label className="text-muted small fw-600">
                       <i className="fa-solid fa-user text-primary me-1"></i> Full Name
                     </label>
                     <p className="fw-600 mb-0">{user.name}</p>
                   </div>
-
                   <div className="mb-3">
                     <label className="text-muted small fw-600">
                       <i className="fa-solid fa-envelope text-primary me-1"></i> Email
                     </label>
                     <p className="fw-600 mb-0">{user.email}</p>
                   </div>
-
                   <div className="mb-4">
                     <label className="text-muted small fw-600">
                       <i className="fa-solid fa-phone text-primary me-1"></i> Phone
                     </label>
                     <p className="fw-600 mb-0">{user.phone || "—"}</p>
                   </div>
-
                   <button
                     className="btn btn-primary rounded-pill w-100"
                     onClick={() => setEditMode(true)}
                   >
                     <i className="fa-solid fa-pen me-2"></i> Edit Profile
                   </button>
-
                 </div>
-
               ) : (
-
-                /* ===== EDIT MODE ===== */
                 <form onSubmit={handleUpdate} className="text-start">
-
                   <div className="mb-3">
                     <label className="form-label fw-600 small">Full Name*</label>
                     <input
@@ -217,7 +184,6 @@ export default function ProfilePage() {
                       required
                     />
                   </div>
-
                   <div className="mb-3">
                     <label className="form-label fw-600 small">Email</label>
                     <input
@@ -229,7 +195,6 @@ export default function ProfilePage() {
                     />
                     <small className="text-muted">Email change nahi ho sakta</small>
                   </div>
-
                   <div className="mb-4">
                     <label className="form-label fw-600 small">Phone</label>
                     <input
@@ -240,7 +205,6 @@ export default function ProfilePage() {
                       placeholder="03XXXXXXXXX"
                     />
                   </div>
-
                   <div className="d-flex gap-2">
                     <button
                       type="submit"
@@ -259,22 +223,16 @@ export default function ProfilePage() {
                       className="btn btn-outline-secondary rounded-pill flex-fill"
                       onClick={() => {
                         setEditMode(false);
-                        setForm({
-                          name: user.name || "",
-                          email: user.email || "",
-                          phone: user.phone || "",
-                        });
+                        setForm({ name: user.name || "", email: user.email || "", phone: user.phone || "" });
                       }}
                     >
                       Cancel
                     </button>
                   </div>
-
                 </form>
-
               )}
 
-              {/* ===== STATS ===== */}
+              {/* STATS */}
               <hr className="mt-4" />
               <div className="row text-center g-2 mt-1">
                 <div className="col-4">
@@ -307,7 +265,7 @@ export default function ProfilePage() {
                 My Bookings
               </h5>
 
-              {/* ===== TABS ===== */}
+              {/* TABS */}
               <ul className="nav nav-pills mb-4 gap-2">
                 {[
                   { key: "all", label: "All" },
@@ -326,111 +284,144 @@ export default function ProfilePage() {
                 ))}
               </ul>
 
-              {/* ===== LOADING ===== */}
               {loadingBookings ? (
-
                 <div className="text-center py-5">
                   <div className="spinner-border text-primary"></div>
                   <p className="mt-3 text-muted">Bookings load ho rahi hain...</p>
                 </div>
-
               ) : filteredBookings.length === 0 ? (
-
-                /* ===== EMPTY ===== */
                 <div className="text-center py-5">
                   <i className="fa-solid fa-calendar-xmark fa-3x text-muted mb-3"></i>
                   <p className="text-muted">Is category mein koi booking nahi hai</p>
                 </div>
-
               ) : (
-
-                /* ===== BOOKING CARDS ===== */
                 <div className="d-flex flex-column gap-3">
-                  {filteredBookings.map((booking) => (
-                    <div
-                      key={booking._id}
-                      className="border rounded-4 p-3"
-                      style={{ background: "#fafafa" }}
-                    >
+                  {filteredBookings.map((booking) => {
 
-                      {/* TOP ROW */}
-                      <div className="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
-                        <div>
-                          <h6 className="fw-700 mb-0">
-                            <i className="fa-solid fa-bed text-primary me-2"></i>
-                            {booking.roomId?.name || "Room"}
-                          </h6>
-                          <small className="text-muted">
-                            Booking ID: #{booking._id.slice(-6).toUpperCase()}
-                          </small>
+                    // ✅ Room image
+                    const roomImages = booking.roomId?.images || [];
+                    const roomImage = roomImages.length > 0 ? roomImages[0] : null;
+
+                    return (
+                      <div
+                        key={booking._id}
+                        className="border rounded-4 overflow-hidden"
+                        style={{ background: "#fafafa" }}
+                      >
+
+                        {/* ✅ ROOM IMAGE + DETAILS ROW */}
+                        <div className="d-flex flex-column flex-md-row">
+
+                          {/* ✅ ROOM IMAGE */}
+                          <div
+                            style={{
+                              width: "100%",
+                              maxWidth: "160px",
+                              minHeight: "140px",
+                              flexShrink: 0,
+                              overflow: "hidden",
+                            }}
+                          >
+                            {roomImage ? (
+                              <img
+                                src={roomImage}
+                                alt={booking.roomId?.name || "Room"}
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
+                                  minHeight: "140px",
+                                }}
+                              />
+                            ) : (
+                              // ✅ fallback — image nahi hai
+                              <div
+                                className="bg-light d-flex align-items-center justify-content-center"
+                                style={{ width: "100%", minHeight: "140px" }}
+                              >
+                                <i className="fa-solid fa-bed fa-2x text-muted"></i>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* BOOKING DETAILS */}
+                          <div className="p-3 flex-fill">
+
+                            {/* TOP ROW */}
+                            <div className="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-2">
+                              <div>
+                                <h6 className="fw-700 mb-0">
+                                  {booking.roomId?.name || `Room ${booking.roomId?.roomNumber || ""}`}
+                                </h6>
+                                <small className="text-muted">
+                                  #{booking._id.slice(-6).toUpperCase()} •{" "}
+                                  <span className="text-capitalize">{booking.roomId?.type}</span>
+                                </small>
+                              </div>
+                              <span className={`badge bg-${statusBadge(booking.bookingStatus)} rounded-pill px-3 py-2`}>
+                                {booking.bookingStatus?.replace("_", " ").toUpperCase()}
+                              </span>
+                            </div>
+
+                            {/* DETAILS GRID */}
+                            <div className="row g-2 mt-1">
+                              <div className="col-6 col-md-3">
+                                <small className="text-muted d-block">Check-in</small>
+                                <span className="fw-600 small">
+                                  <i className="fa-regular fa-calendar text-success me-1"></i>
+                                  {formatDate(booking.checkInDate)}
+                                </span>
+                              </div>
+                              <div className="col-6 col-md-3">
+                                <small className="text-muted d-block">Check-out</small>
+                                <span className="fw-600 small">
+                                  <i className="fa-regular fa-calendar text-danger me-1"></i>
+                                  {formatDate(booking.checkOutDate)}
+                                </span>
+                              </div>
+                              <div className="col-6 col-md-3">
+                                <small className="text-muted d-block">Guests</small>
+                                <span className="fw-600 small">
+                                  <i className="fa-solid fa-users text-primary me-1"></i>
+                                  {booking.guests}
+                                </span>
+                              </div>
+                              <div className="col-6 col-md-3">
+                                <small className="text-muted d-block">Total</small>
+                                <span className="fw-600 small text-success">
+                                  Rs. {booking.totalAmount?.toLocaleString()}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* SPECIAL REQUEST */}
+                            {booking.specialRequests && (
+                              <div className="mt-2 p-2 bg-white rounded-3 border">
+                                <small className="text-muted">
+                                  <i className="fa-solid fa-note-sticky text-warning me-1"></i>
+                                  {booking.specialRequests}
+                                </small>
+                              </div>
+                            )}
+
+                            {/* PAYMENT BADGES */}
+                            <div className="mt-2 d-flex gap-2 flex-wrap">
+                              <span className={`badge rounded-pill px-3 ${booking.paymentStatus === "paid" ? "bg-success" : "bg-warning text-dark"}`}>
+                                <i className="fa-solid fa-credit-card me-1"></i>
+                                {booking.paymentStatus === "paid" ? "Paid" : "Payment Pending"}
+                              </span>
+                              <span className="badge bg-light text-dark rounded-pill px-3">
+                                <i className="fa-solid fa-money-bill me-1"></i>
+                                {booking.paymentMethod?.toUpperCase()}
+                              </span>
+                            </div>
+
+                          </div>
                         </div>
-                        <span className={`badge bg-${statusBadge(booking.bookingStatus)} rounded-pill px-3 py-2`}>
-                          {booking.bookingStatus?.replace("_", " ").toUpperCase()}
-                        </span>
                       </div>
-
-                      {/* DETAILS GRID */}
-                      <div className="row g-2 mt-1">
-
-                        <div className="col-6 col-md-3">
-                          <small className="text-muted d-block">Check-in</small>
-                          <span className="fw-600 small">
-                            <i className="fa-regular fa-calendar text-success me-1"></i>
-                            {formatDate(booking.checkInDate)}
-                          </span>
-                        </div>
-
-                        <div className="col-6 col-md-3">
-                          <small className="text-muted d-block">Check-out</small>
-                          <span className="fw-600 small">
-                            <i className="fa-regular fa-calendar text-danger me-1"></i>
-                            {formatDate(booking.checkOutDate)}
-                          </span>
-                        </div>
-
-                        <div className="col-6 col-md-3">
-                          <small className="text-muted d-block">Guests</small>
-                          <span className="fw-600 small">
-                            <i className="fa-solid fa-users text-primary me-1"></i>
-                            {booking.guests}
-                          </span>
-                        </div>
-
-                        <div className="col-6 col-md-3">
-                          <small className="text-muted d-block">Total</small>
-                          <span className="fw-600 small text-success">
-                            Rs. {booking.totalAmount?.toLocaleString()}
-                          </span>
-                        </div>
-
-                      </div>
-
-                      {/* SPECIAL REQUEST */}
-                      {booking.specialRequests && (
-                        <div className="mt-2 p-2 bg-white rounded-3 border">
-                          <small className="text-muted">
-                            <i className="fa-solid fa-note-sticky text-warning me-1"></i>
-                            {booking.specialRequests}
-                          </small>
-                        </div>
-                      )}
-
-                      {/* PAYMENT STATUS */}
-                      <div className="mt-2 d-flex gap-2 flex-wrap">
-                        <span className={`badge rounded-pill px-3 ${booking.paymentStatus === "paid" ? "bg-success" : "bg-warning text-dark"}`}>
-                          <i className="fa-solid fa-credit-card me-1"></i>
-                          {booking.paymentStatus === "paid" ? "Paid" : "Payment Pending"}
-                        </span>
-                        <span className="badge bg-light text-dark rounded-pill px-3">
-                          <i className="fa-solid fa-money-bill me-1"></i>
-                          {booking.paymentMethod?.toUpperCase()}
-                        </span>
-                      </div>
-
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
-
               )}
 
             </div>

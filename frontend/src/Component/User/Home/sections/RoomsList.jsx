@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getRooms, getSingleRoom } from "../../../../api/roomApi";
-import { filter } from "framer-motion/m";
 
 const BASE_URL = "http://localhost:5001";
 
@@ -12,7 +11,6 @@ const getImageUrl = (img) => {
   return `${BASE_URL}/uploads/${img}`;
 };
 
-// ─── AMENITY ICON MAPPER ──────────────────────────────────────────────────────
 const getAmenityIcon = (name = "") => {
   const n = name.toLowerCase();
   if (n.includes("wifi") || n.includes("internet"))           return "fa-wifi";
@@ -51,7 +49,6 @@ const getAmenityIcon = (name = "") => {
   return "fa-circle-check";
 };
 
-// ─── BOOKING STATUS HELPER ────────────────────────────────────────────────────
 const isRoomUnavailable = (status) => {
   const unavailable = ["booked", "occupied", "reserved", "maintenance", "cleaning"];
   return unavailable.includes(status?.toLowerCase());
@@ -59,21 +56,31 @@ const isRoomUnavailable = (status) => {
 
 const getStatusLabel = (status) => {
   const labels = {
-    booked:      { text: "Already Booked",    color: "#e74c3c", bg: "rgba(231, 76, 60, 0.1)",  border: "rgba(231, 76, 60, 0.2)"  },
-    occupied:    { text: "Currently Occupied",  color: "#e67e22", bg: "rgba(230,126,34,0.1)", border: "rgba(230,126,34,0.2)" },
-    reserved:    { text: "Reserved",            color: "#9b59b6", bg: "rgba(155, 89, 182, 0.1)", border: "rgba(155, 89, 182, 0.2)" },
-    maintenance: { text: "Under Maintenance",   color: "#95a5a6", bg: "rgba(149, 165, 166, 0.1)",border: "rgba(149, 165, 166, 0.2)"},
-    cleaning:    { text: "Being Cleaned",       color: "#3498db", bg: "rgba(52, 152, 219, 0.1)", border: "rgba(52, 152, 219, 0.2)" },
+    booked:      { text: "Already Booked",     color: "#e74c3c", bg: "rgba(231,76,60,0.1)",   border: "rgba(231,76,60,0.2)"   },
+    occupied:    { text: "Currently Occupied", color: "#e67e22", bg: "rgba(230,126,34,0.1)",  border: "rgba(230,126,34,0.2)"  },
+    reserved:    { text: "Reserved",           color: "#9b59b6", bg: "rgba(155,89,182,0.1)",  border: "rgba(155,89,182,0.2)"  },
+    maintenance: { text: "Under Maintenance",  color: "#95a5a6", bg: "rgba(149,165,166,0.1)", border: "rgba(149,165,166,0.2)" },
+    cleaning:    { text: "Being Cleaned",      color: "#3498db", bg: "rgba(52,152,219,0.1)",  border: "rgba(52,152,219,0.2)"  },
   };
   return labels[status?.toLowerCase()] || null;
 };
 
-// ─── MODAL STYLES (Premium Refined UI) ─────────────────────────────
+// ─── FLOOR LABEL ─────────────────────────────────────────────────────────────
+const getFloorLabel = (floor) => {
+  const map = {
+    ground: { label: "Ground Floor", icon: "fa-building" },
+    first:  { label: "1st Floor",    icon: "fa-building" },
+    second: { label: "2nd Floor",    icon: "fa-building" },
+  };
+  return map[floor?.toLowerCase()] || { label: floor, icon: "fa-building" };
+};
+
+// ─── MODAL STYLES ─────────────────────────────────────────────────────────────
 const MODAL_STYLES = `
   .rm-backdrop {
     position: fixed; inset: 0; z-index: 1050;
-    background: rgba(7, 6, 5, 0.82);
-    backdrop-filter: blur(12px);
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(8px);
     animation: rm-fade-in 0.3s ease forwards;
   }
 
@@ -86,10 +93,10 @@ const MODAL_STYLES = `
     height: min(720px, 85vh);
     display: flex;
     flex-direction: column;
-    background: #110e0c;
-    border-radius: 12px;
-    border: 1px solid rgba(212, 175, 115, 0.18);
-    box-shadow: 0 30px 70px rgba(0,0,0,0.8);
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e8e0d5;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.18);
     overflow: hidden;
     animation: rm-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     font-family: 'Jost', sans-serif;
@@ -99,14 +106,14 @@ const MODAL_STYLES = `
     display: flex;
     flex: 1;
     overflow: hidden;
-    height: calc(100% - 80px); /* Adjust for footer */
+    height: calc(100% - 76px);
   }
 
   .rm-modal-sidebar {
     width: 45%;
     position: relative;
     overflow: hidden;
-    background: #090807;
+    background: #f5f0eb;
   }
 
   .rm-modal-sidebar img {
@@ -115,38 +122,39 @@ const MODAL_STYLES = `
     transition: transform 4s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .rm-modal-sidebar img.rm-unavailable-img {
-    filter: grayscale(40%) brightness(0.5);
+    filter: grayscale(30%) brightness(0.85);
   }
   .rm-modal:hover .rm-modal-sidebar img { transform: scale(1.04); }
 
   .rm-sidebar-overlay {
     position: absolute; inset: 0;
-    background: linear-gradient(to bottom, rgba(17,14,12,0.1) 0%, rgba(17,14,12,0.4) 60%, rgba(17,14,12,0.95) 100%);
+    background: linear-gradient(to bottom, rgba(0,0,0,0.0) 40%, rgba(0,0,0,0.65) 100%);
   }
 
   .rm-sidebar-details {
     position: absolute; bottom: 0; left: 0; right: 0;
-    padding: 30px;
+    padding: 28px;
   }
 
   .rm-modal-inner {
     width: 55%;
     overflow-y: auto;
-    background: #110e0c;
-    padding: 35px;
+    background: #ffffff;
+    padding: 32px;
     scrollbar-width: thin;
-    scrollbar-color: rgba(212,175,115,0.2) transparent;
+    scrollbar-color: #e8ddd0 transparent;
   }
   .rm-modal-inner::-webkit-scrollbar { width: 5px; }
   .rm-modal-inner::-webkit-scrollbar-track { background: transparent; }
-  .rm-modal-inner::-webkit-scrollbar-thumb { background: rgba(212,175,115,0.2); border-radius: 10px; }
+  .rm-modal-inner::-webkit-scrollbar-thumb { background: #e8ddd0; border-radius: 10px; }
 
   .rm-status-ribbon {
-    position: absolute; top: 20px; left: 20px;
-    padding: 6px 14px;
+    position: absolute; top: 16px; left: 16px;
+    padding: 5px 12px;
     font-size: 10px; font-weight: 600; letter-spacing: 1.5px;
-    text-transform: uppercase; border-radius: 4px;
-    display: inline-flex; align-items: center; gap: 8px; z-index: 5;
+    text-transform: uppercase; border-radius: 20px;
+    display: inline-flex; align-items: center; gap: 7px; z-index: 5;
+    backdrop-filter: blur(8px);
   }
 
   .rm-status-dot {
@@ -156,139 +164,147 @@ const MODAL_STYLES = `
 
   .rm-tag {
     display: inline-block;
-    font-size: 9px; font-weight: 600; letter-spacing: 2px;
-    text-transform: uppercase; color: #d4af73;
-    border: 1px solid rgba(212,175,115,0.35);
-    padding: 4px 10px; border-radius: 3px; margin-bottom: 12px;
-    background: rgba(212,175,115,0.03);
+    font-size: 10px; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; color: #c9a96e;
+    border: 1px solid rgba(201,169,110,0.4);
+    padding: 4px 12px; border-radius: 20px; margin-bottom: 10px;
+    background: rgba(201,169,110,0.08);
   }
 
   .rm-title {
     font-family: 'Cormorant Garamond', serif;
-    font-size: 34px; font-weight: 500; color: #faf6f0;
-    line-height: 1.2; margin: 0 0 5px 0;
+    font-size: 32px; font-weight: 600; color: #fff;
+    line-height: 1.2; margin: 0 0 6px 0;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
   }
 
   .rm-price-badge {
-    display: flex; align-items: baseline; gap: 6px; margin-top: 5px;
+    display: flex; align-items: baseline; gap: 5px;
   }
   .rm-price-amount {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 32px; font-weight: 500; color: #d4af73; line-height: 1;
+    font-size: 22px; font-weight: 700; color: #c9a96e; line-height: 1;
   }
   .rm-price-night {
-    font-size: 11px; font-weight: 300; letter-spacing: 1px;
-    text-transform: uppercase; color: rgba(250,246,240,0.45);
+    font-size: 11px; font-weight: 400; letter-spacing: 1px;
+    text-transform: uppercase; color: rgba(255,255,255,0.7);
   }
 
   .rm-subtitle {
-    font-size: 13px; font-weight: 500; letter-spacing: 1.5px;
-    text-transform: uppercase; color: rgba(212,175,115,0.9);
-    margin-bottom: 24px; display: block;
+    font-size: 11px; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; color: #c9a96e;
+    margin-bottom: 20px; display: block;
   }
 
   .rm-unavailable-banner {
     display: flex; align-items: flex-start; gap: 12px;
-    padding: 14px 18px; border-radius: 6px; margin-bottom: 25px;
-    border-left: 3px solid; background: rgba(255,255,255,0.02);
+    padding: 14px 16px; border-radius: 8px; margin-bottom: 22px;
+    border-left: 3px solid;
   }
-  .rm-unavailable-banner-icon { font-size: 15px; margin-top: 2px; }
-  .rm-unavailable-banner-title { font-weight: 600; font-size: 13px; margin-bottom: 2px; letter-spacing: 0.5px; }
-  .rm-unavailable-banner-text { font-size: 12px; line-height: 1.5; opacity: 0.85; }
+  .rm-unavailable-banner-icon { font-size: 15px; margin-top: 1px; }
+  .rm-unavailable-banner-title { font-weight: 600; font-size: 13px; margin-bottom: 3px; color: #1a1a1a; }
+  .rm-unavailable-banner-text { font-size: 12px; line-height: 1.5; color: #555; }
 
   .rm-features {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-    margin-bottom: 30px;
+    margin-bottom: 24px;
   }
   .rm-feature-item {
-    background: #171412; padding: 14px;
-    display: flex; flex-direction: column; gap: 8px;
-    border-radius: 6px; border: 1px solid rgba(212,175,115,0.05);
+    background: #fdf8f2; padding: 14px;
+    display: flex; flex-direction: column; gap: 6px;
+    border-radius: 10px; border: 1px solid #f0e8dc;
   }
   .rm-feature-icon {
-    width: 28px; height: 28px; border-radius: 4px;
-    background: rgba(212,175,115,0.05); display: flex; align-items: center; justify-content: center;
-    color: #d4af73; font-size: 13px;
+    width: 30px; height: 30px; border-radius: 8px;
+    background: rgba(201,169,110,0.1); display: flex; align-items: center; justify-content: center;
+    color: #c9a96e; font-size: 13px;
   }
-  .rm-feature-label { font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase; color: rgba(250,246,240,0.35); }
-  .rm-feature-value { font-size: 13px; color: #faf6f0; font-weight: 500; }
+  .rm-feature-label { font-size: 10px; letter-spacing: 0.5px; text-transform: uppercase; color: #999; }
+  .rm-feature-value { font-size: 13px; color: #1a1a1a; font-weight: 600; }
 
   .rm-description {
-    font-size: 14px; color: rgba(250,246,240,0.65);
-    line-height: 1.6; margin-bottom: 30px; font-weight: 300;
+    font-size: 14px; color: #666;
+    line-height: 1.7; margin-bottom: 24px;
   }
 
   .rm-section-title {
-    font-size: 11px; font-weight: 600; letter-spacing: 2px;
-    text-transform: uppercase; color: #d4af73;
-    margin: 30px 0 16px 0; display: flex; align-items: center; gap: 12px;
+    font-size: 10px; font-weight: 700; letter-spacing: 2.5px;
+    text-transform: uppercase; color: #c9a96e;
+    margin: 24px 0 14px 0; display: flex; align-items: center; gap: 12px;
   }
-  .rm-section-title::after { content: ''; flex: 1; height: 1px; background: rgba(212,175,115,0.12); }
+  .rm-section-title::after { content: ''; flex: 1; height: 1px; background: #f0e8dc; }
 
   .rm-gallery {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;
   }
   .rm-gallery img {
     width: 100%; aspect-ratio: 4/3; object-fit: cover;
-    border-radius: 4px; filter: brightness(0.75); transition: all 0.3s ease;
+    border-radius: 8px; filter: brightness(0.9); transition: all 0.3s ease;
+    border: 1px solid #f0e8dc;
   }
-  .rm-gallery img:hover { filter: brightness(1); transform: scale(1.02); }
+  .rm-gallery img:hover { filter: brightness(1); transform: scale(1.03); }
 
   .rm-amenities {
     display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
   }
   .rm-amenity-item {
     display: flex; align-items: center; gap: 10px; padding: 10px 14px;
-    background: #171412; border: 1px solid rgba(255,255,255,0.02); border-radius: 5px;
-    font-size: 13px; color: rgba(250,246,240,0.7);
+    background: #fdf8f2; border: 1px solid #f0e8dc; border-radius: 8px;
+    font-size: 13px; color: #444;
   }
-  .rm-amenity-icon { color: #d4af73; font-size: 12px; width: 16px; text-align: center; }
+  .rm-amenity-icon { color: #c9a96e; font-size: 12px; width: 16px; text-align: center; }
 
   .rm-rules {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
   }
-  .rm-rule-item { background: #171412; padding: 12px 14px; border-radius: 5px; border: 1px solid rgba(255,255,255,0.01); }
-  .rm-rule-label { font-size: 9px; letter-spacing: 0.5px; text-transform: uppercase; color: #d4af73; opacity: 0.8; margin-bottom: 4px; }
-  .rm-rule-value { font-size: 13px; color: #faf6f0; font-weight: 500; }
+  .rm-rule-item {
+    background: #fdf8f2; padding: 12px 14px; border-radius: 8px;
+    border: 1px solid #f0e8dc;
+  }
+  .rm-rule-label { font-size: 9px; letter-spacing: 0.5px; text-transform: uppercase; color: #c9a96e; margin-bottom: 4px; font-weight: 600; }
+  .rm-rule-value { font-size: 13px; color: #1a1a1a; font-weight: 600; }
 
   .rm-footer {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 20px 35px; background: #0a0807; height: 80px;
-    border-top: 1px solid rgba(212,175,115,0.1); flex-shrink: 0;
+    padding: 18px 32px; background: #fdf8f2; height: 76px;
+    border-top: 1px solid #f0e8dc; flex-shrink: 0;
   }
-  .rm-footer-status { display: flex; align-items: center; gap: 8px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; font-weight: 600; }
-  .rm-footer-status-dot { width: 6px; height: 6px; border-radius: 50%; }
-  .rm-footer-btns { display: flex; align-items: center; gap: 12px; }
+  .rm-footer-status { display: flex; align-items: center; gap: 8px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; font-weight: 700; }
+  .rm-footer-status-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .rm-footer-btns { display: flex; align-items: center; gap: 10px; }
 
   .rm-btn-close {
-    font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase;
-    color: rgba(250,246,240,0.5); background: transparent;
-    border: 1px solid rgba(255,255,255,0.12); padding: 10px 20px; border-radius: 4px;
+    font-size: 12px; font-weight: 500; letter-spacing: 0.5px;
+    color: #888; background: transparent;
+    border: 1px solid #ddd; padding: 9px 20px; border-radius: 50px;
     cursor: pointer; transition: all 0.2s;
   }
-  .rm-btn-close:hover { color: #faf6f0; border-color: rgba(255,255,255,0.3); }
+  .rm-btn-close:hover { color: #444; border-color: #aaa; }
 
   .rm-btn-book {
-    font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
-    color: #110e0c; background: #d4af73; border: none; padding: 11px 24px; border-radius: 4px;
+    font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    color: #fff;
+    background: linear-gradient(135deg, #c9a96e, #a67c45);
+    border: none; padding: 10px 24px; border-radius: 50px;
     cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block;
+    box-shadow: 0 4px 15px rgba(201,169,110,0.35);
   }
-  .rm-btn-book:hover { background: #e0c08a; transform: translateY(-1px); }
+  .rm-btn-book:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,169,110,0.5); color: #fff; }
 
   .rm-btn-book-disabled {
-    font-size: 11px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase;
-    padding: 10px 20px; border-radius: 4px; border: 1px solid;
+    font-size: 11px; font-weight: 500; letter-spacing: 0.5px;
+    padding: 9px 20px; border-radius: 50px; border: 1px solid;
     cursor: not-allowed; display: inline-flex; align-items: center; gap: 6px;
   }
 
   .rm-close-btn {
-    position: absolute; top: 20px; right: 20px; z-index: 20;
-    width: 32px; height: 32px; border-radius: 50%;
-    background: rgba(17,14,12,0.6); border: 1px solid rgba(255,255,255,0.1);
-    color: #faf6f0; font-size: 18px; display: flex; align-items: center; justify-content: center;
+    position: absolute; top: 16px; right: 16px; z-index: 20;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: rgba(255,255,255,0.9); border: 1px solid rgba(0,0,0,0.1);
+    color: #333; font-size: 18px; display: flex; align-items: center; justify-content: center;
     cursor: pointer; transition: all 0.2s; backdrop-filter: blur(4px); line-height: 1;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
   }
-  .rm-close-btn:hover { background: #d4af73; color: #110e0c; border-color: #d4af73; }
+  .rm-close-btn:hover { background: #c9a96e; color: #fff; border-color: #c9a96e; }
 
   @keyframes rm-fade-in { from { opacity: 0 } to { opacity: 1 } }
   @keyframes rm-slide-up {
@@ -302,19 +318,116 @@ const MODAL_STYLES = `
     .rm-modal-container { flex-direction: column; overflow-y: auto; height: calc(100% - 70px); }
     .rm-modal-sidebar { width: 100%; height: 240px; flex-shrink: 0; }
     .rm-modal-inner { width: 100%; padding: 24px; overflow-y: visible; }
-    .rm-title { font-size: 28px; }
+    .rm-title { font-size: 26px; }
     .rm-features { grid-template-columns: 1fr; gap: 8px; }
     .rm-amenities { grid-template-columns: 1fr; }
     .rm-rules { grid-template-columns: 1fr; gap: 6px; }
-    .rm-footer { padding: 15px 24px; height: auto; flex-direction: column; gap: 12px; align-items: flex-start; }
+    .rm-footer { padding: 14px 24px; height: auto; flex-direction: column; gap: 12px; align-items: flex-start; }
     .rm-footer-btns { width: 100%; justify-content: flex-end; }
+  }
+
+  /* ─── FILTER BAR ─── */
+  .rooms-filter-bar {
+    background: #fff;
+    border: 1px solid #f0e8dc;
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 32px;
+    box-shadow: 0 2px 12px rgba(201,169,110,0.08);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .rooms-search-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+  }
+  .rooms-search-wrap i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #c9a96e;
+    font-size: 13px;
+  }
+  .rooms-search-input {
+    width: 100%;
+    padding: 10px 14px 10px 36px;
+    border: 1px solid #ede5d8;
+    border-radius: 50px;
+    font-size: 13px;
+    color: #333;
+    background: #fdf8f2;
+    outline: none;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+  .rooms-search-input:focus {
+    border-color: #c9a96e;
+    box-shadow: 0 0 0 3px rgba(201,169,110,0.12);
+    background: #fff;
+  }
+  .rooms-search-input::placeholder { color: #bbb; }
+
+  .rooms-select-wrap {
+    position: relative;
+    min-width: 160px;
+  }
+  .rooms-select-wrap i {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #c9a96e;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 1;
+  }
+  .rooms-select {
+    appearance: none;
+    width: 100%;
+    padding: 10px 32px 10px 34px;
+    border: 1px solid #ede5d8;
+    border-radius: 50px;
+    font-size: 13px;
+    color: #333;
+    background: #fdf8f2;
+    outline: none;
+    cursor: pointer;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+  .rooms-select:focus {
+    border-color: #c9a96e;
+    box-shadow: 0 0 0 3px rgba(201,169,110,0.12);
+    background: #fff;
+  }
+  .rooms-select-arrow {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+    font-size: 10px;
+    pointer-events: none;
+  }
+
+  .rooms-filter-count {
+    font-size: 12px;
+    color: #999;
+    white-space: nowrap;
+    padding: 0 4px;
+  }
+  .rooms-filter-count span {
+    font-weight: 700;
+    color: #c9a96e;
   }
 `;
 
 // ─── MODAL COMPONENT ─────────────────────────────────────────────────────────
 const RoomModal = ({ room, onClose }) => {
   if (!room) return null;
-
   const unavailable = isRoomUnavailable(room.status);
   const statusInfo  = getStatusLabel(room.status);
 
@@ -324,9 +437,9 @@ const RoomModal = ({ room, onClose }) => {
       <div className="rm-backdrop" onClick={onClose} />
       <div className="rm-modal" role="dialog" aria-modal="true">
         <button className="rm-close-btn" onClick={onClose} aria-label="Close">×</button>
-        
+
         <div className="rm-modal-container">
-          {/* LEFT SIDEBAR (Sticky Media View) */}
+          {/* LEFT SIDEBAR */}
           <div className="rm-modal-sidebar">
             <img
               src={getImageUrl(room.images?.[0])}
@@ -338,11 +451,7 @@ const RoomModal = ({ room, onClose }) => {
             {unavailable && statusInfo && (
               <div
                 className="rm-status-ribbon"
-                style={{
-                  background: statusInfo.bg,
-                  border: `1px solid ${statusInfo.border}`,
-                  color: statusInfo.color,
-                }}
+                style={{ background: statusInfo.bg, border: `1px solid ${statusInfo.border}`, color: statusInfo.color }}
               >
                 <div className="rm-status-dot" style={{ background: statusInfo.color }} />
                 {statusInfo.text}
@@ -359,31 +468,27 @@ const RoomModal = ({ room, onClose }) => {
             </div>
           </div>
 
-          {/* RIGHT DETAILS PANEL (Scrollable) */}
+          {/* RIGHT PANEL */}
           <div className="rm-modal-inner">
             {room.subtitle && <span className="rm-subtitle">{room.subtitle}</span>}
 
             {unavailable && statusInfo && (
               <div
                 className="rm-unavailable-banner"
-                style={{
-                  borderLeftColor: statusInfo.color,
-                  color: statusInfo.color,
-                }}
+                style={{ borderLeftColor: statusInfo.color, background: statusInfo.bg }}
               >
-                <div className="rm-unavailable-banner-icon">
+                <div className="rm-unavailable-banner-icon" style={{ color: statusInfo.color }}>
                   <i className="fa-solid fa-circle-exclamation"></i>
                 </div>
-                <div className="rm-unavailable-banner-text">
+                <div>
                   <div className="rm-unavailable-banner-title">Space Temporarily Locked</div>
-                  <div>
+                  <div className="rm-unavailable-banner-text">
                     This room is currently marked as <strong>{statusInfo.text}</strong>. Reservations will open shortly.
                   </div>
                 </div>
               </div>
             )}
 
-            {/* FEATURES */}
             <div className="rm-features">
               {room.area && (
                 <div className="rm-feature-item">
@@ -407,7 +512,7 @@ const RoomModal = ({ room, onClose }) => {
                 <div className="rm-feature-item">
                   <div className="rm-feature-icon"><i className="fa-solid fa-bed"></i></div>
                   <div>
-                    <div className="rm-feature-label">Bed config</div>
+                    <div className="rm-feature-label">Bed Type</div>
                     <div className="rm-feature-value">{room.bedType}</div>
                   </div>
                 </div>
@@ -416,7 +521,6 @@ const RoomModal = ({ room, onClose }) => {
 
             {room.description && <p className="rm-description">{room.description}</p>}
 
-            {/* AMENITIES */}
             {room.amenities?.length > 0 && (
               <>
                 <div className="rm-section-title">Included Amenities</div>
@@ -431,7 +535,6 @@ const RoomModal = ({ room, onClose }) => {
               </>
             )}
 
-            {/* HOUSE RULES */}
             <div className="rm-section-title">Policies & Timeline</div>
             <div className="rm-rules">
               <div className="rm-rule-item">
@@ -448,7 +551,6 @@ const RoomModal = ({ room, onClose }) => {
               </div>
             </div>
 
-            {/* GALLERY */}
             {room.images?.length > 1 && (
               <>
                 <div className="rm-section-title">Interior Gallery</div>
@@ -462,39 +564,33 @@ const RoomModal = ({ room, onClose }) => {
           </div>
         </div>
 
-        {/* FIXED FOOTER */}
+        {/* FOOTER */}
         <div className="rm-footer">
           <div className="rm-footer-status">
             <div
               className="rm-footer-status-dot"
-              style={{ background: unavailable ? (statusInfo?.color || "#e74c3c") : "#2ecc71" }}
+              style={{ background: unavailable ? (statusInfo?.color || "#e74c3c") : "#27ae60" }}
             />
-            <span style={{ color: unavailable ? (statusInfo?.color || "#e74c3c") : "#2ecc71" }}>
+            <span style={{ color: unavailable ? (statusInfo?.color || "#e74c3c") : "#27ae60" }}>
               {unavailable ? (statusInfo?.text || "Unavailable") : "Ready to Reserve"}
             </span>
           </div>
-
           <div className="rm-footer-btns">
             <button className="rm-btn-close" onClick={onClose}>Close</button>
             {unavailable ? (
               <span
                 className="rm-btn-book-disabled"
-                style={{
-                  color: statusInfo?.color || "#e74c3c",
-                  borderColor: statusInfo?.border || "rgba(231,76,60,0.2)",
-                  background: statusInfo?.bg || "rgba(231,76,60,0.05)",
-                }}
+                style={{ color: statusInfo?.color || "#e74c3c", borderColor: statusInfo?.border || "rgba(231,76,60,0.3)", background: statusInfo?.bg || "rgba(231,76,60,0.05)" }}
               >
                 <i className="fa-solid fa-lock" style={{ fontSize: "10px" }}></i> Fully Booked
               </span>
             ) : (
               <Link to={`/booking/${room._id}`} className="rm-btn-book">
-                Book Suite
+                Book Suite →
               </Link>
             )}
           </div>
         </div>
-
       </div>
     </>
   );
@@ -502,42 +598,29 @@ const RoomModal = ({ room, onClose }) => {
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 const RoomsList = () => {
-  const [rooms, setRooms]             = useState([]);
+  const [rooms, setRooms]               = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
-  const [loading, setLoading]         = useState(false);
-  const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("all");
-  const [priceRange, setPriceRange] = useState("all");
+  const [loading, setLoading]           = useState(false);
+  const [search, setSearch]             = useState("");
+  const [category, setCategory]         = useState("all");
+  const [priceRange, setPriceRange]     = useState("all");
 
   useEffect(() => { fetchRooms(); }, []);
 
   const filteredRooms = rooms.filter((room) => {
     const text = search.toLowerCase();
-  
-    // search filter
     const matchSearch =
       room.title?.toLowerCase().includes(text) ||
       room.description?.toLowerCase().includes(text) ||
       room.type?.toLowerCase().includes(text);
-  
-    // category filter
-    const matchCategory =
-      category === "all" ||
-      room.type?.toLowerCase() === category.toLowerCase();
-  
-    // price filter
+    const matchCategory = category === "all" || room.type?.toLowerCase() === category.toLowerCase();
     let matchPrice = true;
-  
-    if (priceRange === "low") {
-      matchPrice = room.price < 5000;
-    } else if (priceRange === "mid") {
-      matchPrice = room.price >= 5000 && room.price <= 15000;
-    } else if (priceRange === "high") {
-      matchPrice = room.price > 15000;
-    }
-  
+    if (priceRange === "low")  matchPrice = room.price < 5000;
+    if (priceRange === "mid")  matchPrice = room.price >= 5000 && room.price <= 15000;
+    if (priceRange === "high") matchPrice = room.price > 15000;
     return matchSearch && matchCategory && matchPrice;
   });
+
   const fetchRooms = async () => {
     try {
       const data = await getRooms();
@@ -569,73 +652,95 @@ const RoomsList = () => {
   }, []);
 
   useEffect(() => {
-    if (selectedRoom) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = selectedRoom ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [selectedRoom]);
 
   if (!rooms.length) {
-    return <div className="text-center py-5"><h3>Loading Rooms...</h3></div>;
+    return (
+      <div className="text-center py-5">
+        <div className="spinner-border text-primary"></div>
+        <p className="mt-3 text-muted">Loading Rooms...</p>
+      </div>
+    );
   }
 
   return (
     <>
+      <style>{MODAL_STYLES}</style>
+
       <section className="section">
         <div className="container">
-       <div className="mb-4 d-flex flex-wrap gap-2 justify-content-end">
 
-  {/* SEARCH */}
-  <input
-    type="text"
-    className="form-control"
-    placeholder="Search rooms..."
-    style={{ maxWidth: "250px" }}
-    value={search}
-    onChange={(e) => setSearch(e.target.value)}
-  />
+          {/* ===== FILTER BAR ===== */}
+          <div className="rooms-filter-bar">
 
-  {/* CATEGORY FILTER */}
-  <select
-    className="form-select"
-    style={{ maxWidth: "180px" }}
-    value={category}
-    onChange={(e) => setCategory(e.target.value)}
-  >
-    <option value="all">All Categories</option>
-    <option value="single">Single</option>
-    <option value="double">Double</option>
-    <option value="deluxe">Deluxe</option>
-    <option value="suite">Suite</option>
-  </select>
+            {/* SEARCH */}
+            <div className="rooms-search-wrap">
+              <i className="fa-solid fa-magnifying-glass"></i>
+              <input
+                type="text"
+                className="rooms-search-input"
+                placeholder="Search rooms by name or type..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
 
-  {/* PRICE FILTER */}
-  <select
-    className="form-select"
-    style={{ maxWidth: "180px" }}
-    value={priceRange}
-    onChange={(e) => setPriceRange(e.target.value)}
-  >
-    <option value="all">All Prices</option>
-    <option value="low">Below 5000</option>
-    <option value="mid">5000 - 15000</option>
-    <option value="high">15000+</option>
-  </select>
+            {/* CATEGORY */}
+            <div className="rooms-select-wrap">
+              <i className="fa-solid fa-layer-group"></i>
+              <select
+                className="rooms-select"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+              >
+                <option value="all">All Categories</option>
+                <option value="single">Single</option>
+                <option value="double">Double</option>
+                <option value="deluxe">Deluxe</option>
+                <option value="suite">Suite</option>
+              </select>
+              <i className="fa-solid fa-chevron-down rooms-select-arrow"></i>
+            </div>
 
-</div>
+            {/* PRICE */}
+            <div className="rooms-select-wrap">
+              <i className="fa-solid fa-tag"></i>
+              <select
+                className="rooms-select"
+                value={priceRange}
+                onChange={(e) => setPriceRange(e.target.value)}
+              >
+                <option value="all">All Prices</option>
+                <option value="low">Below Rs 5,000</option>
+                <option value="mid">Rs 5,000 – 15,000</option>
+                <option value="high">Above Rs 15,000</option>
+              </select>
+              <i className="fa-solid fa-chevron-down rooms-select-arrow"></i>
+            </div>
+
+            {/* COUNT */}
+            <div className="rooms-filter-count">
+              <span>{filteredRooms.length}</span> room{filteredRooms.length !== 1 ? "s" : ""} found
+            </div>
+
+          </div>
+
+          {/* ===== ROOM CARDS ===== */}
           <div className="room-items-wrap">
             {filteredRooms.map((room, index) => {
               const isEven        = index % 2 === 0;
               const isLoadingThis = loading === room._id;
               const unavailable   = isRoomUnavailable(room.status);
               const statusInfo    = getStatusLabel(room.status);
+              const floorInfo     = getFloorLabel(room.floor);
 
               return (
                 <div key={room._id} className="room-item bg-white rounded-5 mb-5">
                   <div className="row g-0">
-                    {/* IMAGE COLUMN */}
+
+                    {/* IMAGE */}
                     <div className={`col-lg-6 ${isEven ? "" : "order-lg-2"}`}>
                       <div className="room-item-img rounded-5 position-relative" style={{ cursor: "pointer" }}>
                         <a href="#" onClick={(e) => handleDetailsClick(e, room._id)}>
@@ -646,14 +751,35 @@ const RoomsList = () => {
                             style={unavailable ? { filter: "grayscale(40%) brightness(0.85)" } : {}}
                           />
                         </a>
-                        {room.tag && !unavailable && (
+
+                        {/* ✅ FLOOR BADGE */}
+                        {room.floor && (
+                          <div
+                            className="position-absolute bottom-0 start-0 ms-4 mb-4 px-3 py-1 rounded-pill d-flex align-items-center gap-2"
+                            style={{
+                              background: "rgba(255,255,255,0.92)",
+                              backdropFilter: "blur(6px)",
+                              fontSize: "11px",
+                              fontWeight: 600,
+                              color: "#1a1a1a",
+                              border: "1px solid rgba(255,255,255,0.6)",
+                              boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+                            }}
+                          >
+                            <i className={`fa-solid ${floorInfo.icon}`} style={{ color: "#c9a96e", fontSize: "10px" }}></i>
+                            {floorInfo.label}
+                          </div>
+                        )}
+
+                        {/* STATUS / TAG BADGE */}
+                        {!unavailable && room.tag && (
                           <div className="position-absolute top-0 start-0 ms-4 mt-4 px-3 py-1 text-3 fw-500 text-bg-primary rounded-pill">
                             {room.tag}
                           </div>
                         )}
                         {unavailable && statusInfo && (
                           <div
-                            className="position-absolute top-0 start-0 ms-4 mt-4 px-3 py-1 text-3 fw-500 rounded-pill d-flex align-items-center gap-2"
+                            className="position-absolute top-0 start-0 ms-4 mt-4 px-3 py-1 rounded-pill d-flex align-items-center gap-2"
                             style={{
                               background: statusInfo.bg,
                               border: `1px solid ${statusInfo.border}`,
@@ -670,13 +796,14 @@ const RoomsList = () => {
                       </div>
                     </div>
 
-                    {/* CONTENT COLUMN */}
+                    {/* CONTENT */}
                     <div className="col-lg-6 align-content-center">
                       <div className="p-4 m-2">
                         <div className="room-discount d-inline-flex text-2 fw-500 rounded-pill border border-dark border-opacity-10 ms-0 mt-0 mb-2">
                           <span className="text-primary me-1"><i className="fa-solid fa-tag"></i></span>
                           {room.subtitle || "Luxury Stay"}
                         </div>
+
                         <h3 className="text-8 fw-600">{room.title}</h3>
                         <p className="text-3 text-body-secondary">{room.description}</p>
 
@@ -696,7 +823,16 @@ const RoomsList = () => {
                               <span className="text-primary text-5 me-2"><i className="fa-solid fa-expand"></i></span>{room.area}
                             </div>
                           )}
-                          {room.amenities?.slice(0, 3).map((item, i) => (
+
+                          {/* ✅ FLOOR IN CARD */}
+                          {room.floor && (
+                            <div className="col-6 col-xl-4 d-flex align-items-center">
+                              <span className="text-primary text-5 me-2"><i className="fa-solid fa-building"></i></span>
+                              {getFloorLabel(room.floor).label}
+                            </div>
+                          )}
+
+                          {room.amenities?.slice(0, 2).map((item, i) => (
                             <div key={i} className="col-6 col-xl-4 d-flex align-items-center">
                               <span className="text-primary text-5 me-2">
                                 <i className={`fa-solid ${getAmenityIcon(item)}`}></i>
@@ -705,7 +841,9 @@ const RoomsList = () => {
                             </div>
                           ))}
                         </div>
+
                         <hr className="opacity-1" />
+
                         <div className="d-flex align-items-center justify-content-between w-100">
                           <div className="text-7 fw-600 d-flex align-items-center gap-1">
                             Rs {room.price}
@@ -726,11 +864,13 @@ const RoomsList = () => {
                         </div>
                       </div>
                     </div>
+
                   </div>
                 </div>
               );
             })}
           </div>
+
         </div>
       </section>
 
