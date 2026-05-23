@@ -3,28 +3,60 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:5001/api';
 
+const TASK_TYPES = [
+  { value: 'room_cleaning',    label: 'Room Cleaning' },
+  { value: 'deep_cleaning',    label: 'Deep Cleaning' },
+  { value: 'linen_change',     label: 'Linen Change' },
+  { value: 'bathroom_cleaning',label: 'Bathroom Cleaning' },
+  { value: 'minibar_refill',   label: 'Mini Bar Refill' },
+  { value: 'guest_request',    label: 'Guest Request' },
+];
+
+const PRIORITIES = [
+  { value: 'low',       label: 'Low',       color: '#6c757d', bg: '#f8f9fa' },
+  { value: 'medium',    label: 'Medium',    color: '#0d6efd', bg: '#e7f1ff' },
+  { value: 'high',      label: 'High',      color: '#fd7e14', bg: '#fff3e0' },
+  { value: 'emergency', label: 'Emergency', color: '#dc3545', bg: '#ffeaea' },
+];
+
+const NEXT_STATUS = { pending: 'in_progress', in_progress: 'completed' };
+
 const Housekeeping = () => {
   const token = localStorage.getItem('token');
   const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
 
-  const [tasks, setTasks] = useState([]);
-  const [filtered, setFiltered] = useState([]);
-  const [filterStatus, setFilterStatus] = useState('');
-  const [rooms, setRooms] = useState([]);
-  const [hkStaff, setHkStaff] = useState([]);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [tasks, setTasks]           = useState([]);
+  const [filtered, setFiltered]     = useState([]);
+  const [filterStatus, setFilterStatus]     = useState('');
+  const [filterPriority, setFilterPriority] = useState('');
+  const [search, setSearch]         = useState('');
+  const [rooms, setRooms]           = useState([]);
+  const [hkStaff, setHkStaff]       = useState([]);
+  const [showAddModal, setShowAddModal]     = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [addForm, setAddForm] = useState({ roomId: '', staffId: '' });
-  const [updateStatus, setUpdateStatus] = useState('pending');
-  const [error, setError] = useState('');
+  const [selectedTask, setSelectedTask]     = useState(null);
+  const [error, setError]           = useState('');
+  const [addForm, setAddForm]       = useState({
+    roomId: '', staffId: '', taskType: 'room_cleaning',
+    priority: 'medium', notes: '', dueDate: ''
+  });
 
   useEffect(() => { loadTasks(); }, []);
 
   useEffect(() => {
-    setFiltered(filterStatus ? tasks.filter(t => t.cleaningStatus === filterStatus) : tasks);
-  }, [filterStatus, tasks]);
+    let result = tasks;
+    if (filterStatus)   result = result.filter(t => t.cleaningStatus === filterStatus);
+    if (filterPriority) result = result.filter(t => t.priority === filterPriority);
+    if (search) {
+      const q = search.toLowerCase();
+      result = result.filter(t =>
+        (t.roomId?.roomNumber || '').toLowerCase().includes(q) ||
+        (t.assignedStaff?.name || '').toLowerCase().includes(q)
+      );
+    }
+    setFiltered(result);
+  }, [filterStatus, filterPriority, search, tasks]);
 
   const loadTasks = async () => {
     try {
@@ -46,37 +78,67 @@ const Housekeeping = () => {
   };
 
   const stats = {
-    total: tasks.length,
-    pending: tasks.filter(t => t.cleaningStatus === 'pending').length,
+    total:      tasks.length,
+    pending:    tasks.filter(t => t.cleaningStatus === 'pending').length,
     inProgress: tasks.filter(t => t.cleaningStatus === 'in_progress').length,
-    completed: tasks.filter(t => t.cleaningStatus === 'completed').length,
+    completed:  tasks.filter(t => t.cleaningStatus === 'completed').length,
+  };
+
+  const priorityInfo = (p) => PRIORITIES.find(x => x.value === p) || PRIORITIES[1];
+
+  const priorityBadge = (p) => {
+    const info = priorityInfo(p);
+    return (
+      <span className="badge" style={{ background: info.bg, color: info.color, border: `1px solid ${info.color}` }}>
+        {info.label}
+      </span>
+    );
   };
 
   const statusBadge = (status) => {
     const map = {
       pending:     'bg-warning-subtle text-warning',
       in_progress: 'bg-primary-subtle text-primary',
-      completed:   'bg-success-subtle text-success'
+      completed:   'bg-success-subtle text-success',
     };
-    return <span className={`badge ${map[status]}`}>{status.replace('_', ' ')}</span>;
+    return <span className={`badge ${map[status] || 'bg-secondary'}`}>{status?.replace('_', ' ')}</span>;
+  };
+
+  const taskTypeLabel = (t) => TASK_TYPES.find(x => x.value === t)?.label || t;
+
+  const isOverdue = (task) => {
+    if (!task.dueDate || task.cleaningStatus === 'completed') return false;
+    return new Date(task.dueDate) < new Date();
   };
 
   const handleAdd = async () => {
     setError('');
-    if (!addForm.roomId || !addForm.staffId) { setError('Please select room and staff.'); return; }
+    if (!addForm.roomId || !addForm.staffId) {
+      setError('Please select room and staff.');
+      return;
+    }
     try {
-      await axios.post(`${API_URL}/housekeeping`, { roomId: addForm.roomId, assignedStaff: addForm.staffId }, { headers });
+      await axios.post(`${API_URL}/housekeeping`, {
+        roomId:        addForm.roomId,
+        assignedStaff: addForm.staffId,
+        taskType:      addForm.taskType,
+        priority:      addForm.priority,
+        notes:         addForm.notes,
+        dueDate:       addForm.dueDate || undefined,
+      }, { headers });
       setShowAddModal(false);
-      setAddForm({ roomId: '', staffId: '' });
+      setAddForm({ roomId: '', staffId: '', taskType: 'room_cleaning', priority: 'medium', notes: '', dueDate: '' });
       loadTasks();
     } catch (err) { setError(err.response?.data?.message || 'Error assigning task.'); }
   };
 
-  const handleUpdateStatus = async () => {
+  const handleNextStatus = async (task) => {
+    const next = NEXT_STATUS[task.cleaningStatus];
+    if (!next) return;
     try {
-      await axios.put(`${API_URL}/housekeeping/${selectedTask._id}`, { cleaningStatus: updateStatus }, { headers });
-      setShowUpdateModal(false);
+      await axios.put(`${API_URL}/housekeeping/${task._id}`, { cleaningStatus: next }, { headers });
       loadTasks();
+      if (selectedTask?._id === task._id) setSelectedTask({ ...task, cleaningStatus: next });
     } catch (err) { console.error(err); }
   };
 
@@ -84,17 +146,24 @@ const Housekeeping = () => {
     try {
       await axios.delete(`${API_URL}/housekeeping/${selectedTask._id}`, { headers });
       setShowDeleteModal(false);
+      setShowDetailModal(false);
       loadTasks();
     } catch (err) { console.error(err); }
   };
 
   return (
     <div className="container-fluid">
+      {/* Header */}
       <div className="row">
         <div className="col-12">
           <div className="page-title-box d-sm-flex align-items-center justify-content-between">
             <h4 className="mb-sm-0">Housekeeping Management</h4>
-            <button className="btn btn-success" onClick={() => { loadModalData(); setAddForm({ roomId: '', staffId: '' }); setError(''); setShowAddModal(true); }}>
+            <button className="btn btn-success" onClick={() => {
+              loadModalData();
+              setAddForm({ roomId: '', staffId: '', taskType: 'room_cleaning', priority: 'medium', notes: '', dueDate: '' });
+              setError('');
+              setShowAddModal(true);
+            }}>
               <i className="ri-add-line me-1"></i> Assign Task
             </button>
           </div>
@@ -104,10 +173,10 @@ const Housekeeping = () => {
       {/* Stats */}
       <div className="row mb-3">
         {[
-          { label: 'Total Tasks', value: stats.total, icon: 'bx bx-list-ul', color: 'info' },
-          { label: 'Pending', value: stats.pending, icon: 'bx bx-time', color: 'warning' },
-          { label: 'In Progress', value: stats.inProgress, icon: 'bx bx-loader', color: 'primary' },
-          { label: 'Completed', value: stats.completed, icon: 'bx bx-check-circle', color: 'success' },
+          { label: 'Total Tasks',  value: stats.total,      icon: 'bx bx-list-ul',      color: 'info'    },
+          { label: 'Pending',      value: stats.pending,    icon: 'bx bx-time',          color: 'warning' },
+          { label: 'In Progress',  value: stats.inProgress, icon: 'bx bx-loader-circle', color: 'primary' },
+          { label: 'Completed',    value: stats.completed,  icon: 'bx bx-check-circle',  color: 'success' },
         ].map((s, i) => (
           <div className="col-md-3 col-6" key={i}>
             <div className="card card-animate">
@@ -131,8 +200,25 @@ const Housekeeping = () => {
 
       {/* Table */}
       <div className="card">
-        <div className="card-header d-flex align-items-center">
+        <div className="card-header d-flex align-items-center flex-wrap gap-2">
           <h5 className="card-title mb-0 flex-grow-1">Cleaning Tasks</h5>
+
+          {/* Search */}
+          <input
+            type="text"
+            className="form-control form-control-sm w-auto"
+            placeholder="Search room or staff..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+
+          {/* Priority Filter */}
+          <select className="form-select form-select-sm w-auto" value={filterPriority} onChange={e => setFilterPriority(e.target.value)}>
+            <option value="">All Priorities</option>
+            {PRIORITIES.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
+          </select>
+
+          {/* Status Filter */}
           <select className="form-select form-select-sm w-auto" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
             <option value="">All Status</option>
             <option value="pending">Pending</option>
@@ -140,38 +226,76 @@ const Housekeeping = () => {
             <option value="completed">Completed</option>
           </select>
         </div>
+
         <div className="card-body">
           <div className="table-responsive">
             <table className="table table-hover align-middle mb-0">
               <thead className="table-light">
-                <tr><th>#</th><th>Room</th><th>Assigned Staff</th><th>Status</th><th>Assigned On</th><th>Completed At</th><th>Actions</th></tr>
+                <tr>
+                  <th>#</th>
+                  <th>Room</th>
+                  <th>Task Type</th>
+                  <th>Assigned Staff</th>
+                  <th>Priority</th>
+                  <th>Due Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
-                  <tr><td colSpan="7" className="text-center py-4 text-muted">No tasks found.</td></tr>
+                  <tr><td colSpan="8" className="text-center py-4 text-muted">No tasks found.</td></tr>
                 ) : filtered.map((t, i) => {
                   const staffName = t.assignedStaff?.name || '—';
-                  const initials = staffName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                  const initials = staffName !== '—'
+                    ? staffName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+                    : '?';
+                  const overdue = isOverdue(t);
                   return (
-                    <tr key={t._id}>
+                    <tr key={t._id} style={overdue ? { background: '#fff8f8' } : {}}>
                       <td>{i + 1}</td>
-                      <td><span className="fw-medium">{t.roomId ? `Room ${t.roomId.roomNumber} (${t.roomId.type})` : '—'}</span></td>
+                      <td>
+                        <span className="fw-medium">
+                          {t.roomId ? `Room ${t.roomId.roomNumber}` : '—'}
+                        </span>
+                        {t.roomId?.type && <small className="text-muted d-block">{t.roomId.type}</small>}
+                      </td>
+                      <td>
+                        <span className="badge bg-info-subtle text-info">{taskTypeLabel(t.taskType)}</span>
+                      </td>
                       <td>
                         <div className="d-flex align-items-center gap-2">
                           <div className="avatar-xs">
-                            <span className="avatar-title rounded-circle bg-success-subtle text-success" style={{ fontSize: '11px' }}>{initials}</span>
+                            <span className="avatar-title rounded-circle bg-success-subtle text-success" style={{ fontSize: '11px' }}>
+                              {initials}
+                            </span>
                           </div>
                           {staffName}
                         </div>
                       </td>
+                      <td>{priorityBadge(t.priority || 'medium')}</td>
+                      <td>
+                        {t.dueDate ? (
+                          <span style={{ color: overdue ? '#dc3545' : '#212529', fontWeight: overdue ? 600 : 400 }}>
+                            {overdue && <i className="ri-alarm-warning-line me-1 text-danger"></i>}
+                            <small>{new Date(t.dueDate).toLocaleString('en-PK', { dateStyle: 'short', timeStyle: 'short' })}</small>
+                          </span>
+                        ) : <small className="text-muted">—</small>}
+                      </td>
                       <td>{statusBadge(t.cleaningStatus)}</td>
-                      <td><small className="text-muted">{new Date(t.createdAt).toLocaleDateString('en-PK')}</small></td>
-                      <td><small className="text-muted">{t.completedAt ? new Date(t.completedAt).toLocaleDateString('en-PK') : '—'}</small></td>
                       <td>
                         <div className="d-flex gap-1">
-                          <button className="btn btn-soft-primary btn-sm" onClick={() => { setSelectedTask(t); setUpdateStatus(t.cleaningStatus); setShowUpdateModal(true); }} title="Update Status">
-                            <i className="ri-edit-line"></i>
+                          {/* View */}
+                          <button className="btn btn-soft-info btn-sm" onClick={() => { setSelectedTask(t); setShowDetailModal(true); }} title="View">
+                            <i className="ri-eye-line"></i>
                           </button>
+                          {/* Next step */}
+                          {NEXT_STATUS[t.cleaningStatus] && (
+                            <button className="btn btn-soft-success btn-sm" onClick={() => handleNextStatus(t)} title={`Move to ${NEXT_STATUS[t.cleaningStatus]}`}>
+                              <i className="ri-arrow-right-line"></i>
+                            </button>
+                          )}
+                          {/* Delete */}
                           <button className="btn btn-soft-danger btn-sm" onClick={() => { setSelectedTask(t); setShowDeleteModal(true); }} title="Delete">
                             <i className="ri-delete-bin-line"></i>
                           </button>
@@ -186,10 +310,66 @@ const Housekeeping = () => {
         </div>
       </div>
 
-      {/* Add Task Modal */}
+      {/* ── DETAIL MODAL ── */}
+      {showDetailModal && selectedTask && (
+        <div className="modal fade show d-block" style={{ background: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Task Detail</h5>
+                <button className="btn-close" onClick={() => setShowDetailModal(false)}></button>
+              </div>
+              <div className="modal-body">
+                <div className="row g-3">
+                  {[
+                    { label: 'Room',        value: selectedTask.roomId ? `Room ${selectedTask.roomId.roomNumber} (${selectedTask.roomId.type})` : '—' },
+                    { label: 'Task Type',   value: taskTypeLabel(selectedTask.taskType) },
+                    { label: 'Assigned To', value: selectedTask.assignedStaff?.name || '—' },
+                    { label: 'Priority',    value: priorityBadge(selectedTask.priority), isNode: true },
+                    { label: 'Status',      value: statusBadge(selectedTask.cleaningStatus), isNode: true },
+                    { label: 'Due Date',    value: selectedTask.dueDate ? new Date(selectedTask.dueDate).toLocaleString('en-PK') : '—' },
+                    { label: 'Assigned On', value: new Date(selectedTask.createdAt).toLocaleString('en-PK') },
+                    { label: 'Completed At',value: selectedTask.completedAt ? new Date(selectedTask.completedAt).toLocaleString('en-PK') : '—' },
+                  ].map((item, i) => (
+                    <div className="col-md-6" key={i}>
+                      <div className="p-3 bg-light rounded">
+                        <p className="text-muted mb-1 fs-12">{item.label}</p>
+                        {item.isNode ? <div className="mt-1">{item.value}</div> : <h6 className="mb-0">{item.value}</h6>}
+                      </div>
+                    </div>
+                  ))}
+                  {selectedTask.notes && (
+                    <div className="col-12">
+                      <div className="p-3 bg-light rounded">
+                        <p className="text-muted mb-1 fs-12">Notes / Instructions</p>
+                        <p className="mb-0">{selectedTask.notes}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Next step in modal */}
+                {NEXT_STATUS[selectedTask.cleaningStatus] && (
+                  <div className="mt-3">
+                    <button className="btn btn-success" onClick={() => handleNextStatus(selectedTask)}>
+                      <i className="ri-arrow-right-line me-1"></i>
+                      Move to {NEXT_STATUS[selectedTask.cleaningStatus].replace('_', ' ')}
+                    </button>
+                  </div>
+                )}
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-light" onClick={() => setShowDetailModal(false)}>Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── ADD TASK MODAL ── */}
       {showAddModal && (
-        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog">
+        <div className="modal fade show d-block" style={{ background: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-lg">
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">Assign Cleaning Task</h5>
@@ -198,7 +378,8 @@ const Housekeeping = () => {
               <div className="modal-body">
                 {error && <div className="alert alert-danger">{error}</div>}
                 <div className="row g-3">
-                  <div className="col-12">
+                  {/* Room */}
+                  <div className="col-md-6">
                     <label className="form-label">Select Room <span className="text-danger">*</span></label>
                     <select className="form-select" value={addForm.roomId} onChange={e => setAddForm({ ...addForm, roomId: e.target.value })}>
                       <option value="">Select Room</option>
@@ -207,7 +388,9 @@ const Housekeeping = () => {
                       ))}
                     </select>
                   </div>
-                  <div className="col-12">
+
+                  {/* Staff */}
+                  <div className="col-md-6">
                     <label className="form-label">Assign Staff <span className="text-danger">*</span></label>
                     <select className="form-select" value={addForm.staffId} onChange={e => setAddForm({ ...addForm, staffId: e.target.value })}>
                       <option value="">Select Housekeeping Staff</option>
@@ -217,46 +400,60 @@ const Housekeeping = () => {
                       }
                     </select>
                   </div>
+
+                  {/* Task Type */}
+                  <div className="col-md-6">
+                    <label className="form-label">Task Type</label>
+                    <select className="form-select" value={addForm.taskType} onChange={e => setAddForm({ ...addForm, taskType: e.target.value })}>
+                      {TASK_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                    </select>
+                  </div>
+
+                  {/* Priority */}
+                  <div className="col-md-6">
+                    <label className="form-label">Priority</label>
+                    <select className="form-select" value={addForm.priority} onChange={e => setAddForm({ ...addForm, priority: e.target.value })}>
+                      {PRIORITIES.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
+                    </select>
+                  </div>
+
+                  {/* Due Date */}
+                  <div className="col-md-6">
+                    <label className="form-label">Due Date & Time</label>
+                    <input
+                      type="datetime-local"
+                      className="form-control"
+                      value={addForm.dueDate}
+                      onChange={e => setAddForm({ ...addForm, dueDate: e.target.value })}
+                    />
+                  </div>
+
+                  {/* Notes */}
+                  <div className="col-12">
+                    <label className="form-label">Notes / Instructions</label>
+                    <textarea
+                      className="form-control" rows={3}
+                      placeholder="Any special instructions for the staff..."
+                      value={addForm.notes}
+                      onChange={e => setAddForm({ ...addForm, notes: e.target.value })}
+                    />
+                  </div>
                 </div>
               </div>
               <div className="modal-footer">
                 <button className="btn btn-light" onClick={() => setShowAddModal(false)}>Cancel</button>
-                <button className="btn btn-success" onClick={handleAdd}>Assign Task</button>
+                <button className="btn btn-success" onClick={handleAdd}>
+                  <i className="ri-check-line me-1"></i>Assign Task
+                </button>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Update Status Modal */}
-      {showUpdateModal && (
-        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-sm">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Update Task Status</h5>
-                <button className="btn-close" onClick={() => setShowUpdateModal(false)}></button>
-              </div>
-              <div className="modal-body">
-                <label className="form-label">Status</label>
-                <select className="form-select" value={updateStatus} onChange={e => setUpdateStatus(e.target.value)}>
-                  <option value="pending">Pending</option>
-                  <option value="in_progress">In Progress</option>
-                  <option value="completed">Completed</option>
-                </select>
-              </div>
-              <div className="modal-footer">
-                <button className="btn btn-light" onClick={() => setShowUpdateModal(false)}>Cancel</button>
-                <button className="btn btn-primary" onClick={handleUpdateStatus}>Update</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Delete Modal */}
+      {/* ── DELETE MODAL ── */}
       {showDeleteModal && (
-        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+        <div className="modal fade show d-block" style={{ background: 'rgba(0,0,0,0.5)' }}>
           <div className="modal-dialog modal-sm">
             <div className="modal-content">
               <div className="modal-body text-center p-4">
@@ -266,7 +463,7 @@ const Housekeeping = () => {
                   </span>
                 </div>
                 <h5>Delete Task?</h5>
-                <p className="text-muted">This action cannot be undone.</p>
+                <p className="text-muted">This cannot be undone.</p>
                 <div className="d-flex gap-2 justify-content-center">
                   <button className="btn btn-light" onClick={() => setShowDeleteModal(false)}>Cancel</button>
                   <button className="btn btn-danger" onClick={handleDelete}>Delete</button>

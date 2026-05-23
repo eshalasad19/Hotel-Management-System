@@ -16,9 +16,20 @@ const housekeepingSchema = new mongoose.Schema({
     enum: ['pending', 'in_progress', 'completed'],
     default: 'pending'
   },
-  completedAt: {
-    type: Date
-  }
+  // New fields
+  taskType: {
+    type: String,
+    enum: ['room_cleaning', 'deep_cleaning', 'linen_change', 'bathroom_cleaning', 'minibar_refill', 'guest_request'],
+    default: 'room_cleaning'
+  },
+  priority: {
+    type: String,
+    enum: ['low', 'medium', 'high', 'emergency'],
+    default: 'medium'
+  },
+  notes: { type: String },
+  dueDate: { type: Date },
+  completedAt: { type: Date }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Housekeeping', housekeepingSchema);
