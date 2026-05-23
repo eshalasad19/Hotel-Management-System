@@ -3,10 +3,10 @@ const Feedback = require('../Models/Feedback');
 // Submit Feedback
 const submitFeedback = async (req, res) => {
   try {
-    const { rating, review } = req.body;
+    const { rating, review ,userId} = req.body;
 
     const feedback = await Feedback.create({
-      userId: req.user.id,
+      userId:
       rating,
       review
     });

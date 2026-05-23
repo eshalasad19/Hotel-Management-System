@@ -173,12 +173,7 @@ const RestaurantMenu = () => {
                     {item.description}
                   </p>
 
-                  <button
-                    className="btn btn-success btn-sm"
-                    onClick={() => openOrderModal(item)}
-                  >
-                    Order Now
-                  </button>
+                
 
                 </div>
               </div>

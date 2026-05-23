@@ -35,15 +35,13 @@ import Services from './Component/Admin/Services';
 import Home from './Component/User/Home/Home';
 import About from './Component/User/Home/About';
 import RoomsPage from './Component/User/Home/RoomsPage';
-import ServicesPage from './Component/User/Home/ServicesPage';
+
 import RestaurantPage from './Component/User/Home/RestaurantPage';
-import Gallery from './Component/User/Home/Gallery';
-import Spa from './Component/User/Home/Spa';
+
 import Faq from './Component/User/Home/Faq';
 import ContactUs from './Component/User/Home/ContactUs';
 import RoomDetailsPage from './Component/User/Home/RoomDetailsPage';
-import BlogPage from './Component/User/Home/BlogPage';
-import BlogDetailsPage from './Component/User/Home/BlogDetailsPage';
+
 import BookingPage from './Component/User/Home/sections/Booking';
 
 // ✅ Naye User Auth Pages
@@ -74,15 +72,13 @@ function App() {
             <Route path="home" element={<Home />} />
             <Route path="about" element={<About />} />
             <Route path="room" element={<RoomsPage />} />
-            <Route path="services" element={<ServicesPage />} />
+
             <Route path="restaurant" element={<RestaurantPage />} />
-            <Route path="spa" element={<Spa />} />
-            <Route path="gallery" element={<Gallery />} />
+
             <Route path="contact" element={<ContactUs />} />
             <Route path="faq" element={<Faq />} />
             <Route path="roomsdetails/:id" element={<RoomDetailsPage />} />
-            <Route path="blog" element={<BlogPage />} />
-            <Route path="blog/:id" element={<BlogDetailsPage />} />
+
             <Route path="booking/:roomId" element={<BookingPage />} />
           </Route>
 

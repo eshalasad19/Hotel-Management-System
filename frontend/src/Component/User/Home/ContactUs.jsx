@@ -16,7 +16,6 @@ export default function ContactUs() {
       <ContactInfo />
       <ContactFormSection />
       <ContactMap />
-      <AvailabilitySection/>
     </div>
   );
 }

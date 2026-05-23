@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getRooms, getSingleRoom } from "../../../../api/roomApi";
+import { filter } from "framer-motion/m";
 
 const BASE_URL = "http://localhost:5001";
 
@@ -352,7 +353,7 @@ const RoomModal = ({ room, onClose }) => {
               {room.tag && <div className="rm-tag">{room.tag}</div>}
               <h2 className="rm-title">{room.title}</h2>
               <div className="rm-price-badge">
-                <span className="rm-price-amount">${room.price}</span>
+                <span className="rm-price-amount">Rs {room.price}</span>
                 <span className="rm-price-night">/ night</span>
               </div>
             </div>
@@ -504,9 +505,39 @@ const RoomsList = () => {
   const [rooms, setRooms]             = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [loading, setLoading]         = useState(false);
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("all");
+  const [priceRange, setPriceRange] = useState("all");
 
   useEffect(() => { fetchRooms(); }, []);
 
+  const filteredRooms = rooms.filter((room) => {
+    const text = search.toLowerCase();
+  
+    // search filter
+    const matchSearch =
+      room.title?.toLowerCase().includes(text) ||
+      room.description?.toLowerCase().includes(text) ||
+      room.type?.toLowerCase().includes(text);
+  
+    // category filter
+    const matchCategory =
+      category === "all" ||
+      room.type?.toLowerCase() === category.toLowerCase();
+  
+    // price filter
+    let matchPrice = true;
+  
+    if (priceRange === "low") {
+      matchPrice = room.price < 5000;
+    } else if (priceRange === "mid") {
+      matchPrice = room.price >= 5000 && room.price <= 15000;
+    } else if (priceRange === "high") {
+      matchPrice = room.price > 15000;
+    }
+  
+    return matchSearch && matchCategory && matchPrice;
+  });
   const fetchRooms = async () => {
     try {
       const data = await getRooms();
@@ -554,8 +585,48 @@ const RoomsList = () => {
     <>
       <section className="section">
         <div className="container">
+       <div className="mb-4 d-flex flex-wrap gap-2 justify-content-end">
+
+  {/* SEARCH */}
+  <input
+    type="text"
+    className="form-control"
+    placeholder="Search rooms..."
+    style={{ maxWidth: "250px" }}
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+  />
+
+  {/* CATEGORY FILTER */}
+  <select
+    className="form-select"
+    style={{ maxWidth: "180px" }}
+    value={category}
+    onChange={(e) => setCategory(e.target.value)}
+  >
+    <option value="all">All Categories</option>
+    <option value="single">Single</option>
+    <option value="double">Double</option>
+    <option value="deluxe">Deluxe</option>
+    <option value="suite">Suite</option>
+  </select>
+
+  {/* PRICE FILTER */}
+  <select
+    className="form-select"
+    style={{ maxWidth: "180px" }}
+    value={priceRange}
+    onChange={(e) => setPriceRange(e.target.value)}
+  >
+    <option value="all">All Prices</option>
+    <option value="low">Below 5000</option>
+    <option value="mid">5000 - 15000</option>
+    <option value="high">15000+</option>
+  </select>
+
+</div>
           <div className="room-items-wrap">
-            {rooms.map((room, index) => {
+            {filteredRooms.map((room, index) => {
               const isEven        = index % 2 === 0;
               const isLoadingThis = loading === room._id;
               const unavailable   = isRoomUnavailable(room.status);
@@ -637,7 +708,7 @@ const RoomsList = () => {
                         <hr className="opacity-1" />
                         <div className="d-flex align-items-center justify-content-between w-100">
                           <div className="text-7 fw-600 d-flex align-items-center gap-1">
-                            ${room.price}
+                            Rs {room.price}
                             <span className="text-3 fw-500 text-body-tertiary text-uppercase">/ Per Night</span>
                           </div>
                           <button
