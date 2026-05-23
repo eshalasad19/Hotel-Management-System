@@ -24,8 +24,7 @@ const RestaurantPage = () => {
       {/* Main Content Layout */}
       <div id="content" role="main">
         
-        {/* 2. Timing and Info Section */}
-        <RestaurantAbout />
+       
 
         {/* 3. Menu Category Tabs Section */}
         <RestaurantMenu />
@@ -33,8 +32,7 @@ const RestaurantPage = () => {
         {/* 4. Luxury Experience Video Banner */}
         <RestaurantVideo />
 
-        {/* 5. Features/Core Values Grid */}
-        <RestaurantValues/>
+       
 
         {/* 6. Testimonials Swiper
         <TestimonialsSection /> */}

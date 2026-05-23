@@ -1,11 +1,17 @@
+// ===== Feedback.js (Model) =====
+
 const mongoose = require('mongoose');
 
 const feedbackSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    ref: "User",
+    required: false,
+    default: null
   },
+  name: { type: String, default: "Guest" },
+  email: { type: String, default: "" },
+  phone: { type: String, default: "" },
   rating: {
     type: Number,
     min: 1,
