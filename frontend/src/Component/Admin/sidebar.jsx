@@ -249,6 +249,15 @@ const Sidebar = () => {
                 </Link>
               </li>
             )}
+            {/* Hotel Services — admin, manager only */}
+{hasRole('admin', 'manager') && (
+  <li className="nav-item">
+    <Link className={`nav-link menu-link ${isActive('/admin/hotel-services') ? 'active' : ''}`} to="/admin/hotel-services">
+      <i className="ri-hotel-line"></i>
+      <span>Hotel Services</span>
+    </Link>
+  </li>
+)}
 
             {/* Housekeeping — admin, manager, housekeeping */}
             {hasRole('admin', 'manager', 'housekeeping') && (

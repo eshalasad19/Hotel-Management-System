@@ -68,6 +68,10 @@ app.use('/api/notifications', notificationRoutes);
 const faqRoutes = require('./Routes/faqRoutes');
 app.use('/api/faqs', faqRoutes);
 
+// Hotel Services Routes
+const hotelServiceRoutes = require('./Routes/hotelServiceRoutes');
+app.use('/api/hotel-services', hotelServiceRoutes);
+
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
 });

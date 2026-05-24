@@ -30,6 +30,7 @@ import RestaurantMenu from './Component/Admin/RestaurantMenu';
 import RestaurantOrders from './Component/Admin/RestaurantOrders';
 import Services from './Component/Admin/Services';
 import FAQs from './Component/Admin/FAQs';
+import HotelServices from './Component/Admin/HotelServices';
 
 // User pages
 import Home from './Component/User/Home/Home';
@@ -98,6 +99,7 @@ function App() {
             <Route path="restaurant-orders" element={<RestaurantOrders />} />
             <Route path="services" element={<Services />} />
             <Route path="/admin/faqs" element={<FAQs />} />
+            <Route path="/admin/hotel-services" element={<HotelServices />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/home" replace />} />

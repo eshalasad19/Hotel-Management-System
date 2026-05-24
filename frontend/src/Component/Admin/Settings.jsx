@@ -7,72 +7,30 @@ const Settings = () => {
   const token = localStorage.getItem('token');
   const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
 
-  const [activeTab, setActiveTab] = useState('pricing');
+  const [activeTab, setActiveTab] = useState('hotel');
   const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError]     = useState('');
 
-  // Pricing Settings
-  const [pricing, setPricing] = useState({
-    singleRoom: 5000,
-    doubleRoom: 8000,
-    suiteRoom: 15000,
-    deluxeRoom: 12000,
-    extraBedCharge: 1500,
-    breakfastCharge: 800,
-  });
-
-  // Tax Settings
-  const [taxes, setTaxes] = useState({
-    gst: 16,
-    serviceTax: 5,
-    tourismLevy: 2,
-    taxEnabled: true,
-  });
-
-  // Policy Settings
-  const [policies, setPolicies] = useState({
-    checkInTime: '14:00',
-    checkOutTime: '12:00',
-    cancellationPolicy: 'Free cancellation up to 24 hours before check-in. After that, one night charge applies.',
-    petPolicy: 'Pets are not allowed on the premises.',
-    smokingPolicy: 'This is a smoke-free property. Smoking is only permitted in designated outdoor areas.',
-    paymentPolicy: 'Full payment required at check-in. We accept cash and online transfers.',
-    childPolicy: 'Children under 5 stay free. Extra bed charges apply for children above 5 years.',
-  });
-
-  // Notification Settings
-  const [notifications, setNotifications] = useState({
-    newBookingAlert: true,
-    checkInReminder: true,
-    checkOutReminder: true,
-    paymentAlert: true,
-    maintenanceAlert: true,
-    housekeepingAlert: false,
-    emailNotifications: true,
-    smsNotifications: false,
-  });
-
-  // Hotel Info
   const [hotelInfo, setHotelInfo] = useState({
-    hotelName: 'Hotel Management System',
-    address: 'Karachi, Pakistan',
-    phone: '+92 300 0000000',
-    email: 'info@hotel.com',
-    website: 'www.hotel.com',
+    hotelName:   'Hotel Management System',
+    address:     'Karachi, Pakistan',
+    phone:       '+92 300 0000000',
+    email:       'info@hotel.com',
     description: 'A premium hotel offering world-class amenities and services.',
-    currency: 'PKR',
-    timezone: 'Asia/Karachi',
+    currency:    'PKR',
+    timezone:    'Asia/Karachi',
+  });
+
+  const [pricing, setPricing] = useState({
+    single: 5000,
+    double: 8000,
+    suite:  15000,
+    deluxe: 12000,
   });
 
   const showSuccess = (msg) => {
-    setSuccess(msg);
-    setError('');
+    setSuccess(msg); setError('');
     setTimeout(() => setSuccess(''), 3000);
-  };
-
-  const showError = (msg) => {
-    setError(msg);
-    setSuccess('');
   };
 
   const persistSettings = async (key, value, successMsg) => {
@@ -82,70 +40,56 @@ const Settings = () => {
       showSuccess(successMsg);
     } catch {
       localStorage.setItem(`hotel_${key}`, JSON.stringify(value));
-      showSuccess(`${successMsg} (saved locally — server unavailable)`);
+      showSuccess(`${successMsg} (saved locally)`);
     }
   };
 
- const savePricing = () => persistSettings('pricing', pricing, 'Pricing settings saved!');
-const saveTaxes = () => persistSettings('taxes', taxes, 'Tax settings saved!');
-const savePolicies = () => persistSettings('policies', policies, 'Policy settings saved!');
-const saveNotifications = () => persistSettings('notifications', notifications, 'Notification settings saved!');
   const saveHotelInfo = () => {
-  localStorage.setItem('hotel_info', JSON.stringify(hotelInfo));
-  persistSettings('hotelInfo', hotelInfo, 'Hotel information saved!');
-};
+    // hotel_info key — Payments invoice is se read karta hai
+    localStorage.setItem('hotel_info', JSON.stringify(hotelInfo));
+    persistSettings('hotelInfo', hotelInfo, 'Hotel information saved!');
+  };
+
+  const savePricing = () => {
+    // hotel_pricing key — Rooms add form is se auto-fill karta hai
+    localStorage.setItem('hotel_pricing', JSON.stringify(pricing));
+    persistSettings('pricing', pricing, 'Pricing saved!');
+  };
 
   useEffect(() => {
-    const loadFromStorage = () => {
-      const savedPricing = localStorage.getItem('hotel_pricing');
-      const savedTaxes = localStorage.getItem('hotel_taxes');
-      const savedPolicies = localStorage.getItem('hotel_policies');
-      const savedNotifications = localStorage.getItem('hotel_notifications');
-      const savedHotelInfo = localStorage.getItem('hotel_hotelInfo') || localStorage.getItem('hotel_info');
-      if (savedPricing) setPricing(JSON.parse(savedPricing));
-      if (savedTaxes) setTaxes(JSON.parse(savedTaxes));
-      if (savedPolicies) setPolicies(JSON.parse(savedPolicies));
-      if (savedNotifications) setNotifications(JSON.parse(savedNotifications));
-      if (savedHotelInfo) setHotelInfo(JSON.parse(savedHotelInfo));
-    };
-
     const loadFromApi = async () => {
       try {
         const res = await axios.get(`${API_URL}/settings`, { headers });
         const s = res.data;
-        if (s.pricing) setPricing(s.pricing);
-        if (s.taxes) setTaxes(s.taxes);
-        if (s.policies) setPolicies(s.policies);
-        if (s.notifications) setNotifications(s.notifications);
         if (s.hotelInfo) setHotelInfo(s.hotelInfo);
+        if (s.pricing)   setPricing(s.pricing);
       } catch {
-        loadFromStorage();
+        const savedHotelInfo = localStorage.getItem('hotel_hotelInfo') || localStorage.getItem('hotel_info');
+        const savedPricing   = localStorage.getItem('hotel_pricing');
+        if (savedHotelInfo) setHotelInfo(JSON.parse(savedHotelInfo));
+        if (savedPricing)   setPricing(JSON.parse(savedPricing));
       }
     };
-
     loadFromApi();
   }, []);
 
   const tabs = [
-    { key: 'hotel', label: 'Hotel Info', icon: 'ri-building-line' },
-    { key: 'pricing', label: 'Pricing', icon: 'ri-price-tag-3-line' },
-    { key: 'taxes', label: 'Taxes', icon: 'ri-percent-line' },
-    { key: 'policies', label: 'Policies', icon: 'ri-file-list-3-line' },
-    { key: 'notifications', label: 'Notifications', icon: 'ri-notification-3-line' },
+    { key: 'hotel',   label: 'Hotel Info', icon: 'ri-building-line'    },
+    { key: 'pricing', label: 'Pricing',    icon: 'ri-price-tag-3-line' },
   ];
 
   return (
     <div className="container-fluid">
       <div className="row">
         <div className="col-12">
-          <div className="page-title-box d-sm-flex align-items-center justify-content-between">
+          <div className="page-title-box">
             <h4 className="mb-sm-0">System Settings</h4>
           </div>
         </div>
       </div>
 
       {success && <div className="alert alert-success"><i className="ri-check-line me-2"></i>{success}</div>}
-      {error && <div className="alert alert-danger"><i className="ri-error-warning-line me-2"></i>{error}</div>}
+      {error   && <div className="alert alert-danger"><i className="ri-error-warning-line me-2"></i>{error}</div>}
 
       <div className="row">
         {/* Sidebar Tabs */}
@@ -170,11 +114,14 @@ const saveNotifications = () => persistSettings('notifications', notifications, 
         {/* Content */}
         <div className="col-lg-9">
 
-          {/* Hotel Info */}
+          {/* ── HOTEL INFO ── */}
           {activeTab === 'hotel' && (
             <div className="card">
               <div className="card-header">
-                <h5 className="card-title mb-0"><i className="ri-building-line me-2 text-primary"></i>Hotel Information</h5>
+                <h5 className="card-title mb-0">
+                  <i className="ri-building-line me-2 text-primary"></i>Hotel Information
+                </h5>
+                <small className="text-muted">This info appears on invoices and receipts</small>
               </div>
               <div className="card-body">
                 <div className="row g-3">
@@ -194,16 +141,6 @@ const saveNotifications = () => persistSettings('notifications', notifications, 
                       onChange={e => setHotelInfo({ ...hotelInfo, email: e.target.value })} />
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label">Website</label>
-                    <input className="form-control" value={hotelInfo.website}
-                      onChange={e => setHotelInfo({ ...hotelInfo, website: e.target.value })} />
-                  </div>
-                  <div className="col-12">
-                    <label className="form-label">Address</label>
-                    <input className="form-control" value={hotelInfo.address}
-                      onChange={e => setHotelInfo({ ...hotelInfo, address: e.target.value })} />
-                  </div>
-                  <div className="col-md-6">
                     <label className="form-label">Currency</label>
                     <select className="form-select" value={hotelInfo.currency}
                       onChange={e => setHotelInfo({ ...hotelInfo, currency: e.target.value })}>
@@ -212,6 +149,11 @@ const saveNotifications = () => persistSettings('notifications', notifications, 
                       <option value="EUR">EUR — Euro</option>
                       <option value="GBP">GBP — British Pound</option>
                     </select>
+                  </div>
+                  <div className="col-12">
+                    <label className="form-label">Address</label>
+                    <input className="form-control" value={hotelInfo.address}
+                      onChange={e => setHotelInfo({ ...hotelInfo, address: e.target.value })} />
                   </div>
                   <div className="col-md-6">
                     <label className="form-label">Timezone</label>
@@ -238,19 +180,25 @@ const saveNotifications = () => persistSettings('notifications', notifications, 
             </div>
           )}
 
-          {/* Pricing */}
+          {/* ── PRICING ── */}
           {activeTab === 'pricing' && (
             <div className="card">
               <div className="card-header">
-                <h5 className="card-title mb-0"><i className="ri-price-tag-3-line me-2 text-success"></i>Room Pricing (PKR per night)</h5>
+                <h5 className="card-title mb-0">
+                  <i className="ri-price-tag-3-line me-2 text-success"></i>Room Pricing (PKR per night)
+                </h5>
+                <small className="text-muted">
+                  <i className="ri-information-line me-1"></i>
+                  These prices can be automatically filled when adding new rooms.
+                </small>
               </div>
               <div className="card-body">
                 <div className="row g-3">
                   {[
-                    { label: 'Single Room', key: 'singleRoom', icon: 'ri-hotel-bed-line', color: 'info' },
-                    { label: 'Double Room', key: 'doubleRoom', icon: 'ri-hotel-bed-line', color: 'primary' },
-                    { label: 'Suite Room', key: 'suiteRoom', icon: 'ri-building-2-line', color: 'warning' },
-                    { label: 'Deluxe Room', key: 'deluxeRoom', icon: 'ri-vip-crown-line', color: 'danger' },
+                    { label: 'Single Room', key: 'single', icon: 'ri-hotel-bed-line',  color: 'info'    },
+                    { label: 'Double Room', key: 'double', icon: 'ri-hotel-bed-line',  color: 'primary' },
+                    { label: 'Suite Room',  key: 'suite',  icon: 'ri-building-2-line', color: 'warning' },
+                    { label: 'Deluxe Room', key: 'deluxe', icon: 'ri-vip-crown-line',  color: 'danger'  },
                   ].map(room => (
                     <div className="col-md-6" key={room.key}>
                       <div className={`p-3 bg-${room.color}-subtle rounded`}>
@@ -259,52 +207,37 @@ const saveNotifications = () => persistSettings('notifications', notifications, 
                         </label>
                         <div className="input-group">
                           <span className="input-group-text">PKR</span>
-                          <input type="number" className="form-control" value={pricing[room.key]}
-                            onChange={e => setPricing({ ...pricing, [room.key]: Number(e.target.value) })} />
+                          <input
+                            type="number"
+                            className="form-control"
+                            value={pricing[room.key]}
+                            onChange={e => setPricing({ ...pricing, [room.key]: Number(e.target.value) })}
+                          />
                           <span className="input-group-text">/night</span>
                         </div>
                       </div>
                     </div>
                   ))}
-
-                  <div className="col-12"><hr className="my-1" /></div>
-
-                  <div className="col-md-6">
-                    <label className="form-label">Extra Bed Charge</label>
-                    <div className="input-group">
-                      <span className="input-group-text">PKR</span>
-                      <input type="number" className="form-control" value={pricing.extraBedCharge}
-                        onChange={e => setPricing({ ...pricing, extraBedCharge: Number(e.target.value) })} />
-                    </div>
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label">Breakfast Charge</label>
-                    <div className="input-group">
-                      <span className="input-group-text">PKR</span>
-                      <input type="number" className="form-control" value={pricing.breakfastCharge}
-                        onChange={e => setPricing({ ...pricing, breakfastCharge: Number(e.target.value) })} />
-                    </div>
-                  </div>
                 </div>
 
-                {/* Pricing Summary */}
+                {/* Summary table */}
                 <div className="mt-4 p-3 bg-light rounded">
-                  <h6 className="fw-semibold mb-3">Current Pricing Summary</h6>
+                  <h6 className="fw-semibold mb-3">Pricing Summary</h6>
                   <div className="table-responsive">
                     <table className="table table-sm table-bordered mb-0">
                       <thead className="table-light">
-                        <tr><th>Room Type</th><th>Price/Night</th><th>Weekly (7 nights)</th><th>Monthly (30 nights)</th></tr>
+                        <tr><th>Room Type</th><th>Per Night</th><th>Weekly (7 nights)</th><th>Monthly (30 nights)</th></tr>
                       </thead>
                       <tbody>
                         {[
-                          { label: 'Single', key: 'singleRoom' },
-                          { label: 'Double', key: 'doubleRoom' },
-                          { label: 'Suite', key: 'suiteRoom' },
-                          { label: 'Deluxe', key: 'deluxeRoom' },
+                          { label: 'Single', key: 'single' },
+                          { label: 'Double', key: 'double' },
+                          { label: 'Suite',  key: 'suite'  },
+                          { label: 'Deluxe', key: 'deluxe' },
                         ].map(r => (
                           <tr key={r.key}>
-                            <td>{r.label}</td>
-                            <td>PKR {pricing[r.key].toLocaleString()}</td>
+                            <td className="fw-medium">{r.label}</td>
+                            <td>PKR {Number(pricing[r.key]).toLocaleString()}</td>
                             <td>PKR {(pricing[r.key] * 7).toLocaleString()}</td>
                             <td>PKR {(pricing[r.key] * 30).toLocaleString()}</td>
                           </tr>
@@ -317,196 +250,6 @@ const saveNotifications = () => persistSettings('notifications', notifications, 
                 <div className="mt-4 text-end">
                   <button className="btn btn-success" onClick={savePricing}>
                     <i className="ri-save-line me-1"></i> Save Pricing
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Taxes */}
-          {activeTab === 'taxes' && (
-            <div className="card">
-              <div className="card-header d-flex align-items-center justify-content-between">
-                <h5 className="card-title mb-0"><i className="ri-percent-line me-2 text-warning"></i>Tax Configuration</h5>
-                <div className="form-check form-switch">
-                  <input className="form-check-input" type="checkbox" checked={taxes.taxEnabled}
-                    onChange={e => setTaxes({ ...taxes, taxEnabled: e.target.checked })} />
-                  <label className="form-check-label">
-                    {taxes.taxEnabled ? <span className="text-success fw-medium">Taxes Enabled</span> : <span className="text-danger fw-medium">Taxes Disabled</span>}
-                  </label>
-                </div>
-              </div>
-              <div className="card-body">
-                <div className={taxes.taxEnabled ? '' : 'opacity-50 pe-none'}>
-                  <div className="row g-3">
-                    <div className="col-md-4">
-                      <div className="p-3 bg-warning-subtle rounded">
-                        <label className="form-label fw-semibold">GST (%)</label>
-                        <div className="input-group">
-                          <input type="number" className="form-control" value={taxes.gst}
-                            onChange={e => setTaxes({ ...taxes, gst: Number(e.target.value) })} min="0" max="100" />
-                          <span className="input-group-text">%</span>
-                        </div>
-                        <small className="text-muted">General Sales Tax</small>
-                      </div>
-                    </div>
-                    <div className="col-md-4">
-                      <div className="p-3 bg-info-subtle rounded">
-                        <label className="form-label fw-semibold">Service Tax (%)</label>
-                        <div className="input-group">
-                          <input type="number" className="form-control" value={taxes.serviceTax}
-                            onChange={e => setTaxes({ ...taxes, serviceTax: Number(e.target.value) })} min="0" max="100" />
-                          <span className="input-group-text">%</span>
-                        </div>
-                        <small className="text-muted">Hotel Service Charges</small>
-                      </div>
-                    </div>
-                    <div className="col-md-4">
-                      <div className="p-3 bg-success-subtle rounded">
-                        <label className="form-label fw-semibold">Tourism Levy (%)</label>
-                        <div className="input-group">
-                          <input type="number" className="form-control" value={taxes.tourismLevy}
-                            onChange={e => setTaxes({ ...taxes, tourismLevy: Number(e.target.value) })} min="0" max="100" />
-                          <span className="input-group-text">%</span>
-                        </div>
-                        <small className="text-muted">Tourism Development Levy</small>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Tax Preview */}
-                  <div className="mt-4 p-3 bg-light rounded">
-                    <h6 className="fw-semibold mb-3">Tax Preview — Sample Bill (PKR 10,000)</h6>
-                    <table className="table table-sm mb-0">
-                      <tbody>
-                        <tr><td>Room Charges</td><td className="text-end">PKR 10,000</td></tr>
-                        <tr><td>GST ({taxes.gst}%)</td><td className="text-end">PKR {(10000 * taxes.gst / 100).toLocaleString()}</td></tr>
-                        <tr><td>Service Tax ({taxes.serviceTax}%)</td><td className="text-end">PKR {(10000 * taxes.serviceTax / 100).toLocaleString()}</td></tr>
-                        <tr><td>Tourism Levy ({taxes.tourismLevy}%)</td><td className="text-end">PKR {(10000 * taxes.tourismLevy / 100).toLocaleString()}</td></tr>
-                        <tr className="fw-bold table-light">
-                          <td>Total</td>
-                          <td className="text-end text-success">
-                            PKR {(10000 + (10000 * (taxes.gst + taxes.serviceTax + taxes.tourismLevy) / 100)).toLocaleString()}
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <div className="mt-4 text-end">
-                  <button className="btn btn-warning" onClick={saveTaxes}>
-                    <i className="ri-save-line me-1"></i> Save Tax Settings
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Policies */}
-          {activeTab === 'policies' && (
-            <div className="card">
-              <div className="card-header">
-                <h5 className="card-title mb-0"><i className="ri-file-list-3-line me-2 text-info"></i>Hotel Policies</h5>
-              </div>
-              <div className="card-body">
-                <div className="row g-3">
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Check-in Time</label>
-                    <input type="time" className="form-control" value={policies.checkInTime}
-                      onChange={e => setPolicies({ ...policies, checkInTime: e.target.value })} />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Check-out Time</label>
-                    <input type="time" className="form-control" value={policies.checkOutTime}
-                      onChange={e => setPolicies({ ...policies, checkOutTime: e.target.value })} />
-                  </div>
-
-                  {[
-                    { label: 'Cancellation Policy', key: 'cancellationPolicy' },
-                    { label: 'Payment Policy', key: 'paymentPolicy' },
-                    { label: 'Child Policy', key: 'childPolicy' },
-                    { label: 'Pet Policy', key: 'petPolicy' },
-                    { label: 'Smoking Policy', key: 'smokingPolicy' },
-                  ].map(p => (
-                    <div className="col-12" key={p.key}>
-                      <label className="form-label fw-semibold">{p.label}</label>
-                      <textarea className="form-control" rows="2" value={policies[p.key]}
-                        onChange={e => setPolicies({ ...policies, [p.key]: e.target.value })}></textarea>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-4 text-end">
-                  <button className="btn btn-info text-white" onClick={savePolicies}>
-                    <i className="ri-save-line me-1"></i> Save Policies
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Notifications */}
-          {activeTab === 'notifications' && (
-            <div className="card">
-              <div className="card-header">
-                <h5 className="card-title mb-0"><i className="ri-notification-3-line me-2 text-danger"></i>Notification Settings</h5>
-              </div>
-              <div className="card-body">
-                <h6 className="fw-semibold mb-3 text-muted text-uppercase fs-12">Alert Preferences</h6>
-                <div className="row g-3 mb-4">
-                  {[
-                    { label: 'New Booking Alert', key: 'newBookingAlert', desc: 'Get notified when a new booking is made' },
-                    { label: 'Check-in Reminder', key: 'checkInReminder', desc: 'Remind staff about upcoming check-ins' },
-                    { label: 'Check-out Reminder', key: 'checkOutReminder', desc: 'Remind staff about upcoming check-outs' },
-                    { label: 'Payment Alert', key: 'paymentAlert', desc: 'Alert when payment is received or pending' },
-                    { label: 'Maintenance Alert', key: 'maintenanceAlert', desc: 'Notify about new maintenance requests' },
-                    { label: 'Housekeeping Alert', key: 'housekeepingAlert', desc: 'Notify about housekeeping task updates' },
-                  ].map(n => (
-                    <div className="col-md-6" key={n.key}>
-                      <div className="p-3 bg-light rounded d-flex align-items-center justify-content-between">
-                        <div>
-                          <div className="fw-medium">{n.label}</div>
-                          <small className="text-muted">{n.desc}</small>
-                        </div>
-                        <div className="form-check form-switch ms-3">
-                          <input className="form-check-input" type="checkbox"
-                            checked={notifications[n.key]}
-                            onChange={e => setNotifications({ ...notifications, [n.key]: e.target.checked })} />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <h6 className="fw-semibold mb-3 text-muted text-uppercase fs-12">Notification Channels</h6>
-                <div className="row g-3">
-                  {[
-                    { label: 'Email Notifications', key: 'emailNotifications', icon: 'ri-mail-line', desc: 'Send alerts via email' },
-                    { label: 'SMS Notifications', key: 'smsNotifications', icon: 'ri-message-2-line', desc: 'Send alerts via SMS' },
-                  ].map(n => (
-                    <div className="col-md-6" key={n.key}>
-                      <div className="p-3 border rounded d-flex align-items-center justify-content-between">
-                        <div className="d-flex align-items-center gap-2">
-                          <i className={`${n.icon} fs-20 text-primary`}></i>
-                          <div>
-                            <div className="fw-medium">{n.label}</div>
-                            <small className="text-muted">{n.desc}</small>
-                          </div>
-                        </div>
-                        <div className="form-check form-switch ms-3">
-                          <input className="form-check-input" type="checkbox"
-                            checked={notifications[n.key]}
-                            onChange={e => setNotifications({ ...notifications, [n.key]: e.target.checked })} />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-4 text-end">
-                  <button className="btn btn-danger" onClick={saveNotifications}>
-                    <i className="ri-save-line me-1"></i> Save Notification Settings
                   </button>
                 </div>
               </div>
