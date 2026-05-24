@@ -250,6 +250,7 @@ export default function Navbar() {
                   { to: "/room", label: "Rooms" },
                   { to: "/restaurant", label: "Restaurant" },
                   { to: "/faq", label: "FAQs" },
+                  { to: "/services", label: "Services" },
                   { to: "/contact", label: "Contact" },
                 ].map((item) => (
                   <li className="nav-item" key={item.to}>
@@ -296,7 +297,7 @@ export default function Navbar() {
                 )}
 
                 {/* BOOK NOW */}
-                <Link to="/contact-us" className="book-now-btn">
+                <Link to="/room" className="book-now-btn">
                   <span>Book Now</span>
                   <div className="arrow-box">
                     <i className="fa-solid fa-arrow-right"></i>

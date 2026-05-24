@@ -95,5 +95,18 @@ const replyToFeedback = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
+// GET /api/feedbacks/public — no auth required
+const getPublicFeedbacks = async (req, res) => {
+  try {
+    const feedbacks = await Feedback.find({ review: { $exists: true, $ne: '' } })
+      .select('name rating review adminReply repliedAt createdAt')
+      .sort({ createdAt: -1 })
+      .limit(20);
 
-module.exports = { submitFeedback, getAllFeedbacks, deleteFeedback, replyToFeedback };
+    res.status(200).json(feedbacks);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+};
+
+module.exports = { submitFeedback, getAllFeedbacks, deleteFeedback, replyToFeedback, getPublicFeedbacks };

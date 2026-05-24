@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { userAsset } from '../../../../utils/userAssets';
 
 export default function Experience() {
@@ -13,7 +14,11 @@ export default function Experience() {
           <div className="row g-5">
             <div className="col-lg-6 text-center wow fadeInLeft">
               <div className="position-relative d-inline-flex">
-                <img className="img-fluid rounded-5" src={userAsset('images/experience.jpg')} alt="Our experience" />
+                <img
+                  className="img-fluid rounded-5"
+                  src={userAsset('images/experience.jpg')}
+                  alt="Our experience"
+                />
               </div>
             </div>
             <div className="col-lg-6 align-content-center wow fadeInRight">
@@ -29,20 +34,20 @@ export default function Experience() {
                 We have <span className="text-primary">10+ years</span> of experience & we have great memories
               </p>
               <p className="text-light mb-4">
-                With years of experience in hospitality, The Mist is committed to delivering exceptional service to
-                every guest. Backed by many years of industry expertise, we ensure a comfortable and memorable stay
-                for all our guests. With extensive experience in hotel management, we provide reliable, high-quality
-                service you can trust.
+                With years of experience in hospitality, The Mist is committed to delivering exceptional
+                service to every guest. Backed by many years of industry expertise, we ensure a comfortable
+                and memorable stay for all our guests. With extensive experience in hotel management, we
+                provide reliable, high-quality service you can trust.
               </p>
               <p className="mb-4">
-                <a className="btn btn-new btn-primary rounded-pill" href="/contact-us">
+                <Link className="btn btn-new btn-primary rounded-pill" to="/contact">
                   <span className="btn-text">
                     <span>Contact Us</span>
                   </span>
                   <span className="btn-icon">
                     <i className="fa-solid fa-arrow-right" />
                   </span>
-                </a>
+                </Link>
               </p>
               <div className="row g-4">
                 <div className="col-6 col-sm-4">

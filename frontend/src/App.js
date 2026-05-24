@@ -46,6 +46,7 @@ import Register from './Component/User/Home/Register';
 
 // ✅ Profile Page
 import ProfilePage from './Component/User/Home/ProfilePage';
+import ServicesPage from './Component/User/Home/ServicesPage';
 
 function App() {
   return (
@@ -72,6 +73,7 @@ function App() {
             <Route path="restaurant" element={<RestaurantPage />} />
             <Route path="contact" element={<ContactUs />} />
             <Route path="faq" element={<Faq />} />
+             <Route path="services" element={<ServicesPage />} />
             <Route path="roomsdetails/:id" element={<RoomDetailsPage />} />
             <Route path="booking/:roomId" element={<BookingPage />} />
 

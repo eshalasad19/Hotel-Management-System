@@ -9,7 +9,7 @@ import Blog from './sections/Blog';
 // import Availability from './sections/HomeAvailability';
 import AboutHome from './sections/AboutHome';
 import HomeAmenities from './sections/HomeAmenities';
-import HomeAvailability from './sections/HomeAvailability';
+
 
 export default function Home() {
   useHomeTemplateEffects();
@@ -18,13 +18,14 @@ export default function Home() {
       <Intro />
       <AboutHome />
       <HomePageRooms/>
-      <Services />
+    <Services />
       <Video />
-      <HomeAmenities />
+       <Testimonials />
+      {/* <HomeAmenities /> */}
       <Experience />
-      <Testimonials />
-      <Blog />
-      <HomeAvailability />
+     
+    
+   
     </div>
   );
 }
