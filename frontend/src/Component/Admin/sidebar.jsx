@@ -79,7 +79,7 @@ const Sidebar = () => {
       </div>
 
       {/* ── USER INFO STRIP ── */}
-      <div className="logo-lg px-3 py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      {/* <div className="logo-lg px-3 py-2" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <div className="d-flex align-items-center gap-2">
           <div style={{
             width: 32, height: 32, borderRadius: '50%',
@@ -102,7 +102,7 @@ const Sidebar = () => {
             </span>
           </div>
         </div>
-      </div>
+      </div> */}
 
       {/* ── NAV ITEMS ── */}
       <div id="scrollbar">

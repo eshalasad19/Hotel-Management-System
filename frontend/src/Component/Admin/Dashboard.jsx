@@ -14,20 +14,20 @@ const Dashboard = () => {
 
   const [stats, setStats] = useState({
     totalRevenue: 0, totalBookings: 0,
-    availableRooms: 0, occupiedRooms: 0,
+    availableRooms: 0, occupiedRooms: 0, reservedRooms: 0,
     pendingBookings: 0, confirmedBookings: 0,
     cancelledBookings: 0, completedBookings: 0,
     totalRooms: 0
   });
-  const [recentBookings, setRecentBookings] = useState([]);
-  const [activity, setActivity] = useState([]);
-  const [monthlyData, setMonthlyData] = useState([]);
-  const [roomTypeData, setRoomTypeData] = useState([]);
+  const [recentBookings, setRecentBookings]   = useState([]);
+  const [activity, setActivity]               = useState([]);
+  const [monthlyData, setMonthlyData]         = useState([]);
+  const [roomTypeData, setRoomTypeData]       = useState([]);
   const [bookingStatusData, setBookingStatusData] = useState([]);
   const [restaurantStats, setRestaurantStats] = useState({
     menuItems: 0, totalOrders: 0, pendingOrders: 0, todayOrders: 0, restaurantRevenue: 0,
   });
-  const [recentOrders, setRecentOrders] = useState([]);
+  const [recentOrders, setRecentOrders]       = useState([]);
   const [orderStatusData, setOrderStatusData] = useState([]);
 
   const now = new Date();
@@ -38,7 +38,7 @@ const Dashboard = () => {
   const formatPKR = (amount) => 'PKR ' + Number(amount).toLocaleString('en-PK');
 
   const COLORS = ['#405189', '#0ab39c', '#f7b84b', '#f06548', '#299cdb', '#45CB85'];
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
   useEffect(() => { loadDashboard(); }, []);
 
@@ -51,65 +51,64 @@ const Dashboard = () => {
         axios.get(`${API_URL}/restaurant/orders`, { headers }).catch(() => ({ data: { data: [] } })),
       ]);
 
-      const rooms = roomsRes.data;
+      const rooms    = roomsRes.data;
       const bookings = bookingsRes.data;
-      const menu = menuRes.data.data || [];
-      const orders = ordersRes.data.data || [];
-      const today = new Date().toDateString();
+      const menu     = menuRes.data.data || [];
+      const orders   = ordersRes.data.data || [];
+      const today    = new Date().toDateString();
 
       setRestaurantStats({
-        menuItems: menu.length,
-        totalOrders: orders.length,
-        pendingOrders: orders.filter(o => ['Pending', 'Confirmed', 'Preparing'].includes(o.status)).length,
-        todayOrders: orders.filter(o => new Date(o.createdAt).toDateString() === today).length,
+        menuItems:         menu.length,
+        totalOrders:       orders.length,
+        pendingOrders:     orders.filter(o => ['Pending','Confirmed','Preparing'].includes(o.status)).length,
+        todayOrders:       orders.filter(o => new Date(o.createdAt).toDateString() === today).length,
         restaurantRevenue: orders.filter(o => o.status === 'Delivered').reduce((s, o) => s + (o.totalAmount || 0), 0),
       });
       setRecentOrders(orders.slice(0, 5));
       setOrderStatusData([
-        { name: 'Pending', value: orders.filter(o => o.status === 'Pending').length },
-        { name: 'Preparing', value: orders.filter(o => ['Confirmed', 'Preparing'].includes(o.status)).length },
-        { name: 'Ready', value: orders.filter(o => o.status === 'Ready').length },
+        { name: 'Pending',   value: orders.filter(o => o.status === 'Pending').length },
+        { name: 'Preparing', value: orders.filter(o => ['Confirmed','Preparing'].includes(o.status)).length },
+        { name: 'Ready',     value: orders.filter(o => o.status === 'Ready').length },
         { name: 'Delivered', value: orders.filter(o => o.status === 'Delivered').length },
       ].filter(d => d.value > 0));
 
       setStats({
-        totalRevenue: bookings.filter(b => b.paymentStatus === 'paid').reduce((s, b) => s + b.totalAmount, 0),
-        totalBookings: bookings.length,
-        availableRooms: rooms.filter(r => r.status === 'available').length,
-        occupiedRooms: rooms.filter(r => r.status === 'occupied').length,
-        pendingBookings: bookings.filter(b => b.bookingStatus === 'pending').length,
+        totalRevenue:      bookings.filter(b => b.paymentStatus === 'paid').reduce((s, b) => s + b.totalAmount, 0),
+        totalBookings:     bookings.length,
+        availableRooms:    rooms.filter(r => r.status === 'available').length,
+        occupiedRooms:     rooms.filter(r => r.status === 'occupied').length,
+        // FIX 3: reserved rooms add kiya
+        reservedRooms:     rooms.filter(r => r.status === 'reserved').length,
+        pendingBookings:   bookings.filter(b => b.bookingStatus === 'pending').length,
         confirmedBookings: bookings.filter(b => b.bookingStatus === 'confirmed').length,
         cancelledBookings: bookings.filter(b => b.bookingStatus === 'cancelled').length,
         completedBookings: bookings.filter(b => b.bookingStatus === 'completed').length,
-        totalRooms: rooms.length,
+        totalRooms:        rooms.length,
       });
 
       setRecentBookings(bookings.slice(0, 8));
       setActivity(bookings.slice(0, 6));
 
-      // Monthly data for charts
       const monthly = months.map((month, i) => {
         const monthBookings = bookings.filter(b => new Date(b.createdAt).getMonth() === i);
         return {
           month,
-          revenue: monthBookings.filter(b => b.paymentStatus === 'paid').reduce((s, b) => s + b.totalAmount, 0),
+          revenue:  monthBookings.filter(b => b.paymentStatus === 'paid').reduce((s, b) => s + b.totalAmount, 0),
           bookings: monthBookings.length,
         };
       });
       setMonthlyData(monthly);
 
-      // Room type distribution
       const typeCount = {};
       rooms.forEach(r => { typeCount[r.type] = (typeCount[r.type] || 0) + 1; });
       setRoomTypeData(Object.entries(typeCount).map(([name, value]) => ({
         name: name.charAt(0).toUpperCase() + name.slice(1), value
       })));
 
-      // Booking status pie
       setBookingStatusData([
         { name: 'Confirmed', value: bookings.filter(b => b.bookingStatus === 'confirmed').length },
         { name: 'Completed', value: bookings.filter(b => b.bookingStatus === 'completed').length },
-        { name: 'Pending', value: bookings.filter(b => b.bookingStatus === 'pending').length },
+        { name: 'Pending',   value: bookings.filter(b => b.bookingStatus === 'pending').length },
         { name: 'Cancelled', value: bookings.filter(b => b.bookingStatus === 'cancelled').length },
       ].filter(d => d.value > 0));
 
@@ -126,7 +125,7 @@ const Dashboard = () => {
     return <span className={`badge ${map[status] || 'bg-secondary'}`}>{status}</span>;
   };
 
-  const avatarColors = ['#0ab39c', '#405189', '#f7b84b', '#f06548', '#299cdb'];
+  const avatarColors = ['#0ab39c','#405189','#f7b84b','#f06548','#299cdb'];
   const occupancyRate = stats.totalRooms > 0 ? Math.round((stats.occupiedRooms / stats.totalRooms) * 100) : 0;
 
   return (
@@ -147,13 +146,13 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Stat Cards */}
+      {/* Hotel Stats */}
       <div className="row">
         {[
-          { label: 'Total Revenue', value: formatPKR(stats.totalRevenue), icon: 'bx bx-dollar-circle', color: 'success', sub: 'Paid bookings only' },
-          { label: 'Total Bookings', value: stats.totalBookings, icon: 'bx bx-calendar-check', color: 'info', sub: `${stats.confirmedBookings} confirmed` },
-          { label: 'Available Rooms', value: stats.availableRooms, icon: 'bx bx-building', color: 'warning', sub: `of ${stats.totalRooms} total rooms` },
-          { label: 'Occupancy Rate', value: `${occupancyRate}%`, icon: 'bx bx-bed', color: 'danger', sub: `${stats.occupiedRooms} occupied` },
+          { label: 'Total Revenue',    value: formatPKR(stats.totalRevenue), icon: 'bx bx-dollar-circle',  color: 'success', sub: 'Paid bookings only' },
+          { label: 'Total Bookings',   value: stats.totalBookings,           icon: 'bx bx-calendar-check', color: 'info',    sub: `${stats.confirmedBookings} confirmed` },
+          { label: 'Available Rooms',  value: stats.availableRooms,          icon: 'bx bx-building',        color: 'warning', sub: `of ${stats.totalRooms} total rooms` },
+          { label: 'Occupancy Rate',   value: `${occupancyRate}%`,           icon: 'bx bx-bed',             color: 'danger',  sub: `${stats.occupiedRooms} occupied` },
         ].map((s, i) => (
           <div className="col-xl-3 col-md-6" key={i}>
             <div className="card card-animate">
@@ -186,10 +185,10 @@ const Dashboard = () => {
       </div>
       <div className="row">
         {[
-          { label: 'Menu Items', value: restaurantStats.menuItems, icon: 'ri-restaurant-2-line', color: 'primary', sub: 'Active dishes' },
-          { label: 'Orders Today', value: restaurantStats.todayOrders, icon: 'ri-shopping-bag-line', color: 'info', sub: `${restaurantStats.totalOrders} total orders` },
-          { label: 'Pending Orders', value: restaurantStats.pendingOrders, icon: 'ri-timer-line', color: 'warning', sub: 'Awaiting preparation' },
-          { label: 'Restaurant Revenue', value: formatPKR(restaurantStats.restaurantRevenue), icon: 'ri-money-dollar-circle-line', color: 'success', sub: 'Delivered orders' },
+          { label: 'Menu Items',          value: restaurantStats.menuItems,                    icon: 'ri-restaurant-2-line',        color: 'primary', sub: 'Active dishes' },
+          { label: 'Orders Today',        value: restaurantStats.todayOrders,                  icon: 'ri-shopping-bag-line',         color: 'info',    sub: `${restaurantStats.totalOrders} total orders` },
+          { label: 'Pending Orders',      value: restaurantStats.pendingOrders,                icon: 'ri-timer-line',                color: 'warning', sub: 'Awaiting preparation' },
+          { label: 'Restaurant Revenue',  value: formatPKR(restaurantStats.restaurantRevenue), icon: 'ri-money-dollar-circle-line',  color: 'success', sub: 'Delivered orders' },
         ].map((s, i) => (
           <div className="col-xl-3 col-md-6" key={`rest-${i}`}>
             <div className="card card-animate border border-dashed">
@@ -212,7 +211,7 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {/* Revenue Chart + Pie Chart */}
+      {/* Revenue Chart + Booking Status Pie */}
       <div className="row">
         <div className="col-xl-8">
           <div className="card">
@@ -235,15 +234,15 @@ const Dashboard = () => {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-                  <YAxis yAxisId="left" tick={{ fontSize: 10 }} width={60} />
+                  <YAxis yAxisId="left"  tick={{ fontSize: 10 }} width={60} />
                   <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10 }} width={30} />
                   <Tooltip formatter={(value, name) => [
                     name === 'revenue' ? `PKR ${Number(value).toLocaleString()}` : value,
                     name === 'revenue' ? 'Revenue' : 'Bookings'
                   ]} />
                   <Legend />
-                  <Area yAxisId="left" type="monotone" dataKey="revenue" name="revenue"
-                    stroke="#0ab39c" fill="url(#colorRev)" strokeWidth={2} />
+                  <Area yAxisId="left"  type="monotone" dataKey="revenue"  name="revenue"
+                    stroke="#0ab39c" fill="url(#colorRev)"  strokeWidth={2} />
                   <Area yAxisId="right" type="monotone" dataKey="bookings" name="bookings"
                     stroke="#405189" fill="url(#colorBook)" strokeWidth={2} />
                 </AreaChart>
@@ -326,12 +325,14 @@ const Dashboard = () => {
               <h4 className="card-title mb-0">Room Occupancy</h4>
             </div>
             <div className="card-body">
+              {/* FIX 3: Reserved rooms bhi add kiya */}
               <div className="row g-3 mb-3">
                 {[
                   { label: 'Available', value: stats.availableRooms, color: 'success' },
-                  { label: 'Occupied', value: stats.occupiedRooms, color: 'danger' },
+                  { label: 'Occupied',  value: stats.occupiedRooms,  color: 'danger'  },
+                  { label: 'Reserved',  value: stats.reservedRooms,  color: 'primary' },
                 ].map((s, i) => (
-                  <div className="col-6" key={i}>
+                  <div className="col-4" key={i}>
                     <div className={`p-3 bg-${s.color}-subtle rounded text-center`}>
                       <h3 className={`fw-bold text-${s.color} mb-1`}>{s.value}</h3>
                       <p className="text-muted mb-0 fs-12">{s.label}</p>
@@ -344,15 +345,15 @@ const Dashboard = () => {
                 <span className="fw-semibold">{occupancyRate}%</span>
               </div>
               <div className="progress mb-4" style={{ height: '10px' }}>
-                <div className="progress-bar bg-danger" style={{ width: `${occupancyRate}%` }}></div>
+                <div className="progress-bar bg-danger"  style={{ width: `${occupancyRate}%` }}></div>
                 <div className="progress-bar bg-success" style={{ width: `${100 - occupancyRate}%` }}></div>
               </div>
               <div className="row g-2">
                 {[
-                  { label: 'Pending', value: stats.pendingBookings, color: 'warning' },
+                  { label: 'Pending',   value: stats.pendingBookings,   color: 'warning' },
                   { label: 'Confirmed', value: stats.confirmedBookings, color: 'success' },
-                  { label: 'Completed', value: stats.completedBookings, color: 'info' },
-                  { label: 'Cancelled', value: stats.cancelledBookings, color: 'danger' },
+                  { label: 'Completed', value: stats.completedBookings, color: 'info'    },
+                  { label: 'Cancelled', value: stats.cancelledBookings, color: 'danger'  },
                 ].map((s, i) => (
                   <div className="col-6" key={i}>
                     <div className="d-flex align-items-center gap-2 p-2 bg-light rounded">
@@ -411,7 +412,8 @@ const Dashboard = () => {
                   <>
                     <ResponsiveContainer width="100%" height={180}>
                       <PieChart>
-                        <Pie data={orderStatusData} cx="50%" cy="50%" innerRadius={45} outerRadius={75} paddingAngle={3} dataKey="value">
+                        <Pie data={orderStatusData} cx="50%" cy="50%"
+                          innerRadius={45} outerRadius={75} paddingAngle={3} dataKey="value">
                           {orderStatusData.map((entry, index) => (
                             <Cell key={index} fill={COLORS[index % COLORS.length]} />
                           ))}
@@ -453,7 +455,8 @@ const Dashboard = () => {
                       <tr><td colSpan="6" className="text-center text-muted py-4">No bookings yet</td></tr>
                     ) : recentBookings.map(b => (
                       <tr key={b._id}>
-                        <td><div className="fw-medium">{b.userId?.name || 'Guest'}</div></td>
+                        {/* FIX 1: guestName pehle check karo */}
+                        <td><div className="fw-medium">{b.guestName || b.userId?.name || 'Guest'}</div></td>
                         <td>{b.roomId ? `Room ${b.roomId.roomNumber}` : '—'}</td>
                         <td>{new Date(b.checkInDate).toLocaleDateString('en-PK')}</td>
                         <td>{new Date(b.checkOutDate).toLocaleDateString('en-PK')}</td>
@@ -477,11 +480,12 @@ const Dashboard = () => {
               {activity.length === 0 ? (
                 <div className="text-center text-muted py-4">No activity yet</div>
               ) : activity.map((b, i) => {
-                const name = b.userId?.name || 'Guest';
+                // FIX 1: guestName pehle check karo activity mein bhi
+                const name = b.guestName || b.userId?.name || 'Guest';
                 const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
                 const text = b.bookingStatus === 'confirmed' ? 'confirmed a booking' :
-                  b.bookingStatus === 'pending' ? 'requested a booking' :
-                  b.bookingStatus === 'cancelled' ? 'cancelled booking' : 'completed stay';
+                  b.bookingStatus === 'pending'   ? 'requested a booking' :
+                  b.bookingStatus === 'cancelled' ? 'cancelled booking'   : 'completed stay';
                 return (
                   <div key={b._id} className="d-flex align-items-center mb-3">
                     <div className="avatar-xs flex-shrink-0 me-3">
