@@ -13,7 +13,6 @@ import HomeAvailability from './sections/HomeAvailability';
 
 export default function Home() {
   useHomeTemplateEffects();
-
   return (
     <div id="content" role="main">
       <Intro />

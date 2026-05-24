@@ -86,11 +86,14 @@ const Settings = () => {
     }
   };
 
-  const savePricing = () => persistSettings('pricing', pricing, 'Pricing settings saved!');
-  const saveTaxes = () => persistSettings('taxes', taxes, 'Tax settings saved!');
-  const savePolicies = () => persistSettings('policies', policies, 'Policy settings saved!');
-  const saveNotifications = () => persistSettings('notifications', notifications, 'Notification settings saved!');
-  const saveHotelInfo = () => persistSettings('hotelInfo', hotelInfo, 'Hotel information saved!');
+ const savePricing = () => persistSettings('pricing', pricing, 'Pricing settings saved!');
+const saveTaxes = () => persistSettings('taxes', taxes, 'Tax settings saved!');
+const savePolicies = () => persistSettings('policies', policies, 'Policy settings saved!');
+const saveNotifications = () => persistSettings('notifications', notifications, 'Notification settings saved!');
+  const saveHotelInfo = () => {
+  localStorage.setItem('hotel_info', JSON.stringify(hotelInfo));
+  persistSettings('hotelInfo', hotelInfo, 'Hotel information saved!');
+};
 
   useEffect(() => {
     const loadFromStorage = () => {

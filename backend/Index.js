@@ -1,4 +1,3 @@
-
 const express = require("express");
 const dotenv = require('dotenv');
 const cors = require('cors');
@@ -14,8 +13,12 @@ app.use(express.json());
 
 connectDB();
 
-app.use("/Uploads", 
-  express.static(path.join(__dirname, "Uploads")));
+app.use(
+  '/Uploads',
+  express.static(
+    path.join(__dirname, 'Uploads')
+  )
+);
 
 // Static files 
 app.use(express.static('Public'));
@@ -60,6 +63,10 @@ app.use('/api/housekeeping', housekeepingRoutes);
 
 const notificationRoutes = require('./Routes/notificationRoutes');
 app.use('/api/notifications', notificationRoutes);
+
+// FAQ Routes
+const faqRoutes = require('./Routes/faqRoutes');
+app.use('/api/faqs', faqRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);

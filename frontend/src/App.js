@@ -29,6 +29,7 @@ import Settings from './Component/Admin/Settings';
 import RestaurantMenu from './Component/Admin/RestaurantMenu';
 import RestaurantOrders from './Component/Admin/RestaurantOrders';
 import Services from './Component/Admin/Services';
+import FAQs from './Component/Admin/FAQs';
 
 // User pages
 import Home from './Component/User/Home/Home';
@@ -96,6 +97,7 @@ function App() {
             <Route path="restaurant-menu" element={<RestaurantMenu />} />
             <Route path="restaurant-orders" element={<RestaurantOrders />} />
             <Route path="services" element={<Services />} />
+            <Route path="/admin/faqs" element={<FAQs />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/home" replace />} />
