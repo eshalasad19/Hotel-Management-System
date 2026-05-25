@@ -644,7 +644,7 @@ const RestaurantMenu = () => {
                       <div className="menu-card-footer">
                         <div className="menu-card-price">Rs {item.price}</div>
 
-                        {!item.isAvailable ? (
+                        {/* {!item.isAvailable ? (
                           <span className="menu-unavailable-badge">
                             <i className="fa-solid fa-clock" style={{ fontSize: "9px" }}></i>
                             Unavailable
@@ -657,7 +657,7 @@ const RestaurantMenu = () => {
                             <i className="fa-solid fa-plus" style={{ fontSize: "10px" }}></i>
                             Order
                           </button>
-                        )}
+                        )} */}
                       </div>
 
                     </div>

@@ -44,7 +44,7 @@ export default function Intro() {
     if (selectedRoom) {
       navigate(`/booking/${selectedRoom}`);
     } else {
-      navigate('/rooms');
+      navigate('/room');
     }
   };
 
@@ -71,7 +71,7 @@ export default function Intro() {
             A Divine Experience<br />The Mist Lifestyle
           </h1>
 
-          <form onSubmit={handleSubmit}>
+          {/* <form onSubmit={handleSubmit}>
             <div
               className="intro-booking-form bg-black bg-opacity-75 rounded-pill p-4 p-lg-3 mt-4 wow fadeInUp"
               data-wow-delay=".4s"
@@ -79,7 +79,7 @@ export default function Intro() {
               <div className="row gy-3 gx-lg-0 input-group">
 
                 {/* Check In */}
-                <div className="col-md-6 col-lg">
+                {/* <div className="col-md-6 col-lg">
                   <div className="position-relative">
                     <input
                       id="hotelsCheckIn"
@@ -97,10 +97,10 @@ export default function Intro() {
                       <i className="fa-regular fa-calendar-alt" />
                     </span>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Check Out */}
-                <div className="col-md-6 col-lg">
+                {/* <div className="col-md-6 col-lg">
                   <div className="position-relative">
                     <input
                       id="hotelsCheckOut"
@@ -118,10 +118,10 @@ export default function Intro() {
                       <i className="fa-regular fa-calendar-alt" />
                     </span>
                   </div>
-                </div>
+                </div> */}
 
                 {/* Room Select */}
-                <div className="col-md-6 col-lg">
+                {/* <div className="col-md-6 col-lg">
                   <select
                     className="form-select rounded-pill h-100"
                     value={selectedRoom}
@@ -147,10 +147,10 @@ export default function Intro() {
                       );
                     })}
                   </select>
-                </div>
+                </div> */}
 
                 {/* Submit */}
-                <div className="col-md-6 col-lg col-xl-auto d-grid">
+                {/* <div className="col-md-6 col-lg col-xl-auto d-grid">
                   <button
                     className="btn btn-primary text-nowrap rounded-pill"
                     type="submit"
@@ -161,7 +161,7 @@ export default function Intro() {
 
               </div>
             </div>
-          </form>
+          </form> */} 
 
         </div>
       </div>
