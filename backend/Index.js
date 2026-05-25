@@ -1,5 +1,6 @@
 const express = require("express");
 const dotenv = require('dotenv');
+require('./cron/checkoutReminder');
 const cors = require('cors');
 const path = require('path');
 const connectDB = require('./Config/db');

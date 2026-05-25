@@ -1,6 +1,12 @@
 const Booking = require("../Models/Booking");
 const Room = require("../Models/Room");
 const User = require('../Models/User');
+const sendEmail = require('../Services/emailService');
+const {
+  bookingConfirmationTemplate,
+  cancellationTemplate,
+  checkoutReminderTemplate,
+} = require('../utils/emailTemplates');
 
 // ========================
 // CREATE BOOKING
@@ -21,6 +27,7 @@ const createBooking = async (req, res) => {
       paymentMethod,
       paymentStatus,
     } = req.body;
+
 
     const room = await Room.findById(roomId);
     if (!room) {
@@ -72,8 +79,24 @@ const createBooking = async (req, res) => {
     }
 
     await Room.findByIdAndUpdate(roomId, { status: finalRoomStatus });
+    await sendEmail({
+      to: booking.guestEmail,
+      subject: 'Booking Confirmation',
+      html: bookingConfirmationTemplate({
+        name: booking.guestName,
+        roomNo: room.roomNumber,
+        checkInDate: booking.checkInDate,
+        checkOutDate: booking.checkOutDate,
+        totalPrice: booking.totalAmount,
+      }),
+    });
+    
+    res.status(201).json({
+      message: "Booking created successfully",
+      booking
+    });
 
-    res.status(201).json({ message: "Booking created successfully", booking });
+
 
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
@@ -142,7 +165,24 @@ const updateBookingStatus = async (req, res) => {
     }
 
     if (bookingStatus === "cancelled" && booking.bookingStatus !== "cancelled") {
-      await Room.findByIdAndUpdate(booking.roomId, { status: "available" });
+
+      await Room.findByIdAndUpdate(booking.roomId, {
+        status: "available"
+      });
+    
+      const room = await Room.findById(booking.roomId);
+    
+      await sendEmail({
+        to: booking.guestEmail,
+        subject: 'Booking Cancelled',
+    
+        html: cancellationTemplate({
+          name: booking.guestName,
+          roomNo: room.roomNumber,
+          checkInDate: booking.checkInDate,
+          checkOutDate: booking.checkOutDate,
+        }),
+      });
     }
 
     if (bookingStatus === "completed" && booking.bookingStatus !== "completed") {
