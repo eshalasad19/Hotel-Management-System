@@ -90,6 +90,33 @@ const createBooking = async (req, res) => {
         totalPrice: booking.totalAmount,
       }),
     });
+    await sendEmail({
+      to: 'adminhotel@gmail.com',
+    
+      subject: 'New Booking Received',
+    
+      html: `
+      
+        <h2>New Booking Alert</h2>
+    
+        <p><strong>Guest:</strong> ${booking.guestName}</p>
+    
+        <p><strong>Email:</strong> ${booking.guestEmail}</p>
+    
+        <p><strong>Phone:</strong> ${booking.guestPhone}</p>
+    
+        <p><strong>Room:</strong> ${room.roomNumber}</p>
+    
+        <p><strong>Check-In:</strong> ${booking.checkInDate}</p>
+    
+        <p><strong>Check-Out:</strong> ${booking.checkOutDate}</p>
+    
+        <p><strong>Total:</strong> Rs. ${booking.totalAmount}</p>
+    
+        <p><strong>Payment Status:</strong> ${booking.paymentStatus}</p>
+    
+      `,
+    });
     
     res.status(201).json({
       message: "Booking created successfully",

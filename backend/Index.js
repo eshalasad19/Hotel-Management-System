@@ -1,11 +1,16 @@
+require('dotenv').config(); // 👈 MUST BE FIRST
+
 const express = require("express");
-const dotenv = require('dotenv');
-require('./cron/checkoutReminder');
 const cors = require('cors');
 const path = require('path');
 const connectDB = require('./Config/db');
 
-dotenv.config();
+// ❗ AFTER dotenv
+require('./cron/checkoutReminder');
+require('./cron/checkinReminder');
+require('./cron/feedbackReminder');
+
+connectDB();
 
 const app = express();
 
