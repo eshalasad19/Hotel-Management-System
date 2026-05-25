@@ -7,7 +7,7 @@ const sendEmail = require('../Services/emailService');
 
 const {
   checkoutReminderTemplate,
-} = require('../utils/emailTemplates');
+} = require('../Utils/emailTemplates');
 
 cron.schedule('0 8 * * *', async () => {
 
@@ -23,31 +23,22 @@ cron.schedule('0 8 * * *', async () => {
       }
     });
 
-    for (const booking of bookings) {
-
+   for (const booking of bookings) {
       const checkout = new Date(booking.checkOutDate);
-
-      if (
-        checkout.getDate() === today.getDate() &&
-        checkout.getMonth() === today.getMonth() &&
-        checkout.getFullYear() === today.getFullYear()
-      ) {
-
+      const diffTime = checkout - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      if (diffDays === 1) {
         const room = await Room.findById(booking.roomId);
-
         await sendEmail({
           to: booking.guestEmail,
-
-          subject: 'Checkout Reminder',
-
+          subject: 'Checkout Reminder - Tomorrow is your checkout day',
           html: checkoutReminderTemplate({
             name: booking.guestName,
             roomNo: room.roomNumber,
             checkOutDate: booking.checkOutDate,
           }),
         });
-
-        console.log(`Reminder sent to ${booking.guestEmail}`);
+        console.log(`Checkout reminder sent to ${booking.guestEmail}`);
       }
     }
 

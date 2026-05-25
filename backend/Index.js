@@ -12,6 +12,9 @@ app.use(cors());
 app.use(express.json());
 
 connectDB();
+require('./cron/checkinReminder');
+require('./cron/checkoutReminder');
+require('./cron/feedbackReminder');
 
 app.use(
   '/Uploads',

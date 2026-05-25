@@ -49,7 +49,6 @@ const Sidebar = () => {
 
   return (
     <div className="app-menu navbar-menu" style={{ background: 'linear-gradient(180deg, #1a1f3a 0%, #162032 100%)' }}>
-
       {/* ── LOGO AREA ── */}
       <div className="navbar-brand-box" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: 16 }}>
         <Link to="/admin/dashboard" style={{ textDecoration: 'none', display: 'block' }}>
@@ -105,7 +104,7 @@ const Sidebar = () => {
       </div> */}
 
       {/* ── NAV ITEMS ── */}
-      <div id="scrollbar">
+                  <div id="scrollbar">
         <div className="container-fluid">
           <div id="two-column-menu"></div>
 

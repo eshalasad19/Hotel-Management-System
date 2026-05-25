@@ -10,14 +10,14 @@ export default function Video() {
       />
       <div className="hero-content">
         <div className="container text-center">
-          <a
+          {/* <a
             className="glightbox rounded-circle d-inline-flex mb-4 wow fadeInUp"
             href="https://www.youtube.com/embed/s8vnc9l8sz4"
           >
             <span className="playButton playButton-pulsing text-white bg-white bg-opacity-50">
               <i className="fa-solid fa-play" />
             </span>
-          </a>
+          </a> */}
           <h2 className="text-19 fw-600 text-white lh-sm wow fadeInUp" data-wow-delay=".2s">
             Enjoy Facilities of Unmatched Quality!
           </h2>

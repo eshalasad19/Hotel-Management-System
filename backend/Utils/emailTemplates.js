@@ -1,23 +1,20 @@
 const bookingConfirmationTemplate = (booking) => {
-    return `
-      <h2>Booking Confirmed</h2>
-  
-      <p>Dear ${booking.name},</p>
-  
-      <p>Your booking has been confirmed successfully.</p>
-  
-      <h3>Booking Details</h3>
-  
-      <ul>
-        <li><strong>Room Number:</strong> ${booking.roomNo}</li>
-        <li><strong>Check-In:</strong> ${booking.checkInDate}</li>
-        <li><strong>Check-Out:</strong> ${booking.checkOutDate}</li>
-        <li><strong>Total Price:</strong> Rs. ${booking.totalPrice}</li>
-      </ul>
-  
-      <p>Thank you for choosing our hotel.</p>
-    `;
-  };
+  return `
+    <h2>Booking Confirmed</h2>
+    <p>Dear ${booking.name},</p>
+    <p>Your booking has been received successfully.</p>
+    <h3>Booking Details</h3>
+    <ul>
+      <li><strong>Room Number:</strong> ${booking.roomNo}</li>
+      <li><strong>Check-In:</strong> ${booking.checkInDate}</li>
+      <li><strong>Check-Out:</strong> ${booking.checkOutDate}</li>
+      <li><strong>Total Price:</strong> Rs. ${booking.totalPrice}</li>
+      <li><strong>Payment Mode:</strong> ${booking.paymentMethod}</li>
+      <li><strong>Payment Status:</strong> ${booking.paymentStatus}</li>
+    </ul>
+    <p>Thank you for choosing our hotel.</p>
+  `;
+};
   
   
   const cancellationTemplate = (booking) => {
@@ -56,9 +53,24 @@ const bookingConfirmationTemplate = (booking) => {
     `;
   };
   
-  
-  module.exports = {
-    bookingConfirmationTemplate,
-    cancellationTemplate,
-    checkoutReminderTemplate,
-  };
+  const checkInReminderTemplate = (booking) => {
+  return `
+    <h2>Check-In Reminder</h2>
+    <p>Hello ${booking.name},</p>
+    <p>This is a reminder that your check-in is tomorrow.</p>
+    <ul>
+      <li><strong>Room Number:</strong> ${booking.roomNo}</li>
+      <li><strong>Check-In Date:</strong> ${booking.checkInDate}</li>
+      <li><strong>Check-Out Date:</strong> ${booking.checkOutDate}</li>
+      <li><strong>Payment Status:</strong> ${booking.paymentStatus}</li>
+      <li><strong>Payment Mode:</strong> ${booking.paymentMethod}</li>
+    </ul>
+    <p>We look forward to welcoming you!</p>
+  `;
+};
+module.exports = {
+  bookingConfirmationTemplate,
+  cancellationTemplate,
+  checkoutReminderTemplate,
+  checkInReminderTemplate,
+};

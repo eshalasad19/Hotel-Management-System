@@ -6,7 +6,7 @@ const {
   bookingConfirmationTemplate,
   cancellationTemplate,
   checkoutReminderTemplate,
-} = require('../utils/emailTemplates');
+} = require('../Utils/emailTemplates');
 
 // ========================
 // CREATE BOOKING
@@ -79,7 +79,7 @@ const createBooking = async (req, res) => {
     }
 
     await Room.findByIdAndUpdate(roomId, { status: finalRoomStatus });
-    await sendEmail({
+   await sendEmail({
       to: booking.guestEmail,
       subject: 'Booking Confirmation',
       html: bookingConfirmationTemplate({
@@ -88,6 +88,8 @@ const createBooking = async (req, res) => {
         checkInDate: booking.checkInDate,
         checkOutDate: booking.checkOutDate,
         totalPrice: booking.totalAmount,
+        paymentMethod: booking.paymentMethod || 'N/A',
+        paymentStatus: booking.paymentStatus || 'pending',
       }),
     });
     await sendEmail({

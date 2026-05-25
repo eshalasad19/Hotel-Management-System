@@ -35,4 +35,25 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+/* Sidebar scrollable fix */
+.app-menu.navbar-menu {
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
 
+.app-menu.navbar-menu #scrollbar {
+  flex: 1 1 0%;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+/* Hide ugly scrollbar */
+.app-menu.navbar-menu #scrollbar::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+.app-menu.navbar-menu #scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

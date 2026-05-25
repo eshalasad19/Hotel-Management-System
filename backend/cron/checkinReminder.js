@@ -3,7 +3,7 @@ const cron = require('node-cron');
 const Booking = require('../Models/Booking');
 const Room = require('../Models/Room');
 
-const sendEmail = require('../services/emailService');
+const sendEmail = require('../Services/emailService');
 
 cron.schedule('0 9 * * *', async () => {
 
