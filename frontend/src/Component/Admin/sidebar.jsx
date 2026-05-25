@@ -308,7 +308,14 @@ const Sidebar = () => {
                 </Link>
               </li>
             )}
-
+{hasRole('admin', 'manager') && (
+  <li className="nav-item">
+    <Link className={`nav-link menu-link ${isActive('/admin/about-us') ? 'active' : ''}`} to="/admin/about-us">
+      <i className="ri-information-line"></i>
+      <span>About Us</span>
+    </Link>
+  </li>
+)}
             {/* System Settings — admin only */}
             {hasRole('admin') && (
               <>
