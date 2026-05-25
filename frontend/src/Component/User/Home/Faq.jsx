@@ -12,7 +12,7 @@ export default function Faq() {
     <div id="content" role="main">
       <FaqHero />
       <FaqAccordion />
-      <AvailabilitySection />
+      {/* <AvailabilitySection /> */}
     </div>
   );
 }

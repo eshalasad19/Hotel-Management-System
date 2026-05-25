@@ -43,5 +43,25 @@ const deleteOrder = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+const getOrdersByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
 
-module.exports = { createOrder, getOrders, updateOrderStatus, deleteOrder };
+    const orders = await RestaurantOrder.find({ userId })
+      .populate('userId', 'name email phone')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: orders.length,
+      data: orders,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+module.exports = { createOrder, getOrders, updateOrderStatus, deleteOrder,getOrdersByUserId };

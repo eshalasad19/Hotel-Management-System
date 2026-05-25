@@ -35,7 +35,6 @@ const PROFILE_STYLES = `
     letter-spacing: 0.5px;
   }
 
-  /* ── LEFT CARD ── */
   .profile-user-card {
     background: #fff;
     border-radius: 20px;
@@ -158,7 +157,6 @@ const PROFILE_STYLES = `
     transform: translateY(-1px);
   }
 
-  /* EDIT FORM */
   .profile-form-input {
     width: 100%;
     padding: 10px 16px;
@@ -223,7 +221,6 @@ const PROFILE_STYLES = `
     color: #444 !important;
   }
 
-  /* STATS */
   .profile-stats {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -254,7 +251,6 @@ const PROFILE_STYLES = `
     font-weight: 600;
   }
 
-  /* ── RIGHT CARD ── */
   .profile-bookings-card {
     background: #fff;
     border-radius: 20px;
@@ -274,7 +270,6 @@ const PROFILE_STYLES = `
     margin-bottom: 16px;
   }
 
-  /* TABS */
   .profile-tabs {
     display: flex;
     gap: 6px;
@@ -336,7 +331,6 @@ const PROFILE_STYLES = `
   .profile-bookings-body::-webkit-scrollbar-track { background: transparent; }
   .profile-bookings-body::-webkit-scrollbar-thumb { background: #ede5d8; border-radius: 10px; }
 
-  /* BOOKING CARD */
   .booking-card {
     border: 1px solid #ede5d8;
     border-radius: 14px;
@@ -480,11 +474,385 @@ const PROFILE_STYLES = `
     color: #c9a96e;
   }
 
+  /* ── ORDER NOW BUTTON ── */
+  .order-now-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #1a1510, #2d231a);
+    color: #c9a96e !important;
+    border: 1px solid rgba(201,169,110,0.35) !important;
+    border-radius: 50px !important;
+    padding: 6px 16px !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.22s !important;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  }
+
+  .order-now-btn:hover {
+    background: linear-gradient(135deg, #c9a96e, #a67c45) !important;
+    color: #fff !important;
+    border-color: transparent !important;
+    box-shadow: 0 5px 16px rgba(201,169,110,0.4) !important;
+    transform: translateY(-1px);
+  }
+
+  /* ── ORDER MODAL OVERLAY ── */
+  .order-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,10,6,0.72);
+    backdrop-filter: blur(6px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: overlayFadeIn 0.2s ease;
+  }
+
+  @keyframes overlayFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .order-modal {
+    background: #fff;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 680px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+    animation: modalSlideUp 0.28s cubic-bezier(0.34,1.56,0.64,1);
+  }
+
+  @keyframes modalSlideUp {
+    from { transform: translateY(40px) scale(0.97); opacity: 0; }
+    to   { transform: translateY(0) scale(1);       opacity: 1; }
+  }
+
+  /* Modal Header */
+  .order-modal-header {
+    background: linear-gradient(135deg, #1a1510 0%, #2d231a 100%);
+    padding: 22px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+
+  .order-modal-header-left h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 500;
+    color: #fff;
+    margin: 0 0 2px;
+  }
+
+  .order-modal-header-left p {
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    margin: 0;
+  }
+
+  .order-modal-close {
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+
+  .order-modal-close:hover {
+    background: rgba(201,169,110,0.2);
+    border-color: rgba(201,169,110,0.4);
+    color: #c9a96e;
+  }
+
+  /* Category Filter Chips */
+  .order-category-bar {
+    padding: 14px 28px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    flex-shrink: 0;
+    border-bottom: 1px solid #f0e8dc;
+    scrollbar-width: none;
+  }
+  .order-category-bar::-webkit-scrollbar { display: none; }
+
+  .order-cat-chip {
+    white-space: nowrap;
+    padding: 6px 16px;
+    border-radius: 50px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+    border: 1px solid #ede5d8;
+    background: #fdf8f2;
+    color: #888;
+    transition: all 0.18s;
+    font-family: 'Jost', sans-serif;
+  }
+
+  .order-cat-chip:hover {
+    border-color: #c9a96e;
+    color: #c9a96e;
+  }
+
+  .order-cat-chip.active {
+    background: linear-gradient(135deg, #c9a96e, #a67c45);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(201,169,110,0.3);
+  }
+
+  /* Menu Scroll Area */
+  .order-menu-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 28px;
+    scrollbar-width: thin;
+    scrollbar-color: #ede5d8 transparent;
+  }
+
+  .order-menu-scroll::-webkit-scrollbar { width: 5px; }
+  .order-menu-scroll::-webkit-scrollbar-track { background: transparent; }
+  .order-menu-scroll::-webkit-scrollbar-thumb { background: #ede5d8; border-radius: 10px; }
+
+  .order-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #c9a96e;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin: 0 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f0e8dc;
+  }
+
+  /* Menu Item Row */
+  .menu-item-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f9f4ef;
+  }
+
+  .menu-item-row:last-child { border-bottom: none; }
+
+  .menu-item-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    object-fit: cover;
+    flex-shrink: 0;
+    background: #f5f0eb;
+  }
+
+  .menu-item-img-fallback {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: #fdf8f2;
+    border: 1px solid #f0e8dc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .menu-item-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .menu-item-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .menu-item-desc {
+    font-size: 11px;
+    color: #bbb;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .menu-item-price {
+    font-size: 13px;
+    font-weight: 700;
+    color: #c9a96e;
+  }
+
+  /* Quantity controls */
+  .menu-item-qty {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-shrink: 0;
+  }
+
+  .qty-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #ede5d8;
+    background: #fdf8f2;
+    color: #888;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.18s;
+    line-height: 1;
+    padding: 0;
+    font-family: 'Jost', sans-serif;
+  }
+
+  .qty-btn:hover {
+    background: #c9a96e;
+    border-color: #c9a96e;
+    color: #fff;
+  }
+
+  .qty-num {
+    width: 32px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a1a;
+  }
+
+  /* Notes input per item */
+  .menu-item-notes {
+    width: 100%;
+    padding: 7px 14px;
+    border: 1px solid #ede5d8;
+    border-radius: 50px;
+    font-size: 12px;
+    color: #555;
+    background: #fdf8f2;
+    outline: none;
+    font-family: 'Jost', sans-serif;
+    margin-top: 6px;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
+
+  .menu-item-notes:focus {
+    border-color: #c9a96e;
+    box-shadow: 0 0 0 3px rgba(201,169,110,0.1);
+    background: #fff;
+  }
+
+  .menu-item-notes::placeholder { color: #ccc; }
+
+  /* Modal Footer */
+  .order-modal-footer {
+    padding: 16px 28px;
+    border-top: 1px solid #f0e8dc;
+    background: #fdf8f2;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    gap: 16px;
+  }
+
+  .order-total-label {
+    font-size: 12px;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  .order-total-amount {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    line-height: 1;
+  }
+
+  .order-items-summary {
+    font-size: 11px;
+    color: #bbb;
+    margin-top: 1px;
+  }
+
+  .order-place-btn {
+    background: linear-gradient(135deg, #c9a96e, #a67c45) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 50px !important;
+    padding: 12px 30px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px;
+    transition: all 0.2s !important;
+    box-shadow: 0 4px 16px rgba(201,169,110,0.35);
+    white-space: nowrap;
+  }
+
+  .order-place-btn:hover {
+    box-shadow: 0 6px 22px rgba(201,169,110,0.5) !important;
+    transform: translateY(-1px);
+  }
+
+  .order-place-btn:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+  }
+
+  .order-loading-wrap {
+    text-align: center;
+    padding: 48px 24px;
+  }
+
+  .order-empty-wrap {
+    text-align: center;
+    padding: 48px 24px;
+    color: #bbb;
+    font-size: 14px;
+  }
+
   @media (max-width: 768px) {
     .booking-card-inner { flex-direction: column; }
     .booking-img-wrap { width: 100%; min-height: 160px; }
     .booking-meta-grid { grid-template-columns: repeat(2, 1fr); }
     .profile-stats { grid-template-columns: repeat(3, 1fr); }
+    .order-modal { border-radius: 20px; }
+    .order-modal-header { padding: 18px 20px; }
+    .order-category-bar { padding: 12px 16px; }
+    .order-menu-scroll { padding: 16px 20px; }
+    .order-modal-footer { padding: 14px 20px; flex-direction: column; align-items: stretch; }
+    .order-place-btn { text-align: center; }
   }
 `;
 
@@ -509,15 +877,497 @@ const formatDate = (date) => {
   return new Date(date).toLocaleDateString("en-PK", { day: "2-digit", month: "short", year: "numeric" });
 };
 
+/* ─────────────────────────────────────────────
+   ORDER MODAL COMPONENT
+───────────────────────────────────────────── */
+function OrderModal({ booking, token, user, onClose }) {
+  const [menuItems, setMenuItems]     = useState([]);
+  const [categories, setCategories]   = useState([]);
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [loadingMenu, setLoadingMenu] = useState(true);
+  const [cart, setCart]               = useState({}); // { itemId: { qty } }
+  const [orderNotes, setOrderNotes]   = useState("");  // order-level notes
+  const [placingOrder, setPlacingOrder] = useState(false);
+  const [myOrders, setMyOrders]         = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+  const [activeModalTab, setActiveModalTab] = useState("menu"); // "menu" | "orders"
+
+  // Fetch previous orders for this booking
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await axios.get(
+          `${BASE_URL}/restaurant/orders/booking/${booking._id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const raw = res.data;
+        const orders = Array.isArray(raw) ? raw
+          : Array.isArray(raw?.data)   ? raw.data
+          : Array.isArray(raw?.orders) ? raw.orders
+          : [];
+        setMyOrders(orders);
+      } catch {
+        setMyOrders([]);
+      } finally {
+        setLoadingOrders(false);
+      }
+    };
+    fetchOrders();
+  }, []);
+
+  // Fetch restaurant menu on mount
+  useEffect(() => {
+    const fetchMenu = async () => {
+      try {
+        const res = await axios.get(`${BASE_URL}/restaurant/menu`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        // Handle various response shapes: plain array, {data:[]}, {menu:[]}, {items:[]}
+        const raw = res.data;
+        const items = Array.isArray(raw)
+          ? raw
+          : Array.isArray(raw?.data)   ? raw.data
+          : Array.isArray(raw?.menu)   ? raw.menu
+          : Array.isArray(raw?.items)  ? raw.items
+          : [];
+        setMenuItems(items);
+        const cats = [...new Set(items.map(i => i.category).filter(Boolean))];
+        setCategories(cats);
+      } catch (err) {
+        toast.error("Something Went Wrong");
+      } finally {
+        setLoadingMenu(false);
+      }
+    };
+    fetchMenu();
+  }, []);
+
+  // Prevent body scroll
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
+
+  const setQty = (itemId, delta) => {
+    setCart(prev => {
+      const current = prev[itemId]?.qty || 0;
+      const newQty = Math.max(0, current + delta);
+      if (newQty === 0) {
+        const { [itemId]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [itemId]: { qty: newQty } };
+    });
+  };
+
+  const cartItems = Object.entries(cart).filter(([, v]) => v.qty > 0);
+
+  const totalAmount = cartItems.reduce((sum, [id, { qty }]) => {
+    const item = menuItems.find(m => m._id === id);
+    return sum + (item?.price || 0) * qty;
+  }, 0);
+
+  const totalQty = cartItems.reduce((sum, [, { qty }]) => sum + qty, 0);
+
+  const filteredItems = activeCategory === "all"
+    ? menuItems
+    : menuItems.filter(i => i.category === activeCategory);
+
+  // Group filtered items by category for display
+  const grouped = filteredItems.reduce((acc, item) => {
+    const cat = item.category || "Other";
+    if (!acc[cat]) acc[cat] = [];
+    acc[cat].push(item);
+    return acc;
+  }, {});
+
+  const handlePlaceOrder = async () => {
+    if (cartItems.length === 0) return;
+    try {
+      setPlacingOrder(true);
+      const orderPayload = {
+        userId:      user?._id || user?.id,
+        guestName:   user?.name,
+        roomNumber:  booking.roomId?.roomNumber || booking.roomId?.name || "",
+        notes:       orderNotes.trim() || undefined,
+        totalAmount,
+        items: cartItems.map(([id, { qty }]) => {
+          const menuItem = menuItems.find(m => m._id === id);
+          return {
+            menuItemId: id,
+            name:       menuItem?.name || "",
+            price:      menuItem?.price || 0,
+            quantity:   qty,
+          };
+        }),
+      };
+      await axios.post(`${BASE_URL}/restaurant/orders/`, orderPayload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success("Order place ho gaya! 🍽️");
+      // Refresh orders then switch to orders tab
+      try {
+        const r2 = await axios.get(
+          `${BASE_URL}/restaurant/orders/user/${user._id}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const raw2 = r2.data;
+        const updated = Array.isArray(raw2) ? raw2
+          : Array.isArray(raw2?.data)   ? raw2.data
+          : Array.isArray(raw2?.orders) ? raw2.orders
+          : [];
+        setMyOrders(updated);
+      } catch {}
+      setCart({});
+      setOrderNotes("");
+      setActiveModalTab("orders");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Order has been placed");
+    } finally {
+      setPlacingOrder(false);
+    }
+  };
+
+  const categoryEmoji = (cat) => {
+    const map = { breakfast: "🍳", lunch: "🥗", dinner: "🍽️", beverages: "☕", desserts: "🍮", snacks: "🥨" };
+    return map[cat?.toLowerCase()] || "🍴";
+  };
+
+  return (
+    <div className="order-modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="order-modal">
+
+        {/* HEADER */}
+        <div className="order-modal-header">
+          <div className="order-modal-header-left">
+            <h3>
+              <i className="fa-solid fa-utensils me-2" style={{ color: "#c9a96e", fontSize: "20px" }}></i>
+              Restaurant Menu
+            </h3>
+            <p>
+              Room: {booking.roomId?.name || `Room ${booking.roomId?.roomNumber || ""}`}
+              &nbsp;•&nbsp;
+              Booking #{booking._id.slice(-6).toUpperCase()}
+            </p>
+          </div>
+          <button className="order-modal-close" onClick={onClose}>
+            <i className="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        {/* MODAL TABS */}
+        <div style={{ display:"flex", borderBottom:"1px solid #f0e8dc", background:"#fff", flexShrink:0 }}>
+          <button
+            onClick={() => setActiveModalTab("menu")}
+            style={{
+              flex:1, border:"none", background:"transparent", padding:"13px 0",
+              fontSize:13, fontWeight: activeModalTab==="menu" ? 700 : 500,
+              color: activeModalTab==="menu" ? "#c9a96e" : "#999",
+              borderBottom: activeModalTab==="menu" ? "2px solid #c9a96e" : "2px solid transparent",
+              cursor:"pointer", fontFamily:"'Jost',sans-serif", transition:"all 0.18s"
+            }}
+          >
+            <i className="fa-solid fa-utensils me-2" style={{fontSize:11}}></i>Menu
+          </button>
+          <button
+            onClick={() => setActiveModalTab("orders")}
+            style={{
+              flex:1, border:"none", background:"transparent", padding:"13px 0",
+              fontSize:13, fontWeight: activeModalTab==="orders" ? 700 : 500,
+              color: activeModalTab==="orders" ? "#c9a96e" : "#999",
+              borderBottom: activeModalTab==="orders" ? "2px solid #c9a96e" : "2px solid transparent",
+              cursor:"pointer", fontFamily:"'Jost',sans-serif", transition:"all 0.18s",
+              display:"flex", alignItems:"center", justifyContent:"center", gap:6
+            }}
+          >
+            <i className="fa-solid fa-receipt" style={{fontSize:11}}></i>
+            My Orders
+            {myOrders.length > 0 && (
+              <span style={{
+                background: activeModalTab==="orders" ? "rgba(201,169,110,0.15)" : "#f0e8dc",
+                color:"#c9a96e", borderRadius:20, fontSize:10, fontWeight:700,
+                padding:"1px 7px"
+              }}>{myOrders.length}</span>
+            )}
+          </button>
+        </div>
+
+        {/* CATEGORY CHIPS */}
+        {activeModalTab === "menu" &&
+  !loadingMenu &&
+  categories.length > 0 && (
+    <div className="order-category-bar">
+      <button
+        className={`order-cat-chip ${activeCategory === "all" ? "active" : ""}`}
+        onClick={() => setActiveCategory("all")}
+      >
+        🍴 All Items
+      </button>
+
+      {categories.map(cat => (
+        <button
+          key={cat}
+          className={`order-cat-chip ${activeCategory === cat ? "active" : ""}`}
+          onClick={() => setActiveCategory(cat)}
+        >
+          {categoryEmoji(cat)}{" "}
+          {cat.charAt(0).toUpperCase() + cat.slice(1)}
+        </button>
+      ))}
+    </div>
+)}
+        {/* ══ ORDERS TAB ══ */}
+        {activeModalTab === "orders" && (
+          <div style={{ flex:1, overflowY:"auto", padding:"20px 28px", scrollbarWidth:"thin" }}>
+            {loadingOrders ? (
+              <div style={{textAlign:"center", padding:"48px 0"}}>
+                <div className="spinner-border" style={{color:"#c9a96e"}}></div>
+              </div>
+            ) : myOrders.length === 0 ? (
+              <div style={{textAlign:"center", padding:"48px 0", color:"#bbb"}}>
+                <div style={{fontSize:36, marginBottom:12}}>🧾</div>
+                <p style={{fontSize:14, margin:0}}>No orders placed yet for this stay</p>
+              </div>
+            ) : (
+              [...myOrders].reverse().map((order, idx) => {
+                const osc = {
+                  Pending:   { color:"#f39c12", bg:"rgba(243,156,18,0.1)"  },
+                  Confirmed: { color:"#3498db", bg:"rgba(52,152,219,0.1)"  },
+                  Preparing: { color:"#8e44ad", bg:"rgba(142,68,173,0.1)"  },
+                  Ready:     { color:"#27ae60", bg:"rgba(39,174,96,0.1)"   },
+                  Delivered: { color:"#7f8c8d", bg:"rgba(127,140,141,0.1)" },
+                  Cancelled: { color:"#e74c3c", bg:"rgba(231,76,60,0.1)"  },
+                };
+                const os = osc[order.status] || osc.Pending;
+                const orderTime = order.createdAt
+                  ? new Date(order.createdAt).toLocaleString("en-PK", { day:"2-digit", month:"short", hour:"2-digit", minute:"2-digit" })
+                  : "";
+                return (
+                  <div key={order._id || idx} style={{
+                    border:"1px solid #ede5d8", borderRadius:14, marginBottom:12,
+                    overflow:"hidden", background:"#fff"
+                  }}>
+                    <div style={{
+                      background:"#fdf8f2", padding:"10px 16px",
+                      display:"flex", alignItems:"center", justifyContent:"space-between",
+                      borderBottom:"1px solid #f0e8dc"
+                    }}>
+                      <div>
+                        <span style={{fontSize:12, fontWeight:700, color:"#1a1a1a"}}>
+                          Order #{(order._id || "").slice(-6).toUpperCase()}
+                        </span>
+                        {orderTime && (
+                          <span style={{fontSize:11, color:"#bbb", marginLeft:8}}>{orderTime}</span>
+                        )}
+                      </div>
+                      <div style={{display:"flex", alignItems:"center", gap:8}}>
+                        <span style={{
+                          fontSize:10, fontWeight:700, letterSpacing:"0.5px", textTransform:"uppercase",
+                          padding:"3px 10px", borderRadius:20, color:os.color, background:os.bg
+                        }}>{order.status}</span>
+                        <span style={{fontSize:13, fontWeight:700, color:"#27ae60"}}>
+                          Rs. {order.totalAmount?.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                    <div style={{padding:"10px 16px"}}>
+                      {(order.items || []).map((it, i) => (
+                        <div key={i} style={{
+                          display:"flex", justifyContent:"space-between", alignItems:"center",
+                          padding:"6px 0", borderBottom: i < order.items.length-1 ? "1px solid #f9f4ef" : "none"
+                        }}>
+                          <div style={{display:"flex", alignItems:"center", gap:8}}>
+                            <span style={{
+                              width:22, height:22, background:"rgba(201,169,110,0.12)",
+                              borderRadius:6, display:"inline-flex", alignItems:"center",
+                              justifyContent:"center", fontSize:10, fontWeight:700, color:"#c9a96e"
+                            }}>{it.quantity}×</span>
+                            <span style={{fontSize:13, fontWeight:600, color:"#333"}}>{it.name}</span>
+                          </div>
+                          <span style={{fontSize:12, fontWeight:600, color:"#888"}}>
+                            Rs. {((it.price || 0) * (it.quantity || 1)).toLocaleString()}
+                          </span>
+                        </div>
+                      ))}
+                      {order.notes && (
+                        <div style={{
+                          marginTop:8, padding:"6px 10px", background:"#fdf8f2",
+                          border:"1px solid #f0e8dc", borderRadius:8, fontSize:11, color:"#aaa"
+                        }}>
+                          <i className="fa-solid fa-note-sticky me-1" style={{color:"#c9a96e"}}></i>
+                          {order.notes}
+                        </div>
+                      )}
+                      {order.estimatedTime && order.status !== "Delivered" && order.status !== "Cancelled" && (
+                        <div style={{marginTop:6, fontSize:11, color:"#bbb"}}>
+                          <i className="fa-solid fa-clock me-1" style={{color:"#c9a96e"}}></i>
+                          Est. delivery: ~{order.estimatedTime} mins
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        )}
+
+        {/* ══ MENU TAB ══ */}
+        {activeModalTab === "menu" && <div className="order-menu-scroll">
+          {loadingMenu ? (
+            <div className="order-loading-wrap">
+              <div className="spinner-border" style={{ color: "#c9a96e" }}></div>
+              <p className="mt-3" style={{ color: "#bbb", fontSize: "13px" }}>Menu load ho raha hai...</p>
+            </div>
+          ) : filteredItems.length === 0 ? (
+            <div className="order-empty-wrap">
+              <div style={{ fontSize: "36px", marginBottom: "12px" }}>🍽️</div>
+              Koi menu item nahi mila
+            </div>
+          ) : (
+            Object.entries(grouped).map(([cat, items]) => (
+              <div key={cat} className="mb-3">
+                <div className="order-section-title">
+                  {categoryEmoji(cat)} {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                </div>
+                {items.map(item => {
+                  const itemCart = cart[item._id];
+                  const qty = itemCart?.qty || 0;
+                  const imgUrl = getImageUrl(item.image);
+
+                  return (
+                    <div key={item._id}>
+                      <div className="menu-item-row">
+                        {/* Image */}
+                        {imgUrl ? (
+                          <img
+                            src={imgUrl}
+                            alt={item.name}
+                            className="menu-item-img"
+                            onError={(e) => { e.target.style.display = "none"; }}
+                          />
+                        ) : (
+                          <div className="menu-item-img-fallback">
+                            {categoryEmoji(item.category)}
+                          </div>
+                        )}
+
+                        {/* Info */}
+                        <div className="menu-item-info">
+                          <div className="menu-item-name">{item.name}</div>
+                          {item.description && (
+                            <div className="menu-item-desc">{item.description}</div>
+                          )}
+                          <div className="menu-item-price">Rs. {item.price?.toLocaleString()}</div>
+                        </div>
+
+                        {/* Qty Controls */}
+                        <div className="menu-item-qty">
+                          <button className="qty-btn" onClick={() => setQty(item._id, -1)}>−</button>
+                          <span className="qty-num">{qty}</span>
+                          <button className="qty-btn" onClick={() => setQty(item._id, 1)}>+</button>
+                        </div>
+                      </div>
+
+                    </div>
+                  );
+                })}
+              </div>
+            ))
+          )}
+        </div>}
+
+        {/* ORDER-LEVEL INFO BANNER + NOTES */}
+        {activeModalTab === "menu" && (
+        <div style={{ padding: "0 28px 0", borderTop: "1px solid #f0e8dc", background: "#fdf8f2" }}>
+          {/* Auto-filled info strip */}
+          <div style={{ display: "flex", gap: "20px", padding: "12px 0 10px", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(201,169,110,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: "#c9a96e", fontSize: 11 }}>
+                <i className="fa-solid fa-user"></i>
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: "#bbb", textTransform: "uppercase", letterSpacing: "0.4px", fontWeight: 600 }}>Guest</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a" }}>{user?.name}</div>
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(201,169,110,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: "#c9a96e", fontSize: 11 }}>
+                <i className="fa-solid fa-door-open"></i>
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: "#bbb", textTransform: "uppercase", letterSpacing: "0.4px", fontWeight: 600 }}>Room</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a" }}>
+                  {booking.roomId?.roomNumber || booking.roomId?.name || "—"}
+                </div>
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(201,169,110,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: "#c9a96e", fontSize: 11 }}>
+                <i className="fa-solid fa-clock"></i>
+              </div>
+              <div>
+                <div style={{ fontSize: 10, color: "#bbb", textTransform: "uppercase", letterSpacing: "0.4px", fontWeight: 600 }}>Est. Time</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a" }}>~20 mins</div>
+              </div>
+            </div>
+          </div>
+          {/* Order-level notes */}
+          <div style={{ paddingBottom: "14px" }}>
+            <input
+              type="text"
+              className="menu-item-notes"
+              style={{ borderRadius: "10px" }}
+              placeholder="Order notes (e.g. allergies, delivery instructions, no plastic...)"
+              value={orderNotes}
+              onChange={(e) => setOrderNotes(e.target.value)}
+            />
+          </div>
+        </div>
+        )}
+
+        {/* FOOTER */}
+        {activeModalTab === "menu" && <div className="order-modal-footer">
+          <div>
+            <div className="order-total-label">Order Total</div>
+            <div className="order-total-amount">Rs. {totalAmount.toLocaleString()}</div>
+            {totalQty > 0 && (
+              <div className="order-items-summary">
+                {totalQty} item{totalQty > 1 ? "s" : ""} selected
+              </div>
+            )}
+          </div>
+          <button
+            className="btn order-place-btn"
+            disabled={totalQty === 0 || placingOrder}
+            onClick={handlePlaceOrder}
+          >
+            {placingOrder ? (
+              <><span className="spinner-border spinner-border-sm me-2"></span>Placing...</>
+            ) : (
+              <><i className="fa-solid fa-check me-2"></i>Place Order</>
+            )}
+          </button>
+        </div>}
+
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────
+   MAIN PROFILE PAGE
+───────────────────────────────────────────── */
 export default function ProfilePage() {
   const { user, token, login } = useAuth();
   const navigate = useNavigate();
 
-  const [bookings, setBookings]             = useState([]);
+  const [bookings, setBookings]               = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
-  const [editMode, setEditMode]             = useState(false);
-  const [updating, setUpdating]             = useState(false);
-  const [activeTab, setActiveTab]           = useState("all");
+  const [editMode, setEditMode]               = useState(false);
+  const [updating, setUpdating]               = useState(false);
+  const [activeTab, setActiveTab]             = useState("all");
+  const [orderModalBooking, setOrderModalBooking] = useState(null); // booking for which modal is open
 
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
 
@@ -536,7 +1386,7 @@ export default function ProfilePage() {
         });
         setBookings(res.data);
       } catch (err) {
-        toast.error("Bookings load nahi ho saki");
+        toast.error("Booking is not loading");
       } finally {
         setLoadingBookings(false);
       }
@@ -546,7 +1396,7 @@ export default function ProfilePage() {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-    if (!form.name.trim()) { toast.error("Naam required hai"); return; }
+    if (!form.name.trim()) { toast.error("Name is required "); return; }
     try {
       setUpdating(true);
       const res = await axios.put(
@@ -555,7 +1405,7 @@ export default function ProfilePage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       login(res.data.user, token);
-      toast.success("Profile update ho gayi!");
+      toast.success("Profile has been Updated!");
       setEditMode(false);
     } catch (err) {
       toast.error(err.response?.data?.message || "Update failed");
@@ -582,6 +1432,17 @@ export default function ProfilePage() {
       <style>{PROFILE_STYLES}</style>
       <div className="profile-page">
         <ToastContainer />
+
+        {/* ORDER MODAL */}
+        {orderModalBooking && (
+          <OrderModal
+            booking={orderModalBooking}
+            token={token}
+            user={user}
+            onClose={() => setOrderModalBooking(null)}
+          />
+        )}
+
         <div className="container">
 
           {/* TITLE */}
@@ -596,7 +1457,6 @@ export default function ProfilePage() {
             <div className="col-lg-4">
               <div className="profile-user-card">
 
-                {/* HEADER */}
                 <div className="profile-card-header">
                   <div className="profile-avatar">
                     {user?.name?.charAt(0)?.toUpperCase()}
@@ -609,7 +1469,6 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                {/* BODY */}
                 <div className="profile-card-body">
 
                   {!editMode ? (
@@ -660,7 +1519,7 @@ export default function ProfilePage() {
                           disabled
                         />
                         <small style={{ fontSize: "11px", color: "#bbb", paddingLeft: "14px" }}>
-                          Email change nahi ho sakta
+                          Email Can't Changed
                         </small>
                       </div>
                       <div className="mb-4">
@@ -729,7 +1588,6 @@ export default function ProfilePage() {
                     My Bookings
                   </div>
 
-                  {/* TABS */}
                   <div className="profile-tabs">
                     {tabs.map((tab) => {
                       const count = bookings.filter(tab.filter).length;
@@ -751,7 +1609,6 @@ export default function ProfilePage() {
 
                 <div className="profile-bookings-body">
 
-                  {/* LOADING */}
                   {loadingBookings ? (
                     <div className="profile-empty">
                       <div className="spinner-border" style={{ color: "#c9a96e" }}></div>
@@ -760,7 +1617,6 @@ export default function ProfilePage() {
 
                   ) : filteredBookings.length === 0 ? (
 
-                    /* EMPTY */
                     <div className="profile-empty">
                       <div className="profile-empty-icon">
                         <i className="fa-solid fa-calendar-xmark"></i>
@@ -772,16 +1628,15 @@ export default function ProfilePage() {
 
                   ) : (
 
-                    /* BOOKING CARDS */
                     filteredBookings.map((booking) => {
                       const st = statusConfig[booking.bookingStatus] || statusConfig.pending;
                       const roomImg = getImageUrl(booking.roomId?.images?.[0]);
+                      const isCheckedIn = booking.bookingStatus === "checked_in";
 
                       return (
                         <div key={booking._id} className="booking-card">
                           <div className="booking-card-inner">
 
-                            {/* IMAGE */}
                             <div className="booking-img-wrap">
                               {roomImg ? (
                                 <img src={roomImg} alt="room" />
@@ -792,7 +1647,6 @@ export default function ProfilePage() {
                               )}
                             </div>
 
-                            {/* DETAILS */}
                             <div className="booking-details">
 
                               <div className="d-flex justify-content-between align-items-start mb-1">
@@ -860,6 +1714,17 @@ export default function ProfilePage() {
                                   <i className="fa-solid fa-money-bill me-1"></i>
                                   {booking.paymentMethod?.toUpperCase()}
                                 </span>
+
+                                {/* ── ORDER NOW BUTTON (only for checked_in) ── */}
+                                {isCheckedIn && (
+                                  <button
+                                    className="btn order-now-btn"
+                                    onClick={() => setOrderModalBooking(booking)}
+                                  >
+                                    <i className="fa-solid fa-utensils" style={{ fontSize: "10px" }}></i>
+                                    Order Now
+                                  </button>
+                                )}
                               </div>
 
                             </div>
