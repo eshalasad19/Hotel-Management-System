@@ -1,39 +1,70 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { getRooms } from '../../../../api/roomApi';
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { getRooms } from "../../../../api/roomApi";
 
-const BASE_URL = 'http://localhost:5001';
+const BASE_URL = "http://localhost:5001";
 
 const getImageUrl = (img) => {
   if (!img) return null;
-  if (img.startsWith('http')) return img;
-  if (img.startsWith('uploads/')) return `${BASE_URL}/${img}`;
+  if (img.startsWith("http")) return img;
+  if (img.startsWith("uploads/")) return `${BASE_URL}/${img}`;
   return `${BASE_URL}/uploads/${img}`;
 };
 
-const getAmenityIcon = (name = '') => {
+const getAmenityIcon = (name = "") => {
   const n = name.toLowerCase();
-  if (n.includes('wifi') || n.includes('internet')) return 'fa-wifi';
-  if (n.includes('tv') || n.includes('television')) return 'fa-tv';
-  if (n.includes('pool') || n.includes('swimming'))  return 'fa-water-ladder';
-  if (n.includes('gym') || n.includes('fitness'))    return 'fa-dumbbell';
-  if (n.includes('spa') || n.includes('massage'))    return 'fa-spa';
-  if (n.includes('breakfast') || n.includes('meal')) return 'fa-utensils';
-  if (n.includes('parking'))                         return 'fa-square-parking';
-  if (n.includes('air') || n.includes('ac'))         return 'fa-wind';
-  if (n.includes('bath') || n.includes('tub'))       return 'fa-bath';
-  if (n.includes('balcony') || n.includes('terrace'))return 'fa-archway';
-  return 'fa-circle-check';
+  if (n.includes("wifi") || n.includes("internet")) return "fa-wifi";
+  if (n.includes("tv") || n.includes("television")) return "fa-tv";
+  if (n.includes("pool") || n.includes("swimming")) return "fa-water-ladder";
+  if (n.includes("gym") || n.includes("fitness")) return "fa-dumbbell";
+  if (n.includes("spa") || n.includes("massage")) return "fa-spa";
+  if (n.includes("breakfast") || n.includes("meal")) return "fa-utensils";
+  if (n.includes("parking")) return "fa-square-parking";
+  if (n.includes("air") || n.includes("ac")) return "fa-wind";
+  if (n.includes("bath") || n.includes("tub")) return "fa-bath";
+  if (n.includes("balcony") || n.includes("terrace")) return "fa-archway";
+  return "fa-circle-check";
 };
 
-const UNAVAILABLE = ['booked', 'occupied', 'reserved', 'maintenance', 'cleaning'];
+const UNAVAILABLE = [
+  "booked",
+  "occupied",
+  "reserved",
+  "maintenance",
+  "cleaning",
+];
 
 const STATUS_CONFIG = {
-  booked:      { label: 'Already Booked',     color: '#e74c3c', bg: 'rgba(231,76,60,0.1)',   border: 'rgba(231,76,60,0.25)' },
-  occupied:    { label: 'Currently Occupied', color: '#e67e22', bg: 'rgba(230,126,34,0.1)',  border: 'rgba(230,126,34,0.25)' },
-  reserved:    { label: 'Reserved',           color: '#9b59b6', bg: 'rgba(155,89,182,0.1)',  border: 'rgba(155,89,182,0.25)' },
-  maintenance: { label: 'Under Maintenance',  color: '#95a5a6', bg: 'rgba(149,165,166,0.1)', border: 'rgba(149,165,166,0.25)' },
-  cleaning:    { label: 'Being Cleaned',      color: '#3498db', bg: 'rgba(52,152,219,0.1)',  border: 'rgba(52,152,219,0.25)' },
+  booked: {
+    label: "Already Booked",
+    color: "#e74c3c",
+    bg: "rgba(231,76,60,0.1)",
+    border: "rgba(231,76,60,0.25)",
+  },
+  occupied: {
+    label: "Currently Occupied",
+    color: "#e67e22",
+    bg: "rgba(230,126,34,0.1)",
+    border: "rgba(230,126,34,0.25)",
+  },
+  reserved: {
+    label: "Reserved",
+    color: "#9b59b6",
+    bg: "rgba(155,89,182,0.1)",
+    border: "rgba(155,89,182,0.25)",
+  },
+  maintenance: {
+    label: "Under Maintenance",
+    color: "#95a5a6",
+    bg: "rgba(149,165,166,0.1)",
+    border: "rgba(149,165,166,0.25)",
+  },
+  cleaning: {
+    label: "Being Cleaned",
+    color: "#3498db",
+    bg: "rgba(52,152,219,0.1)",
+    border: "rgba(52,152,219,0.25)",
+  },
 };
 
 export default function HomePageRooms() {
@@ -43,7 +74,7 @@ export default function HomePageRooms() {
 
   useEffect(() => {
     getRooms()
-      .then(data => {
+      .then((data) => {
         const list = Array.isArray(data) ? data : data.rooms || [];
         setRooms(list);
         setLoading(false);
@@ -51,13 +82,14 @@ export default function HomePageRooms() {
       .catch(() => setLoading(false));
   }, []);
 
-  if (loading) return (
-    <section className="section bg-light-1">
-      <div className="container text-center py-5">
-        <div className="spinner-border text-primary" role="status" />
-      </div>
-    </section>
-  );
+  if (loading)
+    return (
+      <section className="section bg-light-1">
+        <div className="container text-center py-5">
+          <div className="spinner-border text-primary" role="status" />
+        </div>
+      </section>
+    );
 
   const activeRoom = rooms[activeIndex];
   if (!activeRoom) return null;
@@ -69,7 +101,6 @@ export default function HomePageRooms() {
   return (
     <section className="section bg-light-1">
       <div className="container">
-
         {/* Heading */}
         <div className="mx-auto text-center mb-5">
           <p className="wow fadeInUp">
@@ -77,11 +108,15 @@ export default function HomePageRooms() {
               Rooms & Suites
             </span>
           </p>
-          <h2 className="heading-font-family text-13 fw-600 lh-sm wow fadeInUp" data-wow-delay=".2s">
-            Revel in the{' '}
+          <h2
+            className="heading-font-family text-13 fw-600 lh-sm wow fadeInUp"
+            data-wow-delay=".2s"
+          >
+            Revel in the{" "}
             <span className="text-primary">
-              Unmatched<br className="d-none d-md-block" /> Comfort
-            </span>{' '}
+              Unmatched
+              <br className="d-none d-md-block" /> Comfort
+            </span>{" "}
             with The Mist
           </h2>
         </div>
@@ -89,10 +124,9 @@ export default function HomePageRooms() {
         {/* Room Card */}
         <div
           className="bg-white rounded-5 overflow-hidden wow fadeInUp"
-          style={{ boxShadow: '0 8px 40px rgba(0,0,0,0.08)' }}
+          style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.08)" }}
         >
           <div className="row g-0">
-
             {/* Image */}
             <div className="col-lg-6 position-relative">
               {imageUrl ? (
@@ -100,16 +134,21 @@ export default function HomePageRooms() {
                   src={imageUrl}
                   alt={activeRoom.title}
                   style={{
-                    width: '100%', height: '100%', minHeight: 320,
-                    objectFit: 'cover', display: 'block',
-                    filter: isUnavailable ? 'grayscale(30%) brightness(0.85)' : 'none',
-                    transition: 'filter 0.3s',
+                    width: "100%",
+                    height: "100%",
+                    minHeight: 320,
+                    objectFit: "cover",
+                    display: "block",
+                    filter: isUnavailable
+                      ? "grayscale(30%) brightness(0.85)"
+                      : "none",
+                    transition: "filter 0.3s",
                   }}
                 />
               ) : (
                 <div
                   className="d-flex align-items-center justify-content-center bg-light"
-                  style={{ minHeight: 320, height: '100%' }}
+                  style={{ minHeight: 320, height: "100%" }}
                 >
                   <i className="fa-solid fa-image fa-3x text-muted opacity-25" />
                 </div>
@@ -123,14 +162,18 @@ export default function HomePageRooms() {
                     background: statusCfg.bg,
                     border: `1px solid ${statusCfg.border}`,
                     color: statusCfg.color,
-                    fontSize: 11, fontWeight: 600,
-                    backdropFilter: 'blur(6px)',
+                    fontSize: 11,
+                    fontWeight: 600,
+                    backdropFilter: "blur(6px)",
                   }}
                 >
                   <span
                     style={{
-                      width: 6, height: 6, borderRadius: '50%',
-                      background: statusCfg.color, display: 'inline-block',
+                      width: 6,
+                      height: 6,
+                      borderRadius: "50%",
+                      background: statusCfg.color,
+                      display: "inline-block",
                     }}
                   />
                   {statusCfg.label}
@@ -147,42 +190,100 @@ export default function HomePageRooms() {
 
             {/* Content */}
             <div className="col-lg-6 p-4 p-xl-5 d-flex flex-column justify-content-center">
-
               {/* Subtitle / discount */}
               {activeRoom.subtitle && (
                 <div className="mb-2">
                   <span className="d-inline-flex align-items-center gap-1 text-2 fw-600 rounded-pill border border-dark border-opacity-10 px-3 py-1">
-                    <i className="fa-solid fa-tag text-primary" style={{ fontSize: 11 }} />
+                    <i
+                      className="fa-solid fa-tag text-primary"
+                      style={{ fontSize: 11 }}
+                    />
                     {activeRoom.subtitle}
                   </span>
                 </div>
               )}
 
-              <h3 className="text-8 fw-600 mb-2">{activeRoom.title}</h3>
-              <p className="text-3 text-body-secondary mb-3">{activeRoom.description}</p>
+              <div className="d-flex align-items-center gap-2 mb-2">
+                <span
+                  style={{
+                    background: "#c9a96e",
+                    color: "#fff",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    letterSpacing: 1.5,
+                    padding: "3px 12px",
+                    borderRadius: 20,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Room {activeRoom.roomNumber}
+                </span>
+              </div>
+              {/* <h3 className="text-8 fw-600 mb-2">
+                {activeRoom.type
+                  ? activeRoom.type.charAt(0).toUpperCase() +
+                    activeRoom.type.slice(1) +
+                    " Room"
+                  : `Room ${activeRoom.roomNumber}`}
+              </h3> */}
+
+              {/* Type + Floor tagline */}
+              <div className="d-flex align-items-center gap-2 mb-2">
+                {activeRoom.type && (
+                  <span className="d-inline-flex align-items-center gap-1 text-2 fw-600 rounded-pill border border-dark border-opacity-10 px-3 py-1 text-capitalize">
+                    <i
+                      className="fa-solid fa-bed text-primary"
+                      style={{ fontSize: 11 }}
+                    />
+                    {activeRoom.type} Room
+                  </span>
+                )}
+                {activeRoom.floor && (
+                  <span className="d-inline-flex align-items-center gap-1 text-2 fw-600 rounded-pill border border-dark border-opacity-10 px-3 py-1 text-capitalize">
+                    <i
+                      className="fa-solid fa-layer-group text-primary"
+                      style={{ fontSize: 11 }}
+                    />
+                    {activeRoom.floor} Floor
+                  </span>
+                )}
+              </div>
+
+              <p className="text-3 text-body-secondary mb-3">
+                {activeRoom.description}
+              </p>
 
               {/* Features grid */}
               <div className="row g-2 text-3 text-body-secondary mb-3">
                 {activeRoom.bedType && (
                   <div className="col-6 col-xl-4 d-flex align-items-center">
-                    <span className="text-primary text-5 me-2"><i className="fa-solid fa-bed" /></span>
+                    <span className="text-primary text-5 me-2">
+                      <i className="fa-solid fa-bed" />
+                    </span>
                     {activeRoom.bedType}
                   </div>
                 )}
                 {activeRoom.persons && (
                   <div className="col-6 col-xl-4 d-flex align-items-center">
-                    <span className="text-primary text-5 me-2"><i className="fa-solid fa-users" /></span>
+                    <span className="text-primary text-5 me-2">
+                      <i className="fa-solid fa-users" />
+                    </span>
                     {activeRoom.persons} Persons
                   </div>
                 )}
                 {activeRoom.area && (
                   <div className="col-6 col-xl-4 d-flex align-items-center">
-                    <span className="text-primary text-5 me-2"><i className="fa-solid fa-expand" /></span>
+                    <span className="text-primary text-5 me-2">
+                      <i className="fa-solid fa-expand" />
+                    </span>
                     {activeRoom.area}
                   </div>
                 )}
                 {activeRoom.amenities?.slice(0, 3).map((item, i) => (
-                  <div key={i} className="col-6 col-xl-4 d-flex align-items-center">
+                  <div
+                    key={i}
+                    className="col-6 col-xl-4 d-flex align-items-center"
+                  >
                     <span className="text-primary text-5 me-2">
                       <i className={`fa-solid ${getAmenityIcon(item)}`} />
                     </span>
@@ -194,36 +295,13 @@ export default function HomePageRooms() {
               <hr className="opacity-1" />
 
               {/* Price + Button */}
-              <div className="d-flex align-items-center justify-content-between">
-                <div className="text-7 fw-600 d-flex align-items-baseline gap-1">
-                  Rs {activeRoom.price}
-                  <span className="text-3 fw-500 text-body-tertiary text-uppercase">/ Per Night</span>
-                </div>
-                {isUnavailable ? (
-                  <span
-                    className="btn rounded-pill px-4 py-2 text-3 fw-600"
-                    style={{
-                      background: statusCfg?.bg,
-                      color: statusCfg?.color,
-                      border: `1px solid ${statusCfg?.border}`,
-                      cursor: 'not-allowed',
-                    }}
-                  >
-                    <i className="fa-solid fa-lock me-2" style={{ fontSize: 11 }} />
-                    {statusCfg?.label}
-                  </span>
-                ) : (
-                  <Link
-                    className="btn btn-new btn-primary rounded-pill"
-                    to={`/rooms`}
-                  >
-                    <span className="btn-text"><span>Details</span></span>
-                    <span className="btn-icon"><i className="fa-solid fa-arrow-right" /></span>
-                  </Link>
-                )}
-              </div>
+              <div className="d-flex align-items-center">
+  <div className="text-7 fw-600 d-flex align-items-baseline gap-1">
+    Rs {activeRoom.price?.toLocaleString()}
+    <span className="text-3 fw-500 text-body-tertiary text-uppercase">/ Per Night</span>
+  </div>
+  </div>
             </div>
-
           </div>
         </div>
 
@@ -238,11 +316,11 @@ export default function HomePageRooms() {
                   width: i === activeIndex ? 24 : 10,
                   height: 10,
                   borderRadius: 20,
-                  border: 'none',
-                  background: i === activeIndex ? '#c9a96e' : '#ddd',
-                  cursor: 'pointer',
+                  border: "none",
+                  background: i === activeIndex ? "#c9a96e" : "#ddd",
+                  cursor: "pointer",
                   padding: 0,
-                  transition: 'all 0.3s ease',
+                  transition: "all 0.3s ease",
                 }}
               />
             ))}
@@ -251,12 +329,18 @@ export default function HomePageRooms() {
 
         {/* View All Button */}
         <div className="text-center mt-4 wow fadeInUp">
-          <Link className="btn btn-new btn-outline-primary rounded-pill" to="/room">
-            <span className="btn-text"><span>View All Rooms</span></span>
-            <span className="btn-icon"><i className="fa-solid fa-arrow-right" /></span>
+          <Link
+            className="btn btn-new btn-outline-primary rounded-pill"
+            to="/room"
+          >
+            <span className="btn-text">
+              <span>View All Rooms</span>
+            </span>
+            <span className="btn-icon">
+              <i className="fa-solid fa-arrow-right" />
+            </span>
           </Link>
         </div>
-
       </div>
     </section>
   );

@@ -13,54 +13,105 @@ const getImageUrl = (img) => {
 
 const getAmenityIcon = (name = "") => {
   const n = name.toLowerCase();
-  if (n.includes("wifi") || n.includes("internet"))           return "fa-wifi";
-  if (n.includes("tv") || n.includes("television"))           return "fa-tv";
-  if (n.includes("pool") || n.includes("swimming"))           return "fa-water-ladder";
-  if (n.includes("gym") || n.includes("fitness"))            return "fa-dumbbell";
-  if (n.includes("spa") || n.includes("massage"))             return "fa-spa";
-  if (n.includes("parking") || n.includes("garage"))          return "fa-square-parking";
-  if (n.includes("breakfast") || n.includes("meal") || n.includes("dining")) return "fa-utensils";
-  if (n.includes("bar") || n.includes("drink") || n.includes("minibar"))     return "fa-martini-glass";
-  if (n.includes("air") || n.includes("ac") || n.includes("conditioner"))    return "fa-wind";
-  if (n.includes("heat") || n.includes("heating"))            return "fa-temperature-high";
-  if (n.includes("bath") || n.includes("tub") || n.includes("jacuzzi"))      return "fa-bath";
-  if (n.includes("shower"))                                   return "fa-shower";
-  if (n.includes("safe") || n.includes("locker"))             return "fa-lock";
-  if (n.includes("laundry") || n.includes("washing"))         return "fa-shirt";
-  if (n.includes("balcony") || n.includes("terrace"))         return "fa-archway";
-  if (n.includes("view") || n.includes("ocean") || n.includes("sea") || n.includes("mountain")) return "fa-binoculars";
-  if (n.includes("kitchen") || n.includes("kitchenette"))     return "fa-kitchen-set";
-  if (n.includes("fridge") || n.includes("refrigerator"))     return "fa-temperature-low";
-  if (n.includes("coffee") || n.includes("tea") || n.includes("kettle"))     return "fa-mug-hot";
-  if (n.includes("phone") || n.includes("telephone"))         return "fa-phone";
-  if (n.includes("desk") || n.includes("work"))               return "fa-briefcase";
-  if (n.includes("iron") || n.includes("ironing"))            return "fa-shirt";
-  if (n.includes("hair") || n.includes("dryer"))               return "fa-wind";
-  if (n.includes("towel") || n.includes("linen"))             return "fa-scroll";
-  if (n.includes("24") || n.includes("reception") || n.includes("concierge")) return "fa-bell-concierge";
-  if (n.includes("room service"))                             return "fa-bell-concierge";
-  if (n.includes("pet"))                                      return "fa-paw";
-  if (n.includes("smoke") || n.includes("smoking"))           return "fa-smoking";
-  if (n.includes("disable") || n.includes("accessible") || n.includes("wheelchair")) return "fa-wheelchair";
-  if (n.includes("child") || n.includes("kid") || n.includes("baby"))        return "fa-baby";
-  if (n.includes("garden") || n.includes("outdoor"))          return "fa-tree";
-  if (n.includes("security") || n.includes("cctv"))           return "fa-shield-halved";
-  if (n.includes("elevator") || n.includes("lift"))           return "fa-elevator";
+  if (n.includes("wifi") || n.includes("internet")) return "fa-wifi";
+  if (n.includes("tv") || n.includes("television")) return "fa-tv";
+  if (n.includes("pool") || n.includes("swimming")) return "fa-water-ladder";
+  if (n.includes("gym") || n.includes("fitness")) return "fa-dumbbell";
+  if (n.includes("spa") || n.includes("massage")) return "fa-spa";
+  if (n.includes("parking") || n.includes("garage")) return "fa-square-parking";
+  if (n.includes("breakfast") || n.includes("meal") || n.includes("dining"))
+    return "fa-utensils";
+  if (n.includes("bar") || n.includes("drink") || n.includes("minibar"))
+    return "fa-martini-glass";
+  if (n.includes("air") || n.includes("ac") || n.includes("conditioner"))
+    return "fa-wind";
+  if (n.includes("heat") || n.includes("heating")) return "fa-temperature-high";
+  if (n.includes("bath") || n.includes("tub") || n.includes("jacuzzi"))
+    return "fa-bath";
+  if (n.includes("shower")) return "fa-shower";
+  if (n.includes("safe") || n.includes("locker")) return "fa-lock";
+  if (n.includes("laundry") || n.includes("washing")) return "fa-shirt";
+  if (n.includes("balcony") || n.includes("terrace")) return "fa-archway";
+  if (
+    n.includes("view") ||
+    n.includes("ocean") ||
+    n.includes("sea") ||
+    n.includes("mountain")
+  )
+    return "fa-binoculars";
+  if (n.includes("kitchen") || n.includes("kitchenette"))
+    return "fa-kitchen-set";
+  if (n.includes("fridge") || n.includes("refrigerator"))
+    return "fa-temperature-low";
+  if (n.includes("coffee") || n.includes("tea") || n.includes("kettle"))
+    return "fa-mug-hot";
+  if (n.includes("phone") || n.includes("telephone")) return "fa-phone";
+  if (n.includes("desk") || n.includes("work")) return "fa-briefcase";
+  if (n.includes("iron") || n.includes("ironing")) return "fa-shirt";
+  if (n.includes("hair") || n.includes("dryer")) return "fa-wind";
+  if (n.includes("towel") || n.includes("linen")) return "fa-scroll";
+  if (n.includes("24") || n.includes("reception") || n.includes("concierge"))
+    return "fa-bell-concierge";
+  if (n.includes("room service")) return "fa-bell-concierge";
+  if (n.includes("pet")) return "fa-paw";
+  if (n.includes("smoke") || n.includes("smoking")) return "fa-smoking";
+  if (
+    n.includes("disable") ||
+    n.includes("accessible") ||
+    n.includes("wheelchair")
+  )
+    return "fa-wheelchair";
+  if (n.includes("child") || n.includes("kid") || n.includes("baby"))
+    return "fa-baby";
+  if (n.includes("garden") || n.includes("outdoor")) return "fa-tree";
+  if (n.includes("security") || n.includes("cctv")) return "fa-shield-halved";
+  if (n.includes("elevator") || n.includes("lift")) return "fa-elevator";
   return "fa-circle-check";
 };
 
 const isRoomUnavailable = (status) => {
-  const unavailable = ["booked", "occupied", "reserved", "maintenance", "cleaning"];
+  const unavailable = [
+    "booked",
+    "occupied",
+    "reserved",
+    "maintenance",
+    "cleaning",
+  ];
   return unavailable.includes(status?.toLowerCase());
 };
 
 const getStatusLabel = (status) => {
   const labels = {
-    booked:      { text: "Already Booked",     color: "#e74c3c", bg: "rgba(231,76,60,0.1)",   border: "rgba(231,76,60,0.2)"   },
-    occupied:    { text: "Currently Occupied", color: "#e67e22", bg: "rgba(230,126,34,0.1)",  border: "rgba(230,126,34,0.2)"  },
-    reserved:    { text: "Reserved",           color: "#9b59b6", bg: "rgba(155,89,182,0.1)",  border: "rgba(155,89,182,0.2)"  },
-    maintenance: { text: "Under Maintenance",  color: "#95a5a6", bg: "rgba(149,165,166,0.1)", border: "rgba(149,165,166,0.2)" },
-    cleaning:    { text: "Being Cleaned",      color: "#3498db", bg: "rgba(52,152,219,0.1)",  border: "rgba(52,152,219,0.2)"  },
+    booked: {
+      text: "Already Booked",
+      color: "#e74c3c",
+      bg: "rgba(231,76,60,0.1)",
+      border: "rgba(231,76,60,0.2)",
+    },
+    occupied: {
+      text: "Currently Occupied",
+      color: "#e67e22",
+      bg: "rgba(230,126,34,0.1)",
+      border: "rgba(230,126,34,0.2)",
+    },
+    reserved: {
+      text: "Reserved",
+      color: "#9b59b6",
+      bg: "rgba(155,89,182,0.1)",
+      border: "rgba(155,89,182,0.2)",
+    },
+    maintenance: {
+      text: "Under Maintenance",
+      color: "#95a5a6",
+      bg: "rgba(149,165,166,0.1)",
+      border: "rgba(149,165,166,0.2)",
+    },
+    cleaning: {
+      text: "Being Cleaned",
+      color: "#3498db",
+      bg: "rgba(52,152,219,0.1)",
+      border: "rgba(52,152,219,0.2)",
+    },
   };
   return labels[status?.toLowerCase()] || null;
 };
@@ -69,8 +120,8 @@ const getStatusLabel = (status) => {
 const getFloorLabel = (floor) => {
   const map = {
     ground: { label: "Ground Floor", icon: "fa-building" },
-    first:  { label: "1st Floor",    icon: "fa-building" },
-    second: { label: "2nd Floor",    icon: "fa-building" },
+    first: { label: "1st Floor", icon: "fa-building" },
+    second: { label: "2nd Floor", icon: "fa-building" },
   };
   return map[floor?.toLowerCase()] || { label: floor, icon: "fa-building" };
 };
@@ -429,14 +480,16 @@ const MODAL_STYLES = `
 const RoomModal = ({ room, onClose }) => {
   if (!room) return null;
   const unavailable = isRoomUnavailable(room.status);
-  const statusInfo  = getStatusLabel(room.status);
+  const statusInfo = getStatusLabel(room.status);
 
   return (
     <>
       <style>{MODAL_STYLES}</style>
       <div className="rm-backdrop" onClick={onClose} />
       <div className="rm-modal" role="dialog" aria-modal="true">
-        <button className="rm-close-btn" onClick={onClose} aria-label="Close">×</button>
+        <button className="rm-close-btn" onClick={onClose} aria-label="Close">
+          ×
+        </button>
 
         <div className="rm-modal-container">
           {/* LEFT SIDEBAR */}
@@ -451,16 +504,27 @@ const RoomModal = ({ room, onClose }) => {
             {unavailable && statusInfo && (
               <div
                 className="rm-status-ribbon"
-                style={{ background: statusInfo.bg, border: `1px solid ${statusInfo.border}`, color: statusInfo.color }}
+                style={{
+                  background: statusInfo.bg,
+                  border: `1px solid ${statusInfo.border}`,
+                  color: statusInfo.color,
+                }}
               >
-                <div className="rm-status-dot" style={{ background: statusInfo.color }} />
+                <div
+                  className="rm-status-dot"
+                  style={{ background: statusInfo.color }}
+                />
                 {statusInfo.text}
               </div>
             )}
 
             <div className="rm-sidebar-details">
-              {room.tag && <div className="rm-tag">{room.tag}</div>}
-              <h2 className="rm-title">{room.title}</h2>
+              <div className="rm-tag">
+                {room.type
+                  ? room.type.toUpperCase() + " ROOM"
+                  : room.tag || "ROOM"}
+              </div>
+              <h2 className="rm-title">Room {room.roomNumber}</h2>
               <div className="rm-price-badge">
                 <span className="rm-price-amount">Rs {room.price}</span>
                 <span className="rm-price-night">/ night</span>
@@ -470,56 +534,100 @@ const RoomModal = ({ room, onClose }) => {
 
           {/* RIGHT PANEL */}
           <div className="rm-modal-inner">
-            {room.subtitle && <span className="rm-subtitle">{room.subtitle}</span>}
+            {room.subtitle && (
+              <span className="rm-subtitle">{room.subtitle}</span>
+            )}
 
             {unavailable && statusInfo && (
               <div
                 className="rm-unavailable-banner"
-                style={{ borderLeftColor: statusInfo.color, background: statusInfo.bg }}
+                style={{
+                  borderLeftColor: statusInfo.color,
+                  background: statusInfo.bg,
+                }}
               >
-                <div className="rm-unavailable-banner-icon" style={{ color: statusInfo.color }}>
+                <div
+                  className="rm-unavailable-banner-icon"
+                  style={{ color: statusInfo.color }}
+                >
                   <i className="fa-solid fa-circle-exclamation"></i>
                 </div>
                 <div>
-                  <div className="rm-unavailable-banner-title">Space Temporarily Locked</div>
+                  <div className="rm-unavailable-banner-title">
+                    Space Temporarily Locked
+                  </div>
                   <div className="rm-unavailable-banner-text">
-                    This room is currently marked as <strong>{statusInfo.text}</strong>. Reservations will open shortly.
+                    This room is currently marked as{" "}
+                    <strong>{statusInfo.text}</strong>. Reservations will open
+                    shortly.
                   </div>
                 </div>
               </div>
             )}
 
-            <div className="rm-features">
-              {room.area && (
-                <div className="rm-feature-item">
-                  <div className="rm-feature-icon"><i className="fa-solid fa-expand"></i></div>
-                  <div>
-                    <div className="rm-feature-label">Size</div>
-                    <div className="rm-feature-value">{room.area}</div>
-                  </div>
-                </div>
-              )}
-              {room.persons && (
-                <div className="rm-feature-item">
-                  <div className="rm-feature-icon"><i className="fa-solid fa-users"></i></div>
-                  <div>
-                    <div className="rm-feature-label">Capacity</div>
-                    <div className="rm-feature-value">{room.persons} Guests</div>
-                  </div>
-                </div>
-              )}
-              {room.bedType && (
-                <div className="rm-feature-item">
-                  <div className="rm-feature-icon"><i className="fa-solid fa-bed"></i></div>
-                  <div>
-                    <div className="rm-feature-label">Bed Type</div>
-                    <div className="rm-feature-value">{room.bedType}</div>
-                  </div>
-                </div>
-              )}
-            </div>
+          <div className="rm-features">
+  {room.roomNumber && (
+    <div className="rm-feature-item">
+      <div className="rm-feature-icon"><i className="fa-solid fa-door-open"></i></div>
+      <div>
+        <div className="rm-feature-label">Room No</div>
+        <div className="rm-feature-value">Room {room.roomNumber}</div>
+      </div>
+    </div>
+  )}
+  {room.type && (
+    <div className="rm-feature-item">
+      <div className="rm-feature-icon"><i className="fa-solid fa-bed"></i></div>
+      <div>
+        <div className="rm-feature-label">Room Type</div>
+        <div className="rm-feature-value" style={{textTransform:'capitalize'}}>{room.type} Room</div>
+      </div>
+    </div>
+  )}
+  {room.floor && (
+    <div className="rm-feature-item">
+      <div className="rm-feature-icon"><i className="fa-solid fa-building"></i></div>
+      <div>
+        <div className="rm-feature-label">Floor</div>
+        <div className="rm-feature-value" style={{textTransform:'capitalize'}}>{room.floor} Floor</div>
+      </div>
+    </div>
+  )}
+  {room.capacity && (
+    <div className="rm-feature-item">
+      <div className="rm-feature-icon"><i className="fa-solid fa-users"></i></div>
+      <div>
+        <div className="rm-feature-label">Capacity</div>
+        <div className="rm-feature-value">{room.capacity} Guests</div>
+      </div>
+    </div>
+  )}
+  {room.price && (
+    <div className="rm-feature-item">
+      <div className="rm-feature-icon"><i className="fa-solid fa-tag"></i></div>
+      <div>
+        <div className="rm-feature-label">Price</div>
+        <div className="rm-feature-value">Rs {room.price?.toLocaleString()}/night</div>
+      </div>
+    </div>
+  )}
+  {room.status && (
+    <div className="rm-feature-item">
+      <div className="rm-feature-icon"><i className="fa-solid fa-circle-check"></i></div>
+      <div>
+        <div className="rm-feature-label">Status</div>
+        <div className="rm-feature-value" style={{
+          textTransform:'capitalize',
+          color: room.status === 'available' ? '#27ae60' : '#e74c3c'
+        }}>{room.status}</div>
+      </div>
+    </div>
+  )}
+</div>
 
-            {room.description && <p className="rm-description">{room.description}</p>}
+            {room.description && (
+              <p className="rm-description">{room.description}</p>
+            )}
 
             {room.amenities?.length > 0 && (
               <>
@@ -527,7 +635,9 @@ const RoomModal = ({ room, onClose }) => {
                 <div className="rm-amenities">
                   {room.amenities.map((item, i) => (
                     <div key={i} className="rm-amenity-item">
-                      <i className={`fa-solid ${getAmenityIcon(item)} rm-amenity-icon`}></i>
+                      <i
+                        className={`fa-solid ${getAmenityIcon(item)} rm-amenity-icon`}
+                      ></i>
                       <span>{item}</span>
                     </div>
                   ))}
@@ -535,28 +645,38 @@ const RoomModal = ({ room, onClose }) => {
               </>
             )}
 
-            <div className="rm-section-title">Policies & Timeline</div>
+            {/* <div className="rm-section-title">Policies & Timeline</div>
             <div className="rm-rules">
               <div className="rm-rule-item">
                 <div className="rm-rule-label">Check-in</div>
-                <div className="rm-rule-value">{room.checkIn || "14:00 PM"}</div>
+                <div className="rm-rule-value">
+                  {room.checkIn || "14:00 PM"}
+                </div>
               </div>
               <div className="rm-rule-item">
                 <div className="rm-rule-label">Check-out</div>
-                <div className="rm-rule-value">{room.checkOut || "12:00 PM"}</div>
+                <div className="rm-rule-value">
+                  {room.checkOut || "12:00 PM"}
+                </div>
               </div>
               <div className="rm-rule-item">
                 <div className="rm-rule-label">Pets</div>
-                <div className="rm-rule-value">{room.pets || "Not Allowed"}</div>
+                <div className="rm-rule-value">
+                  {room.pets || "Not Allowed"}
+                </div>
               </div>
-            </div>
+            </div> */}
 
             {room.images?.length > 1 && (
               <>
                 <div className="rm-section-title">Interior Gallery</div>
                 <div className="rm-gallery">
                   {room.images.slice(1).map((img, i) => (
-                    <img key={i} src={getImageUrl(img)} alt={`${room.title} view ${i + 2}`} />
+                    <img
+                      key={i}
+                      src={getImageUrl(img)}
+                      alt={`${room.title} view ${i + 2}`}
+                    />
                   ))}
                 </div>
               </>
@@ -569,20 +689,40 @@ const RoomModal = ({ room, onClose }) => {
           <div className="rm-footer-status">
             <div
               className="rm-footer-status-dot"
-              style={{ background: unavailable ? (statusInfo?.color || "#e74c3c") : "#27ae60" }}
+              style={{
+                background: unavailable
+                  ? statusInfo?.color || "#e74c3c"
+                  : "#27ae60",
+              }}
             />
-            <span style={{ color: unavailable ? (statusInfo?.color || "#e74c3c") : "#27ae60" }}>
-              {unavailable ? (statusInfo?.text || "Unavailable") : "Ready to Reserve"}
+            <span
+              style={{
+                color: unavailable ? statusInfo?.color || "#e74c3c" : "#27ae60",
+              }}
+            >
+              {unavailable
+                ? statusInfo?.text || "Unavailable"
+                : "Ready to Reserve"}
             </span>
           </div>
           <div className="rm-footer-btns">
-            <button className="rm-btn-close" onClick={onClose}>Close</button>
+            <button className="rm-btn-close" onClick={onClose}>
+              Close
+            </button>
             {unavailable ? (
               <span
                 className="rm-btn-book-disabled"
-                style={{ color: statusInfo?.color || "#e74c3c", borderColor: statusInfo?.border || "rgba(231,76,60,0.3)", background: statusInfo?.bg || "rgba(231,76,60,0.05)" }}
+                style={{
+                  color: statusInfo?.color || "#e74c3c",
+                  borderColor: statusInfo?.border || "rgba(231,76,60,0.3)",
+                  background: statusInfo?.bg || "rgba(231,76,60,0.05)",
+                }}
               >
-                <i className="fa-solid fa-lock" style={{ fontSize: "10px" }}></i> Fully Booked
+                <i
+                  className="fa-solid fa-lock"
+                  style={{ fontSize: "10px" }}
+                ></i>{" "}
+                Fully Booked
               </span>
             ) : (
               <Link to={`/booking/${room._id}`} className="rm-btn-book">
@@ -598,14 +738,16 @@ const RoomModal = ({ room, onClose }) => {
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 const RoomsList = () => {
-  const [rooms, setRooms]               = useState([]);
+  const [rooms, setRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
-  const [loading, setLoading]           = useState(false);
-  const [search, setSearch]             = useState("");
-  const [category, setCategory]         = useState("all");
-  const [priceRange, setPriceRange]     = useState("all");
+  const [loading, setLoading] = useState(false);
+  const [search, setSearch] = useState("");
+  const [category, setCategory] = useState("all");
+  const [priceRange, setPriceRange] = useState("all");
 
-  useEffect(() => { fetchRooms(); }, []);
+  useEffect(() => {
+    fetchRooms();
+  }, []);
 
   const filteredRooms = rooms.filter((room) => {
     const text = search.toLowerCase();
@@ -613,11 +755,12 @@ const RoomsList = () => {
       room.title?.toLowerCase().includes(text) ||
       room.description?.toLowerCase().includes(text) ||
       room.type?.toLowerCase().includes(text);
-    const matchCategory = category === "all" || room.type?.toLowerCase() === category.toLowerCase();
+    const matchCategory =
+      category === "all" || room.type?.toLowerCase() === category.toLowerCase();
     let matchPrice = true;
-    if (priceRange === "low")  matchPrice = room.price < 5000;
-    if (priceRange === "mid")  matchPrice = room.price >= 5000 && room.price <= 15000;
-    if (priceRange === "high") matchPrice = room.price > 15000;
+    if (priceRange === "low")  matchPrice = room.price <= 5000;
+if (priceRange === "mid")  matchPrice = room.price > 5000 && room.price <= 10000;
+if (priceRange === "high") matchPrice = room.price > 10000;
     return matchSearch && matchCategory && matchPrice;
   });
 
@@ -646,14 +789,18 @@ const RoomsList = () => {
   const closeModal = () => setSelectedRoom(null);
 
   useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") closeModal(); };
+    const onKey = (e) => {
+      if (e.key === "Escape") closeModal();
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
   useEffect(() => {
     document.body.style.overflow = selectedRoom ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [selectedRoom]);
 
   if (!rooms.length) {
@@ -671,10 +818,8 @@ const RoomsList = () => {
 
       <section className="section">
         <div className="container">
-
           {/* ===== FILTER BAR ===== */}
           <div className="rooms-filter-bar">
-
             {/* SEARCH */}
             <div className="rooms-search-wrap">
               <i className="fa-solid fa-magnifying-glass"></i>
@@ -712,43 +857,55 @@ const RoomsList = () => {
                 value={priceRange}
                 onChange={(e) => setPriceRange(e.target.value)}
               >
-                <option value="all">All Prices</option>
-                <option value="low">Below Rs 5,000</option>
-                <option value="mid">Rs 5,000 – 15,000</option>
-                <option value="high">Above Rs 15,000</option>
+               <option value="all">All Prices</option>
+<option value="low">Up to Rs 5,000</option>
+<option value="mid">Rs 5,001 – 10,000</option>
+<option value="high">Above Rs 10,000</option>
               </select>
               <i className="fa-solid fa-chevron-down rooms-select-arrow"></i>
             </div>
 
             {/* COUNT */}
             <div className="rooms-filter-count">
-              <span>{filteredRooms.length}</span> room{filteredRooms.length !== 1 ? "s" : ""} found
+              <span>{filteredRooms.length}</span> room
+              {filteredRooms.length !== 1 ? "s" : ""} found
             </div>
-
           </div>
 
           {/* ===== ROOM CARDS ===== */}
           <div className="room-items-wrap">
             {filteredRooms.map((room, index) => {
-              const isEven        = index % 2 === 0;
+              const isEven = index % 2 === 0;
               const isLoadingThis = loading === room._id;
-              const unavailable   = isRoomUnavailable(room.status);
-              const statusInfo    = getStatusLabel(room.status);
-              const floorInfo     = getFloorLabel(room.floor);
+              const unavailable = isRoomUnavailable(room.status);
+              const statusInfo = getStatusLabel(room.status);
+              const floorInfo = getFloorLabel(room.floor);
 
               return (
-                <div key={room._id} className="room-item bg-white rounded-5 mb-5">
+                <div
+                  key={room._id}
+                  className="room-item bg-white rounded-5 mb-5"
+                >
                   <div className="row g-0">
-
                     {/* IMAGE */}
                     <div className={`col-lg-6 ${isEven ? "" : "order-lg-2"}`}>
-                      <div className="room-item-img rounded-5 position-relative" style={{ cursor: "pointer" }}>
-                        <a href="#" onClick={(e) => handleDetailsClick(e, room._id)}>
+                      <div
+                        className="room-item-img rounded-5 position-relative"
+                        style={{ cursor: "pointer" }}
+                      >
+                        <a
+                          href="#"
+                          onClick={(e) => handleDetailsClick(e, room._id)}
+                        >
                           <img
                             className="img-fluid d-block w-100"
                             src={getImageUrl(room.images?.[0])}
                             alt={room.title}
-                            style={unavailable ? { filter: "grayscale(40%) brightness(0.85)" } : {}}
+                            style={
+                              unavailable
+                                ? { filter: "grayscale(40%) brightness(0.85)" }
+                                : {}
+                            }
                           />
                         </a>
 
@@ -763,10 +920,13 @@ const RoomsList = () => {
                               fontWeight: 600,
                               color: "#1a1a1a",
                               border: "1px solid rgba(255,255,255,0.6)",
-                              boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+                              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                             }}
                           >
-                            <i className={`fa-solid ${floorInfo.icon}`} style={{ color: "#c9a96e", fontSize: "10px" }}></i>
+                            <i
+                              className={`fa-solid ${floorInfo.icon}`}
+                              style={{ color: "#c9a96e", fontSize: "10px" }}
+                            ></i>
                             {floorInfo.label}
                           </div>
                         )}
@@ -789,7 +949,10 @@ const RoomsList = () => {
                               fontWeight: 500,
                             }}
                           >
-                            <i className="fa-solid fa-circle-exclamation" style={{ fontSize: "10px" }}></i>
+                            <i
+                              className="fa-solid fa-circle-exclamation"
+                              style={{ fontSize: "10px" }}
+                            ></i>
                             {statusInfo.text}
                           </div>
                         )}
@@ -799,43 +962,70 @@ const RoomsList = () => {
                     {/* CONTENT */}
                     <div className="col-lg-6 align-content-center">
                       <div className="p-4 m-2">
-                        <div className="room-discount d-inline-flex text-2 fw-500 rounded-pill border border-dark border-opacity-10 ms-0 mt-0 mb-2">
-                          <span className="text-primary me-1"><i className="fa-solid fa-tag"></i></span>
-                          {room.subtitle || "Luxury Stay"}
-                        </div>
-
-                        <h3 className="text-8 fw-600">{room.title}</h3>
-                        <p className="text-3 text-body-secondary">{room.description}</p>
+                       <div className="d-flex align-items-center gap-2 mb-2">
+  <span className="d-inline-flex align-items-center gap-1 text-2 fw-500 rounded-pill border border-dark border-opacity-10 px-3 py-1">
+    <i className="fa-solid fa-door-open text-primary" style={{ fontSize: 11 }}></i>
+    Room {room.roomNumber}
+  </span>
+  {room.type && (
+    <span style={{
+      color: '#c9a96e', fontSize: 10, fontWeight: 700,
+      letterSpacing: 1.5, padding: '3px 12px', borderRadius: 20,
+      textTransform: 'uppercase', border: '1px solid rgba(201,169,110,0.4)'
+    }}>
+      {room.type} Room
+    </span>
+  )}
+</div>
+                        <p className="text-3 text-body-secondary">
+                          {room.description}
+                        </p>
 
                         <div className="row g-2 text-3 text-body-secondary mb-3">
                           {room.bedType && (
                             <div className="col-6 col-xl-4 d-flex align-items-center">
-                              <span className="text-primary text-5 me-2"><i className="fa-solid fa-bed"></i></span>{room.bedType}
+                              <span className="text-primary text-5 me-2">
+                                <i className="fa-solid fa-bed"></i>
+                              </span>
+                              {room.bedType}
                             </div>
                           )}
                           {room.persons && (
                             <div className="col-6 col-xl-4 d-flex align-items-center">
-                              <span className="text-primary text-5 me-2"><i className="fa-solid fa-users"></i></span>{room.persons}
+                              <span className="text-primary text-5 me-2">
+                                <i className="fa-solid fa-users"></i>
+                              </span>
+                              {room.persons}
                             </div>
                           )}
                           {room.area && (
                             <div className="col-6 col-xl-4 d-flex align-items-center">
-                              <span className="text-primary text-5 me-2"><i className="fa-solid fa-expand"></i></span>{room.area}
+                              <span className="text-primary text-5 me-2">
+                                <i className="fa-solid fa-expand"></i>
+                              </span>
+                              {room.area}
                             </div>
                           )}
 
                           {/* ✅ FLOOR IN CARD */}
                           {room.floor && (
                             <div className="col-6 col-xl-4 d-flex align-items-center">
-                              <span className="text-primary text-5 me-2"><i className="fa-solid fa-building"></i></span>
+                              <span className="text-primary text-5 me-2">
+                                <i className="fa-solid fa-building"></i>
+                              </span>
                               {getFloorLabel(room.floor).label}
                             </div>
                           )}
 
                           {room.amenities?.slice(0, 2).map((item, i) => (
-                            <div key={i} className="col-6 col-xl-4 d-flex align-items-center">
+                            <div
+                              key={i}
+                              className="col-6 col-xl-4 d-flex align-items-center"
+                            >
                               <span className="text-primary text-5 me-2">
-                                <i className={`fa-solid ${getAmenityIcon(item)}`}></i>
+                                <i
+                                  className={`fa-solid ${getAmenityIcon(item)}`}
+                                ></i>
                               </span>
                               {item}
                             </div>
@@ -847,7 +1037,9 @@ const RoomsList = () => {
                         <div className="d-flex align-items-center justify-content-between w-100">
                           <div className="text-7 fw-600 d-flex align-items-center gap-1">
                             Rs {room.price}
-                            <span className="text-3 fw-500 text-body-tertiary text-uppercase">/ Per Night</span>
+                            <span className="text-3 fw-500 text-body-tertiary text-uppercase">
+                              / Per Night
+                            </span>
                           </div>
                           <button
                             className="btn btn-new btn-primary rounded-pill"
@@ -855,22 +1047,24 @@ const RoomsList = () => {
                             disabled={!!loading}
                           >
                             <span className="btn-text">
-                              <span>{isLoadingThis ? "Loading..." : "Details"}</span>
+                              <span>
+                                {isLoadingThis ? "Loading..." : "Details"}
+                              </span>
                             </span>
                             <span className="btn-icon">
-                              <i className={`fa-solid ${isLoadingThis ? "fa-spinner fa-spin" : "fa-arrow-right"}`}></i>
+                              <i
+                                className={`fa-solid ${isLoadingThis ? "fa-spinner fa-spin" : "fa-arrow-right"}`}
+                              ></i>
                             </span>
                           </button>
                         </div>
                       </div>
                     </div>
-
                   </div>
                 </div>
               );
             })}
           </div>
-
         </div>
       </section>
 
