@@ -14,9 +14,9 @@ export default function About() {
     <div id="content" role="main">
       <AboutHero />
       <AboutIntro />
-      <AboutAmenities />
-      <AboutServices />
-      <AboutExperience />
+      {/* <AboutAmenities /> */}
+      {/* <AboutServices /> */}
+      {/* <AboutExperience /> */}
       <AboutTestimonials />
       <AboutCTA />
     </div>

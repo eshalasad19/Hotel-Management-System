@@ -21,12 +21,12 @@ export default function AboutCTA() {
         <p className="text-white text-5 mb-4 wow fadeInUp" data-wow-delay=".1s">
           {about?.tagline || ''}
         </p>
-        <div className="wow fadeInUp" data-wow-delay=".2s">
+        {/* <div className="wow fadeInUp" data-wow-delay=".2s">
           <a className="btn btn-new btn-dark rounded-pill" href="/contact-us">
             <span className="btn-text"><span>Contact Us</span></span>
             <span className="btn-icon"><i className="fa-solid fa-arrow-right"></i></span>
           </a>
-        </div>
+        </div> */}
       </div>
     </section>
   );

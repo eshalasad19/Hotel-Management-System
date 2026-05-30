@@ -38,14 +38,14 @@ export default function AboutIntro() {
                   <span className="btn-text"><span>Rooms & Suites</span></span>
                   <span className="btn-icon"><i className="fa-solid fa-arrow-right"></i></span>
                 </a>
-                <div className="d-flex align-items-center gap-3 ms-sm-2 h-100">
+                {/* <div className="d-flex align-items-center gap-3 ms-sm-2 h-100">
                   <div className="text-body-tertiary text-7 opacity-7 d-inline-flex"><i className="fa-solid fa-phone-volume"></i></div>
                   <div className="vr my-1 opacity-1"></div>
                   <div className="text-start">
                     <div className="text-2 fw-600 text-body-tertiary mb-1">Call us for Inquiry:</div>
                     <h3 className="text-4 fw-700 mb-0">(+060) 444 5346</h3>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
             <div className="col-lg-6 text-center wow fadeInRight">

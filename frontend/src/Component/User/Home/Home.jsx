@@ -22,7 +22,7 @@ export default function Home() {
       <Video />
        <Testimonials />
       {/* <HomeAmenities /> */}
-      <Experience />
+      {/* <Experience /> */}
      
     
    

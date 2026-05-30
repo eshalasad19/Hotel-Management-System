@@ -156,12 +156,12 @@ export default function Testimonials() {
           </div>
         )}
 
-        <div className="fw-500 text-center mt-4 wow fadeInUp">
+        {/* <div className="fw-500 text-center mt-4 wow fadeInUp">
           Share Your Experience{' '}
           <a href="/feedback" className="fw-600 link-primary link-offset-2 link-underline-opacity-100 link-underline-opacity-0-hover">
             Leave a Review
           </a>
-        </div>
+        </div> */}
 
       </div>
     </section>

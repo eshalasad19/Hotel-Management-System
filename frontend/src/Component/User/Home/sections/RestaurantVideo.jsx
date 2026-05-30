@@ -13,11 +13,11 @@ export const RestaurantVideo = () => (
             <h2 className="text-16 fw-600 text-white lh-sm">Experience <br />Luxurious Dining</h2>
             <p className="text-5 text-light mb-0">Crafted with precision. Served with distinction.</p>
           </div>
-          <div className="col-md-3 align-content-center text-center wow fadeInRight" data-wow-delay=".2s">
+          {/* <div className="col-md-3 align-content-center text-center wow fadeInRight" data-wow-delay=".2s">
             <a className="glightbox rounded-circle d-inline-flex mb-4" href="https://www.youtube.com/embed/xPPLbEFbCAo">
               <span className="playButton playButton-pulsing text-white bg-white bg-opacity-50"><i className="fa-solid fa-play"></i></span>
             </a>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

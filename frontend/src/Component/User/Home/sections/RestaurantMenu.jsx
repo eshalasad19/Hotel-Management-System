@@ -8,22 +8,24 @@ const BASE_URL = "http://localhost:5001";
 const getImageUrl = (img) => {
   if (!img) return "https://via.placeholder.com/70x70?text=Food";
   if (img.startsWith("http")) return img;
+  // /Uploads/filename.jpg already hai to sirf BASE_URL lagao
+  if (img.startsWith("/Uploads/") || img.startsWith("/uploads/")) return `${BASE_URL}${img}`;
   return `${BASE_URL}/Uploads/${img}`;
 };
 
 const TABS = [
-  { key: "Desi",      label: "Desi",      icon: "fa-bowl-rice"    },
-  { key: "Italian",   label: "Italian",   icon: "fa-pizza-slice"  },
-  { key: "Chinese",   label: "Chinese",   icon: "fa-utensils"     },
-  { key: "Fast Food", label: "Fast Food", icon: "fa-burger"       },
+  { key: "Desi", label: "Desi", icon: "fa-bowl-rice" },
+  { key: "Italian", label: "Italian", icon: "fa-pizza-slice" },
+  { key: "Chinese", label: "Chinese", icon: "fa-utensils" },
+  { key: "Fast Food", label: "Fast Food", icon: "fa-burger" },
 ];
 
 // ✅ Dietary tag config
 const DIETARY_CONFIG = {
-  spicy:     { label: "Spicy",    icon: "fa-fire",         color: "#e74c3c", bg: "rgba(231,76,60,0.1)"    },
-  veg:       { label: "Veg",      icon: "fa-leaf",         color: "#27ae60", bg: "rgba(39,174,96,0.1)"    },
-  "non-veg": { label: "Non-Veg",  icon: "fa-drumstick-bite", color: "#e67e22", bg: "rgba(230,126,34,0.1)" },
-  halal:     { label: "Halal",    icon: "fa-star-and-crescent", color: "#2980b9", bg: "rgba(41,128,185,0.1)" },
+  spicy: { label: "Spicy", icon: "fa-fire", color: "#e74c3c", bg: "rgba(231,76,60,0.1)" },
+  veg: { label: "Veg", icon: "fa-leaf", color: "#27ae60", bg: "rgba(39,174,96,0.1)" },
+  "non-veg": { label: "Non-Veg", icon: "fa-drumstick-bite", color: "#e67e22", bg: "rgba(230,126,34,0.1)" },
+  halal: { label: "Halal", icon: "fa-star-and-crescent", color: "#2980b9", bg: "rgba(41,128,185,0.1)" },
 };
 
 const STYLES = `
@@ -483,15 +485,15 @@ const RestaurantMenu = () => {
 
   const { user, token } = useAuth();
 
-  const [menuData, setMenuData]       = useState([]);
-  const [activeTab, setActiveTab]     = useState("Desi");
-  const [loading, setLoading]         = useState(true);
-  const [guestName, setGuestName]     = useState("");
-  const [roomNumber, setRoomNumber]   = useState("");
-  const [notes, setNotes]             = useState("");
-  const [quantity, setQuantity]       = useState(1);
+  const [menuData, setMenuData] = useState([]);
+  const [activeTab, setActiveTab] = useState("Desi");
+  const [loading, setLoading] = useState(true);
+  const [guestName, setGuestName] = useState("");
+  const [roomNumber, setRoomNumber] = useState("");
+  const [notes, setNotes] = useState("");
+  const [quantity, setQuantity] = useState(1);
   const [selectedItem, setSelectedItem] = useState(null);
-  const [showModal, setShowModal]     = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     const fetchMenu = async () => {

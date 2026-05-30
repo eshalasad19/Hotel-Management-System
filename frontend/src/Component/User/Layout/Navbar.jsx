@@ -253,16 +253,17 @@ export default function Navbar() {
                   { to: "/services", label: "Services" },
                   { to: "/contact", label: "Contact" },
                 ].map((item) => (
-                  <li className="nav-item" key={item.to}>
-                    <NavLink
-                      to={item.to}
-                      end={item.end}
-                      className={({ isActive }) =>
-                        `nav-link-item ${isActive ? "active-link" : ""}`
-                      }
-                    >
-                      {item.label}
-                    </NavLink>
+                 <li className="nav-item" key={item.to}>
+  <NavLink
+    to={item.to}
+    end={item.end}
+    className={({ isActive }) =>
+      `nav-link-item ${isActive ? "active-link" : ""}`
+    }
+    onClick={() => window.scrollTo(0, 0)}
+  >
+    {item.label}
+  </NavLink>
                   </li>
                 ))}
               </ul>
