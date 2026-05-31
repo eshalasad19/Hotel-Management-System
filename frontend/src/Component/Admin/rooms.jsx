@@ -42,11 +42,22 @@ const Rooms = () => {
     setFiltered(result);
   }, [filterStatus, filterType, rooms]);
 
-  const loadRooms = async () => {
+ const loadRooms = async () => {
     try {
-      const res = await axios.get(`${API_URL}/rooms`, { headers });
-      setRooms(res.data);
-      setFiltered(res.data);
+      const [roomsRes, maintRes, hkRes] = await Promise.all([
+        axios.get(`${API_URL}/rooms`, { headers }),
+        axios.get(`${API_URL}/maintenance`, { headers }),
+        axios.get(`${API_URL}/housekeeping`, { headers }),
+      ]);
+      const activeMaint = maintRes.data.filter(r => r.status !== 'resolved');
+      const activeHk = hkRes.data.filter(r => r.cleaningStatus !== 'completed');
+      const enriched = roomsRes.data.map(room => ({
+        ...room,
+        _activeMaint: activeMaint.filter(r => String(r.roomId?._id || r.roomId) === String(room._id)).length,
+        _activeHk: activeHk.filter(r => String(r.roomId?._id || r.roomId) === String(room._id)).length,
+      }));
+      setRooms(enriched);
+      setFiltered(enriched);
     } catch (err) { console.error(err); }
   };
 
@@ -266,7 +277,19 @@ const Rooms = () => {
                           width="70" height="70" style={{ objectFit: "cover", borderRadius: "8px" }} />
                       ) : <span className="text-muted">No Image</span>}
                     </td>
-                    <td>{statusBadge(room.status)}</td>
+                    <td>
+                      {statusBadge(room.status)}
+                      {room._activeMaint > 0 && (
+                        <span className="badge bg-warning-subtle text-warning ms-1" title="Active maintenance request">
+                          🔧 Maintenance Pending
+                        </span>
+                      )}
+                      {room._activeHk > 0 && (
+                        <span className="badge bg-info-subtle text-info ms-1" title="Active housekeeping request">
+                          🧹 Housekeeping Pending
+                        </span>
+                      )}
+                    </td>
                     <td>
                       <div className="d-flex gap-1">
                         <button className="btn btn-soft-info btn-sm" onClick={() => { setViewRoom(room); setShowViewModal(true); }} title="View">

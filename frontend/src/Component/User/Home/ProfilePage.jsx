@@ -876,6 +876,273 @@ const formatDate = (date) => {
 };
 
 /* ─────────────────────────────────────────────
+   GUEST REQUEST MODAL COMPONENT
+───────────────────────────────────────────── */
+function GuestRequestModal({ booking, token, user, onClose }) {
+  const [activeTab, setActiveTab] = useState('maintenance');
+  const [submitting, setSubmitting] = useState(false);
+  const [popup, setPopup] = useState({ show: false, type: '', message: '' });
+
+  const roomNumber = booking.roomId?.roomNumber || booking.roomId?.name || '';
+  const roomId = booking.roomId?._id || booking.roomId;
+
+  const showPopup = (type, message) => {
+    setPopup({ show: true, type, message });
+    setTimeout(() => setPopup({ show: false, type: '', message: '' }), 3500);
+  };
+
+  // Maintenance form
+  const [maintForm, setMaintForm] = useState({ issueType: 'other', issue: '', priority: 'medium' });
+  // Housekeeping form
+  const [hkForm, setHkForm] = useState({ taskType: 'room_cleaning', notes: '' });
+  // Guest Service form
+  const [svcForm, setSvcForm] = useState({ serviceType: 'room_service', description: '' });
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, []);
+
+  const handleMaintSubmit = async () => {
+    if (!maintForm.issue.trim()) { showPopup('error', 'Please describe the issue.'); return; }
+    try {
+      setSubmitting(true);
+      await axios.post(`${BASE_URL}/maintenance`, {
+        roomId: roomId || undefined,
+        roomNumber,
+        issue: maintForm.issue,
+        issueType: maintForm.issueType,
+        priority: maintForm.priority,
+        reportedBy: user?._id || user?.id,
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      showPopup('success', 'Maintenance request submitted! Our team will assist you shortly.');
+      setMaintForm({ issueType: 'other', issue: '', priority: 'medium' });
+    } catch (err) {
+      showPopup('error', err.response?.data?.message || 'Failed to submit request.');
+    } finally { setSubmitting(false); }
+  };
+
+  const handleHkSubmit = async () => {
+    try {
+      setSubmitting(true);
+      await axios.post(`${BASE_URL}/housekeeping`, {
+        roomId: roomId || undefined,
+        roomNumber,
+        taskType: hkForm.taskType,
+        notes: hkForm.notes,
+        priority: 'medium',
+        guestRequest: true,
+        requestedBy: user?._id || user?.id,
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      showPopup('success', 'Housekeeping request submitted! Staff will arrive soon.');
+      setHkForm({ taskType: 'room_cleaning', notes: '' });
+    } catch (err) {
+      showPopup('error', err.response?.data?.message || 'Failed to submit request.');
+    } finally { setSubmitting(false); }
+  };
+
+  const handleSvcSubmit = async () => {
+    try {
+      setSubmitting(true);
+      await axios.post(`${BASE_URL}/services`, {
+        serviceType: svcForm.serviceType,
+        description: svcForm.description,
+        roomNumber,
+      }, { headers: { Authorization: `Bearer ${token}` } });
+      showPopup('success', 'Service request submitted! We\'ll take care of it.');
+      setSvcForm({ serviceType: 'room_service', description: '' });
+    } catch (err) {
+      showPopup('error', err.response?.data?.message || 'Failed to submit request.');
+    } finally { setSubmitting(false); }
+  };
+
+  const tabs = [
+    { key: 'maintenance', label: 'Maintenance', icon: 'fa-solid fa-wrench', emoji: '🔧' },
+    { key: 'housekeeping', label: 'Housekeeping', icon: 'fa-solid fa-broom', emoji: '🧹' },
+    { key: 'service', label: 'Guest Service', icon: 'fa-solid fa-bell-concierge', emoji: '🛎️' },
+  ];
+
+  return (
+    <>
+      {popup.show && (
+        <div style={{
+          position: 'fixed', top: 24, right: 24, zIndex: 99999,
+          minWidth: 300, maxWidth: 380, background: '#fff', borderRadius: 16,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.15)', padding: '18px 22px',
+          display: 'flex', alignItems: 'center', gap: 14,
+          borderLeft: `4px solid ${popup.type === 'success' ? '#c9a96e' : '#e74c3c'}`
+        }}>
+          <div style={{
+            width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
+            background: popup.type === 'success' ? 'linear-gradient(135deg,#c9a96e,#a67c40)' : '#e74c3c',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#fff', fontSize: 18, fontWeight: 700
+          }}>{popup.type === 'success' ? '✓' : '✕'}</div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: '#1a1a2e', marginBottom: 2 }}>
+              {popup.type === 'success' ? 'Request Sent!' : 'Error'}
+            </div>
+            <div style={{ fontSize: 13, color: '#6c757d' }}>{popup.message}</div>
+          </div>
+          <button onClick={() => setPopup({ show: false, type: '', message: '' })}
+            style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#adb5bd', fontSize: 18 }}>✕</button>
+        </div>
+      )}
+
+      <div className="order-modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+        <div className="order-modal" style={{ maxWidth: 520 }}>
+
+          {/* HEADER */}
+          <div className="order-modal-header">
+            <div className="order-modal-header-left">
+              <h3><i className="fa-solid fa-bell-concierge me-2" style={{ color: '#c9a96e', fontSize: 20 }}></i>Request Service</h3>
+              <p>Room {roomNumber} &nbsp;•&nbsp; Booking #{booking._id.slice(-6).toUpperCase()}</p>
+            </div>
+            <button className="order-modal-close" onClick={onClose}>
+              <i className="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          {/* TABS */}
+          <div style={{ display: 'flex', borderBottom: '1px solid #f0e8dc', background: '#fff', flexShrink: 0 }}>
+            {tabs.map(t => (
+              <button key={t.key} onClick={() => setActiveTab(t.key)} style={{
+                flex: 1, border: 'none', background: 'transparent', padding: '13px 0',
+                fontSize: 12, fontWeight: activeTab === t.key ? 700 : 500,
+                color: activeTab === t.key ? '#c9a96e' : '#999',
+                borderBottom: activeTab === t.key ? '2px solid #c9a96e' : '2px solid transparent',
+                cursor: 'pointer', fontFamily: "'Jost',sans-serif", transition: 'all 0.18s'
+              }}>
+                <span style={{ marginRight: 4 }}>{t.emoji}</span>{t.label}
+              </button>
+            ))}
+          </div>
+
+          {/* BODY */}
+          <div style={{ padding: '24px 28px', overflowY: 'auto', flex: 1 }}>
+
+            {/* Room info strip */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
+              background: '#fdf8f2', border: '1px solid #f0e8dc', borderRadius: 10, marginBottom: 20
+            }}>
+              <i className="fa-solid fa-door-open" style={{ color: '#c9a96e' }}></i>
+              <div>
+                <div style={{ fontSize: 10, color: '#bbb', textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 600 }}>Your Room</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: '#1a1a1a' }}>Room {roomNumber}</div>
+              </div>
+              <div style={{ marginLeft: 'auto' }}>
+                <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: 'rgba(39,174,96,0.1)', color: '#27ae60', textTransform: 'uppercase' }}>Checked In</span>
+              </div>
+            </div>
+
+            {/* ── MAINTENANCE TAB ── */}
+            {activeTab === 'maintenance' && (
+              <div>
+                <p style={{ fontSize: 13, color: '#888', marginBottom: 18 }}>
+                  Report any technical issue in your room — AC, plumbing, electrical, furniture, etc.
+                </p>
+                <div className="mb-3">
+                  <label style={{ fontSize: 11, fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', marginBottom: 6 }}>Issue Type</label>
+                  <select className="profile-form-input" style={{ borderRadius: 10 }} value={maintForm.issueType}
+                    onChange={e => setMaintForm({ ...maintForm, issueType: e.target.value })}>
+                    <option value="ac">❄️ AC / Cooling</option>
+                    <option value="plumbing">💧 Plumbing</option>
+                    <option value="electrical">⚡ Electrical</option>
+                    <option value="furniture">🪑 Furniture</option>
+                    <option value="appliance">📺 Appliance</option>
+                    <option value="internet">📶 Internet / WiFi</option>
+                    <option value="other">🔧 Other</option>
+                  </select>
+                </div>
+                <div className="mb-3">
+                  <label style={{ fontSize: 11, fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', marginBottom: 6 }}>Priority</label>
+                  <select className="profile-form-input" style={{ borderRadius: 10 }} value={maintForm.priority}
+                    onChange={e => setMaintForm({ ...maintForm, priority: e.target.value })}>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                    <option value="emergency">Emergency</option>
+                  </select>
+                </div>
+                <div className="mb-4">
+                  <label style={{ fontSize: 11, fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', marginBottom: 6 }}>Describe the Issue *</label>
+                  <textarea className="profile-form-input" style={{ borderRadius: 10, resize: 'none' }} rows={3}
+                    placeholder="e.g. AC is not cooling properly, water dripping from tap..."
+                    value={maintForm.issue} onChange={e => setMaintForm({ ...maintForm, issue: e.target.value })} />
+                </div>
+                <button className="btn order-place-btn w-100" disabled={submitting} onClick={handleMaintSubmit}>
+                  {submitting ? <><span className="spinner-border spinner-border-sm me-2"></span>Submitting...</> : <><i className="fa-solid fa-wrench me-2"></i>Submit Maintenance Request</>}
+                </button>
+              </div>
+            )}
+
+            {/* ── HOUSEKEEPING TAB ── */}
+            {activeTab === 'housekeeping' && (
+              <div>
+                <p style={{ fontSize: 13, color: '#888', marginBottom: 18 }}>
+                  Need your room cleaned or fresh linens? Submit a housekeeping request.
+                </p>
+                <div className="mb-3">
+                  <label style={{ fontSize: 11, fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', marginBottom: 6 }}>Service Type</label>
+                  <select className="profile-form-input" style={{ borderRadius: 10 }} value={hkForm.taskType}
+                    onChange={e => setHkForm({ ...hkForm, taskType: e.target.value })}>
+                    <option value="room_cleaning">🧹 Room Cleaning</option>
+                    <option value="deep_cleaning">✨ Deep Cleaning</option>
+                    <option value="linen_change">🛏️ Linen Change</option>
+                    <option value="bathroom_cleaning">🚿 Bathroom Cleaning</option>
+                    <option value="minibar_refill">🥤 Mini Bar Refill</option>
+                    <option value="guest_request">📋 Other Request</option>
+                  </select>
+                </div>
+                <div className="mb-4">
+                  <label style={{ fontSize: 11, fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', marginBottom: 6 }}>Additional Notes</label>
+                  <textarea className="profile-form-input" style={{ borderRadius: 10, resize: 'none' }} rows={3}
+                    placeholder="Any special instructions or preferences..."
+                    value={hkForm.notes} onChange={e => setHkForm({ ...hkForm, notes: e.target.value })} />
+                </div>
+                <button className="btn order-place-btn w-100" disabled={submitting} onClick={handleHkSubmit}>
+                  {submitting ? <><span className="spinner-border spinner-border-sm me-2"></span>Submitting...</> : <><i className="fa-solid fa-broom me-2"></i>Submit Housekeeping Request</>}
+                </button>
+              </div>
+            )}
+
+            {/* ── GUEST SERVICE TAB ── */}
+            {activeTab === 'service' && (
+              <div>
+                <p style={{ fontSize: 13, color: '#888', marginBottom: 18 }}>
+                  Need extra amenities, wake-up call, laundry or transport? We're here to help.
+                </p>
+                <div className="mb-3">
+                  <label style={{ fontSize: 11, fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', marginBottom: 6 }}>Service Type</label>
+                  <select className="profile-form-input" style={{ borderRadius: 10 }} value={svcForm.serviceType}
+                    onChange={e => setSvcForm({ ...svcForm, serviceType: e.target.value })}>
+                    <option value="room_service">🍽️ Room Service</option>
+                    <option value="laundry">👔 Laundry</option>
+                    <option value="wake_up_call">⏰ Wake-Up Call</option>
+                    <option value="transportation">🚗 Transportation</option>
+                  </select>
+                </div>
+                <div className="mb-4">
+                  <label style={{ fontSize: 11, fontWeight: 600, color: '#888', textTransform: 'uppercase', letterSpacing: 0.5, display: 'block', marginBottom: 6 }}>Details / Instructions</label>
+                  <textarea className="profile-form-input" style={{ borderRadius: 10, resize: 'none' }} rows={3}
+                    placeholder="e.g. Wake-up call at 6:00 AM, extra blanket needed, pickup to airport at 9 AM..."
+                    value={svcForm.description} onChange={e => setSvcForm({ ...svcForm, description: e.target.value })} />
+                </div>
+                <button className="btn order-place-btn w-100" disabled={submitting} onClick={handleSvcSubmit}>
+                  {submitting ? <><span className="spinner-border spinner-border-sm me-2"></span>Submitting...</> : <><i className="fa-solid fa-bell-concierge me-2"></i>Submit Service Request</>}
+                </button>
+              </div>
+            )}
+          </div>
+
+        </div>
+      </div>
+    </>
+  );
+}
+
+/* ─────────────────────────────────────────────
    ORDER MODAL COMPONENT
 ───────────────────────────────────────────── */
 function OrderModal({ booking, token, user, onClose }) {
@@ -900,7 +1167,7 @@ function OrderModal({ booking, token, user, onClose }) {
     const fetchOrders = async () => {
       try {
         const res = await axios.get(
-          `${BASE_URL}/restaurant/orders/booking/${booking._id}`,
+          `${BASE_URL}/restaurant/orders/user/${user._id}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         const raw = res.data;
@@ -1404,6 +1671,9 @@ export default function ProfilePage() {
   const [updating, setUpdating] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
   const [orderModalBooking, setOrderModalBooking] = useState(null);
+  const [guestRequestBooking, setGuestRequestBooking] = useState(null);
+  const [myRequests, setMyRequests] = useState([]);
+const [loadingRequests, setLoadingRequests] = useState(false);
   const [popup, setPopup] = useState({ show: false, type: '', message: '' });
   const showPopup = (type, message) => {
     setPopup({ show: true, type, message });
@@ -1416,7 +1686,37 @@ export default function ProfilePage() {
     if (!user) { navigate("/user-login"); return; }
     setForm({ name: user.name || "", email: user.email || "", phone: user.phone || "" });
   }, [user]);
-
+useEffect(() => {
+    if (!user?._id && !user?.id) return;
+    const fetchRequests = async () => {
+      setLoadingRequests(true);
+      try {
+        const uid = user._id || user.id;
+        const headers = { Authorization: `Bearer ${token}` };
+        const [maintRes, hkRes, svcRes] = await Promise.allSettled([
+          axios.get(`${BASE_URL}/maintenance`, { headers }),
+          axios.get(`${BASE_URL}/housekeeping`, { headers }),
+          axios.get(`${BASE_URL}/services`, { headers }),
+        ]);
+        const maint = (maintRes.status === 'fulfilled' ? maintRes.value.data : [])
+          .filter(r => String(r.reportedBy?._id || r.reportedBy) === String(uid))
+          .map(r => ({ ...r, _type: 'maintenance', _label: 'Maintenance', _icon: '🔧' }));
+        const hk = (hkRes.status === 'fulfilled' ? hkRes.value.data : [])
+          .filter(r => String(r.requestedBy?._id || r.requestedBy) === String(uid))
+          .map(r => ({ ...r, _type: 'housekeeping', _label: 'Housekeeping', _icon: '🧹' }));
+        const svc = (svcRes.status === 'fulfilled' ? svcRes.value.data : [])
+          .filter(r => String(r.userId?._id || r.userId) === String(uid))
+          .map(r => ({ ...r, _type: 'service', _label: 'Guest Service', _icon: '🛎️' }));
+        const all = [...maint, ...hk, ...svc].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setMyRequests(all);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoadingRequests(false);
+      }
+    };
+    fetchRequests();
+  }, [user]);
   useEffect(() => {
     if (!user?._id && !user?.id) return;
     const fetchBookings = async () => {
@@ -1460,6 +1760,7 @@ export default function ProfilePage() {
     { key: "upcoming", label: "Upcoming", filter: (b) => ["pending", "confirmed"].includes(b.bookingStatus) },
     { key: "active", label: "Active", filter: (b) => b.bookingStatus === "checked_in" },
     { key: "past", label: "Past", filter: (b) => ["checked_out", "completed", "cancelled"].includes(b.bookingStatus) },
+    { key: "requests", label: "My Requests", filter: () => false },
   ];
 
   const filteredBookings = bookings.filter(
@@ -1521,6 +1822,16 @@ export default function ProfilePage() {
             token={token}
             user={user}
             onClose={() => setOrderModalBooking(null)}
+          />
+        )}
+
+        {/* GUEST REQUEST MODAL */}
+        {guestRequestBooking && (
+          <GuestRequestModal
+            booking={guestRequestBooking}
+            token={token}
+            user={user}
+            onClose={() => setGuestRequestBooking(null)}
           />
         )}
 
@@ -1690,13 +2001,72 @@ export default function ProfilePage() {
 
                 <div className="profile-bookings-body">
 
-                  {loadingBookings ? (
+                 {activeTab === "requests" ? (
+                    loadingRequests ? (
+                      <div className="profile-empty">
+                        <div className="spinner-border" style={{ color: "#c9a96e" }}></div>
+                      </div>
+                    ) : myRequests.length === 0 ? (
+                      <div className="profile-empty">
+                        <div className="profile-empty-icon">🛎️</div>
+                        <p style={{ color: "#bbb", fontSize: "14px", margin: 0 }}>No requests submitted yet</p>
+                      </div>
+                    ) : (
+                      myRequests.map((req, i) => {
+                        const statusColors = {
+                          pending:     { color: '#f39c12', bg: 'rgba(243,156,18,0.1)' },
+                          in_progress: { color: '#3498db', bg: 'rgba(52,152,219,0.1)' },
+                          resolved:    { color: '#27ae60', bg: 'rgba(39,174,96,0.1)' },
+                          completed:   { color: '#27ae60', bg: 'rgba(39,174,96,0.1)' },
+                          cancelled:   { color: '#e74c3c', bg: 'rgba(231,76,60,0.1)' },
+                        };
+                        const st = statusColors[req.status || req.cleaningStatus] || statusColors.pending;
+                        const statusLabel = (req.status || req.cleaningStatus || 'pending').replace('_', ' ');
+                        const dateStr = req.createdAt ? new Date(req.createdAt).toLocaleString('en-PK', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+                        const title = req._type === 'maintenance'
+                          ? (req.issueType || 'other').replace('_', ' ')
+                          : req._type === 'housekeeping'
+                            ? (req.taskType || 'room_cleaning').replace('_', ' ')
+                            : (req.serviceType || 'service').replace('_', ' ');
+                        const desc = req.issue || req.notes || req.description || '';
+                        return (
+                          <div key={req._id || i} className="booking-card" style={{ marginBottom: 12 }}>
+                            <div style={{ padding: '14px 16px' }}>
+                              <div className="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                  <div style={{ fontSize: 15, fontWeight: 700, color: '#1a1a1a' }}>
+                                    {req._icon} {req._label}
+                                    <span style={{ fontSize: 12, fontWeight: 500, color: '#aaa', marginLeft: 8, textTransform: 'capitalize' }}>{title}</span>
+                                  </div>
+                                  <div style={{ fontSize: 11, color: '#bbb', marginTop: 2 }}>{dateStr}</div>
+                                </div>
+                                <span style={{ fontSize: 10, fontWeight: 700, padding: '3px 10px', borderRadius: 20, textTransform: 'uppercase', color: st.color, background: st.bg }}>
+                                  {statusLabel}
+                                </span>
+                              </div>
+                              {desc && (
+                                <div style={{ fontSize: 12, color: '#777', padding: '8px 12px', background: '#fdf8f2', borderRadius: 8, border: '1px solid #f0e8dc' }}>
+                                  {desc}
+                                </div>
+                              )}
+                              {req.roomNumber && (
+                                <div style={{ fontSize: 11, color: '#bbb', marginTop: 6 }}>
+                                  <i className="fa-solid fa-door-open me-1" style={{ color: '#c9a96e' }}></i>
+                                  Room {req.roomNumber}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })
+                    )
+                  ) : loadingBookings ? (
                     <div className="profile-empty">
                       <div className="spinner-border" style={{ color: "#c9a96e" }}></div>
                       <p className="mt-3" style={{ color: "#bbb", fontSize: "13px" }}>Loading bookings...</p>
                     </div>
 
-                  ) : filteredBookings.length === 0 ? (
+              ) : filteredBookings.length === 0 ? (
 
                     <div className="profile-empty">
                       <div className="profile-empty-icon">
@@ -1804,6 +2174,18 @@ export default function ProfilePage() {
                                   >
                                     <i className="fa-solid fa-utensils" style={{ fontSize: "10px" }}></i>
                                     Order Now
+                                  </button>
+                                )}
+
+                                {/* ── REQUEST SERVICE BUTTON (only for checked_in) ── */}
+                                {isCheckedIn && (
+                                  <button
+                                    className="btn order-now-btn"
+                                    style={{ background: 'linear-gradient(135deg, #1a2a1a, #1e3a1e)' }}
+                                    onClick={() => setGuestRequestBooking(booking)}
+                                  >
+                                    <i className="fa-solid fa-bell-concierge" style={{ fontSize: "10px" }}></i>
+                                    Request Service
                                   </button>
                                 )}
                               </div>

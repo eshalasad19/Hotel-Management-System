@@ -4,12 +4,12 @@ const housekeepingSchema = new mongoose.Schema({
   roomId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Room',
-    required: true
+    required: false
   },
   assignedStaff: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: false
   },
   cleaningStatus: {
     type: String,
@@ -29,7 +29,10 @@ const housekeepingSchema = new mongoose.Schema({
   },
   notes: { type: String },
   dueDate: { type: Date },
-  completedAt: { type: Date }
+  completedAt: { type: Date },
+  guestRequest: { type: Boolean, default: false },
+  roomNumber: { type: String },
+  requestedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, { timestamps: true });
 
 module.exports = mongoose.model('Housekeeping', housekeepingSchema);

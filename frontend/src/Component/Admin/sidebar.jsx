@@ -318,9 +318,11 @@ const Sidebar = () => {
             {/* System Settings — admin only */}
             {hasRole('admin') && (
               <>
-                <div className="logo-lg" style={{ padding: '16px 16px 4px', color: 'rgba(255,255,255,0.3)', fontSize: 10, letterSpacing: 1.5, textTransform: 'uppercase', fontWeight: 600 }}>
-                  System
-                </div>
+                <li className="nav-item" style={{ listStyle: 'none' }}>
+                  <div className="logo-lg" style={{ padding: '16px 16px 4px', color: 'rgba(255,255,255,0.3)', fontSize: 10, letterSpacing: 1.5, textTransform: 'uppercase', fontWeight: 600 }}>
+                    System
+                  </div>
+                </li>
                 <li className="nav-item">
                   <Link className={`nav-link menu-link ${isActive('/admin/settings') ? 'active' : ''}`} to="/admin/settings">
                     <i className="ri-settings-3-line"></i>

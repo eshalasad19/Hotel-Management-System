@@ -4,7 +4,7 @@ const maintenanceSchema = new mongoose.Schema({
   roomId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Room',
-    required: true
+    required: false
   },
   issue: {
     type: String,
@@ -37,6 +37,7 @@ const maintenanceSchema = new mongoose.Schema({
   notes:      { type: String },
   resolution: { type: String },
   resolvedAt: { type: Date },
+  roomNumber: { type: String },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Maintenance', maintenanceSchema);

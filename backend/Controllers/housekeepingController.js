@@ -2,7 +2,24 @@ const Housekeeping = require('../Models/Housekeeping');
 
 const createTask = async (req, res) => {
   try {
-    const { roomId, assignedStaff, taskType, priority, notes, dueDate } = req.body;
+    const { roomId, assignedStaff, taskType, priority, notes, dueDate, guestRequest, roomNumber } = req.body;
+
+    // Guest request — roomId aur assignedStaff optional
+    if (guestRequest) {
+      const task = await Housekeeping.create({
+        roomId: roomId || undefined,
+        assignedStaff: undefined,
+        taskType: taskType || 'room_cleaning',
+        priority: priority || 'medium',
+        notes: notes || '',
+        dueDate: dueDate || undefined,
+        guestRequest: true,
+        roomNumber: roomNumber || '',
+        requestedBy: req.user?.id,
+      });
+      return res.status(201).json({ message: 'Task created', task });
+    }
+
     const task = await Housekeeping.create({
       roomId, assignedStaff, taskType, priority, notes, dueDate
     });
