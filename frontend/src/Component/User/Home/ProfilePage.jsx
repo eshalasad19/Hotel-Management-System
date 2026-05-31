@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../Context/AuthContext";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const BASE_URL = "http://localhost:5001/api";
 
@@ -857,12 +855,12 @@ const PROFILE_STYLES = `
 `;
 
 const statusConfig = {
-  pending:     { color: "#f39c12", bg: "rgba(243,156,18,0.1)",   label: "PENDING"     },
-  confirmed:   { color: "#3498db", bg: "rgba(52,152,219,0.1)",   label: "CONFIRMED"   },
-  checked_in:  { color: "#8e44ad", bg: "rgba(142,68,173,0.1)",   label: "CHECKED IN"  },
-  checked_out: { color: "#7f8c8d", bg: "rgba(127,140,141,0.1)",  label: "CHECKED OUT" },
-  completed:   { color: "#27ae60", bg: "rgba(39,174,96,0.1)",    label: "COMPLETED"   },
-  cancelled:   { color: "#e74c3c", bg: "rgba(231,76,60,0.1)",    label: "CANCELLED"   },
+  pending: { color: "#f39c12", bg: "rgba(243,156,18,0.1)", label: "PENDING" },
+  confirmed: { color: "#3498db", bg: "rgba(52,152,219,0.1)", label: "CONFIRMED" },
+  checked_in: { color: "#8e44ad", bg: "rgba(142,68,173,0.1)", label: "CHECKED IN" },
+  checked_out: { color: "#7f8c8d", bg: "rgba(127,140,141,0.1)", label: "CHECKED OUT" },
+  completed: { color: "#27ae60", bg: "rgba(39,174,96,0.1)", label: "COMPLETED" },
+  cancelled: { color: "#e74c3c", bg: "rgba(231,76,60,0.1)", label: "CANCELLED" },
 };
 
 const getImageUrl = (img) => {
@@ -881,16 +879,21 @@ const formatDate = (date) => {
    ORDER MODAL COMPONENT
 ───────────────────────────────────────────── */
 function OrderModal({ booking, token, user, onClose }) {
-  const [menuItems, setMenuItems]     = useState([]);
-  const [categories, setCategories]   = useState([]);
+  const [menuItems, setMenuItems] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState("all");
   const [loadingMenu, setLoadingMenu] = useState(true);
-  const [cart, setCart]               = useState({}); // { itemId: { qty } }
-  const [orderNotes, setOrderNotes]   = useState("");  // order-level notes
+  const [cart, setCart] = useState({}); // { itemId: { qty } }
+  const [orderNotes, setOrderNotes] = useState("");  // order-level notes
   const [placingOrder, setPlacingOrder] = useState(false);
-  const [myOrders, setMyOrders]         = useState([]);
+  const [myOrders, setMyOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
   const [activeModalTab, setActiveModalTab] = useState("menu"); // "menu" | "orders"
+  const [popup, setPopup] = useState({ show: false, type: '', message: '' });
+  const showPopup = (type, message) => {
+    setPopup({ show: true, type, message });
+    setTimeout(() => setPopup({ show: false, type: '', message: '' }), 3000);
+  };
 
   // Fetch previous orders for this booking
   useEffect(() => {
@@ -902,9 +905,9 @@ function OrderModal({ booking, token, user, onClose }) {
         );
         const raw = res.data;
         const orders = Array.isArray(raw) ? raw
-          : Array.isArray(raw?.data)   ? raw.data
-          : Array.isArray(raw?.orders) ? raw.orders
-          : [];
+          : Array.isArray(raw?.data) ? raw.data
+            : Array.isArray(raw?.orders) ? raw.orders
+              : [];
         setMyOrders(orders);
       } catch {
         setMyOrders([]);
@@ -926,15 +929,15 @@ function OrderModal({ booking, token, user, onClose }) {
         const raw = res.data;
         const items = Array.isArray(raw)
           ? raw
-          : Array.isArray(raw?.data)   ? raw.data
-          : Array.isArray(raw?.menu)   ? raw.menu
-          : Array.isArray(raw?.items)  ? raw.items
-          : [];
+          : Array.isArray(raw?.data) ? raw.data
+            : Array.isArray(raw?.menu) ? raw.menu
+              : Array.isArray(raw?.items) ? raw.items
+                : [];
         setMenuItems(items);
         const cats = [...new Set(items.map(i => i.category).filter(Boolean))];
         setCategories(cats);
       } catch (err) {
-        toast.error("Something Went Wrong");
+        showPopup('error', 'Something Went Wrong');
       } finally {
         setLoadingMenu(false);
       }
@@ -986,25 +989,25 @@ function OrderModal({ booking, token, user, onClose }) {
     try {
       setPlacingOrder(true);
       const orderPayload = {
-        userId:      user?._id || user?.id,
-        guestName:   user?.name,
-        roomNumber:  booking.roomId?.roomNumber || booking.roomId?.name || "",
-        notes:       orderNotes.trim() || undefined,
+        userId: user?._id || user?.id,
+        guestName: user?.name,
+        roomNumber: booking.roomId?.roomNumber || booking.roomId?.name || "",
+        notes: orderNotes.trim() || undefined,
         totalAmount,
         items: cartItems.map(([id, { qty }]) => {
           const menuItem = menuItems.find(m => m._id === id);
           return {
             menuItemId: id,
-            name:       menuItem?.name || "",
-            price:      menuItem?.price || 0,
-            quantity:   qty,
+            name: menuItem?.name || "",
+            price: menuItem?.price || 0,
+            quantity: qty,
           };
         }),
       };
       await axios.post(`${BASE_URL}/restaurant/orders/`, orderPayload, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      toast.success("Order place ho gaya! 🍽️");
+      showPopup('success', 'Order placed successfully! 🍽️');
       // Refresh orders then switch to orders tab
       try {
         const r2 = await axios.get(
@@ -1013,16 +1016,16 @@ function OrderModal({ booking, token, user, onClose }) {
         );
         const raw2 = r2.data;
         const updated = Array.isArray(raw2) ? raw2
-          : Array.isArray(raw2?.data)   ? raw2.data
-          : Array.isArray(raw2?.orders) ? raw2.orders
-          : [];
+          : Array.isArray(raw2?.data) ? raw2.data
+            : Array.isArray(raw2?.orders) ? raw2.orders
+              : [];
         setMyOrders(updated);
-      } catch {}
+      } catch { }
       setCart({});
       setOrderNotes("");
       setActiveModalTab("orders");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Order has been placed");
+      showPopup('error', err.response?.data?.message || 'Failed to place order');
     } finally {
       setPlacingOrder(false);
     }
@@ -1034,324 +1037,357 @@ function OrderModal({ booking, token, user, onClose }) {
   };
 
   return (
-    <div className="order-modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="order-modal">
-
-        {/* HEADER */}
-        <div className="order-modal-header">
-          <div className="order-modal-header-left">
-            <h3>
-              <i className="fa-solid fa-utensils me-2" style={{ color: "#c9a96e", fontSize: "20px" }}></i>
-              Restaurant Menu
-            </h3>
-            <p>
-              Room: {booking.roomId?.name || `Room ${booking.roomId?.roomNumber || ""}`}
-              &nbsp;•&nbsp;
-              Booking #{booking._id.slice(-6).toUpperCase()}
-            </p>
+    <>
+      {popup.show && (
+        <div style={{
+          position: 'fixed', top: 24, right: 24, zIndex: 99999,
+          minWidth: 300, maxWidth: 380,
+          background: '#fff', borderRadius: 16,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+          padding: '18px 22px',
+          display: 'flex', alignItems: 'center', gap: 14,
+          borderLeft: `4px solid ${popup.type === 'success' ? '#c9a96e' : '#e74c3c'}`
+        }}>
+          <div style={{
+            width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
+            background: popup.type === 'success' ? 'linear-gradient(135deg, #c9a96e, #a67c40)' : '#e74c3c',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#fff', fontSize: 18, fontWeight: 700
+          }}>
+            {popup.type === 'success' ? '✓' : '✕'}
           </div>
-          <button className="order-modal-close" onClick={onClose}>
-            <i className="fa-solid fa-xmark"></i>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: '#1a1a2e', marginBottom: 2 }}>
+              {popup.type === 'success' ? 'Success' : 'Error'}
+            </div>
+            <div style={{ fontSize: 13, color: '#6c757d' }}>{popup.message}</div>
+          </div>
+          <button onClick={() => setPopup({ show: false, type: '', message: '' })}
+            style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#adb5bd', fontSize: 18 }}>
+            ✕
           </button>
         </div>
+      )}
 
-        {/* MODAL TABS */}
-        <div style={{ display:"flex", borderBottom:"1px solid #f0e8dc", background:"#fff", flexShrink:0 }}>
-          <button
-            onClick={() => setActiveModalTab("menu")}
-            style={{
-              flex:1, border:"none", background:"transparent", padding:"13px 0",
-              fontSize:13, fontWeight: activeModalTab==="menu" ? 700 : 500,
-              color: activeModalTab==="menu" ? "#c9a96e" : "#999",
-              borderBottom: activeModalTab==="menu" ? "2px solid #c9a96e" : "2px solid transparent",
-              cursor:"pointer", fontFamily:"'Jost',sans-serif", transition:"all 0.18s"
-            }}
-          >
-            <i className="fa-solid fa-utensils me-2" style={{fontSize:11}}></i>Menu
-          </button>
-          <button
-            onClick={() => setActiveModalTab("orders")}
-            style={{
-              flex:1, border:"none", background:"transparent", padding:"13px 0",
-              fontSize:13, fontWeight: activeModalTab==="orders" ? 700 : 500,
-              color: activeModalTab==="orders" ? "#c9a96e" : "#999",
-              borderBottom: activeModalTab==="orders" ? "2px solid #c9a96e" : "2px solid transparent",
-              cursor:"pointer", fontFamily:"'Jost',sans-serif", transition:"all 0.18s",
-              display:"flex", alignItems:"center", justifyContent:"center", gap:6
-            }}
-          >
-            <i className="fa-solid fa-receipt" style={{fontSize:11}}></i>
-            My Orders
-            {myOrders.length > 0 && (
-              <span style={{
-                background: activeModalTab==="orders" ? "rgba(201,169,110,0.15)" : "#f0e8dc",
-                color:"#c9a96e", borderRadius:20, fontSize:10, fontWeight:700,
-                padding:"1px 7px"
-              }}>{myOrders.length}</span>
+      <div className="order-modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
+        <div className="order-modal">
+
+          {/* HEADER */}
+          <div className="order-modal-header">
+            <div className="order-modal-header-left">
+              <h3>
+                <i className="fa-solid fa-utensils me-2" style={{ color: "#c9a96e", fontSize: "20px" }}></i>
+                Restaurant Menu
+              </h3>
+              <p>
+                Room: {booking.roomId?.name || `Room ${booking.roomId?.roomNumber || ""}`}
+                &nbsp;•&nbsp;
+                Booking #{booking._id.slice(-6).toUpperCase()}
+              </p>
+            </div>
+            <button className="order-modal-close" onClick={onClose}>
+              <i className="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          {/* MODAL TABS */}
+          <div style={{ display: "flex", borderBottom: "1px solid #f0e8dc", background: "#fff", flexShrink: 0 }}>
+            <button
+              onClick={() => setActiveModalTab("menu")}
+              style={{
+                flex: 1, border: "none", background: "transparent", padding: "13px 0",
+                fontSize: 13, fontWeight: activeModalTab === "menu" ? 700 : 500,
+                color: activeModalTab === "menu" ? "#c9a96e" : "#999",
+                borderBottom: activeModalTab === "menu" ? "2px solid #c9a96e" : "2px solid transparent",
+                cursor: "pointer", fontFamily: "'Jost',sans-serif", transition: "all 0.18s"
+              }}
+            >
+              <i className="fa-solid fa-utensils me-2" style={{ fontSize: 11 }}></i>Menu
+            </button>
+            <button
+              onClick={() => setActiveModalTab("orders")}
+              style={{
+                flex: 1, border: "none", background: "transparent", padding: "13px 0",
+                fontSize: 13, fontWeight: activeModalTab === "orders" ? 700 : 500,
+                color: activeModalTab === "orders" ? "#c9a96e" : "#999",
+                borderBottom: activeModalTab === "orders" ? "2px solid #c9a96e" : "2px solid transparent",
+                cursor: "pointer", fontFamily: "'Jost',sans-serif", transition: "all 0.18s",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 6
+              }}
+            >
+              <i className="fa-solid fa-receipt" style={{ fontSize: 11 }}></i>
+              My Orders
+              {myOrders.length > 0 && (
+                <span style={{
+                  background: activeModalTab === "orders" ? "rgba(201,169,110,0.15)" : "#f0e8dc",
+                  color: "#c9a96e", borderRadius: 20, fontSize: 10, fontWeight: 700,
+                  padding: "1px 7px"
+                }}>{myOrders.length}</span>
+              )}
+            </button>
+          </div>
+
+          {/* CATEGORY CHIPS */}
+          {activeModalTab === "menu" &&
+            !loadingMenu &&
+            categories.length > 0 && (
+              <div className="order-category-bar">
+                <button
+                  className={`order-cat-chip ${activeCategory === "all" ? "active" : ""}`}
+                  onClick={() => setActiveCategory("all")}
+                >
+                  🍴 All Items
+                </button>
+
+                {categories.map(cat => (
+                  <button
+                    key={cat}
+                    className={`order-cat-chip ${activeCategory === cat ? "active" : ""}`}
+                    onClick={() => setActiveCategory(cat)}
+                  >
+                    {categoryEmoji(cat)}{" "}
+                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                  </button>
+                ))}
+              </div>
             )}
-          </button>
-        </div>
-
-        {/* CATEGORY CHIPS */}
-        {activeModalTab === "menu" &&
-  !loadingMenu &&
-  categories.length > 0 && (
-    <div className="order-category-bar">
-      <button
-        className={`order-cat-chip ${activeCategory === "all" ? "active" : ""}`}
-        onClick={() => setActiveCategory("all")}
-      >
-        🍴 All Items
-      </button>
-
-      {categories.map(cat => (
-        <button
-          key={cat}
-          className={`order-cat-chip ${activeCategory === cat ? "active" : ""}`}
-          onClick={() => setActiveCategory(cat)}
-        >
-          {categoryEmoji(cat)}{" "}
-          {cat.charAt(0).toUpperCase() + cat.slice(1)}
-        </button>
-      ))}
-    </div>
-)}
-        {/* ══ ORDERS TAB ══ */}
-        {activeModalTab === "orders" && (
-          <div style={{ flex:1, overflowY:"auto", padding:"20px 28px", scrollbarWidth:"thin" }}>
-            {loadingOrders ? (
-              <div style={{textAlign:"center", padding:"48px 0"}}>
-                <div className="spinner-border" style={{color:"#c9a96e"}}></div>
-              </div>
-            ) : myOrders.length === 0 ? (
-              <div style={{textAlign:"center", padding:"48px 0", color:"#bbb"}}>
-                <div style={{fontSize:36, marginBottom:12}}>🧾</div>
-                <p style={{fontSize:14, margin:0}}>No orders placed yet for this stay</p>
-              </div>
-            ) : (
-              [...myOrders].reverse().map((order, idx) => {
-                const osc = {
-                  Pending:   { color:"#f39c12", bg:"rgba(243,156,18,0.1)"  },
-                  Confirmed: { color:"#3498db", bg:"rgba(52,152,219,0.1)"  },
-                  Preparing: { color:"#8e44ad", bg:"rgba(142,68,173,0.1)"  },
-                  Ready:     { color:"#27ae60", bg:"rgba(39,174,96,0.1)"   },
-                  Delivered: { color:"#7f8c8d", bg:"rgba(127,140,141,0.1)" },
-                  Cancelled: { color:"#e74c3c", bg:"rgba(231,76,60,0.1)"  },
-                };
-                const os = osc[order.status] || osc.Pending;
-                const orderTime = order.createdAt
-                  ? new Date(order.createdAt).toLocaleString("en-PK", { day:"2-digit", month:"short", hour:"2-digit", minute:"2-digit" })
-                  : "";
-                return (
-                  <div key={order._id || idx} style={{
-                    border:"1px solid #ede5d8", borderRadius:14, marginBottom:12,
-                    overflow:"hidden", background:"#fff"
-                  }}>
-                    <div style={{
-                      background:"#fdf8f2", padding:"10px 16px",
-                      display:"flex", alignItems:"center", justifyContent:"space-between",
-                      borderBottom:"1px solid #f0e8dc"
+          {/* ══ ORDERS TAB ══ */}
+          {activeModalTab === "orders" && (
+            <div style={{ flex: 1, overflowY: "auto", padding: "20px 28px", scrollbarWidth: "thin" }}>
+              {loadingOrders ? (
+                <div style={{ textAlign: "center", padding: "48px 0" }}>
+                  <div className="spinner-border" style={{ color: "#c9a96e" }}></div>
+                </div>
+              ) : myOrders.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "48px 0", color: "#bbb" }}>
+                  <div style={{ fontSize: 36, marginBottom: 12 }}>🧾</div>
+                  <p style={{ fontSize: 14, margin: 0 }}>No orders placed yet for this stay</p>
+                </div>
+              ) : (
+                [...myOrders].reverse().map((order, idx) => {
+                  const osc = {
+                    Pending: { color: "#f39c12", bg: "rgba(243,156,18,0.1)" },
+                    Confirmed: { color: "#3498db", bg: "rgba(52,152,219,0.1)" },
+                    Preparing: { color: "#8e44ad", bg: "rgba(142,68,173,0.1)" },
+                    Ready: { color: "#27ae60", bg: "rgba(39,174,96,0.1)" },
+                    Delivered: { color: "#7f8c8d", bg: "rgba(127,140,141,0.1)" },
+                    Cancelled: { color: "#e74c3c", bg: "rgba(231,76,60,0.1)" },
+                  };
+                  const os = osc[order.status] || osc.Pending;
+                  const orderTime = order.createdAt
+                    ? new Date(order.createdAt).toLocaleString("en-PK", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })
+                    : "";
+                  return (
+                    <div key={order._id || idx} style={{
+                      border: "1px solid #ede5d8", borderRadius: 14, marginBottom: 12,
+                      overflow: "hidden", background: "#fff"
                     }}>
-                      <div>
-                        <span style={{fontSize:12, fontWeight:700, color:"#1a1a1a"}}>
-                          Order #{(order._id || "").slice(-6).toUpperCase()}
-                        </span>
-                        {orderTime && (
-                          <span style={{fontSize:11, color:"#bbb", marginLeft:8}}>{orderTime}</span>
-                        )}
-                      </div>
-                      <div style={{display:"flex", alignItems:"center", gap:8}}>
-                        <span style={{
-                          fontSize:10, fontWeight:700, letterSpacing:"0.5px", textTransform:"uppercase",
-                          padding:"3px 10px", borderRadius:20, color:os.color, background:os.bg
-                        }}>{order.status}</span>
-                        <span style={{fontSize:13, fontWeight:700, color:"#27ae60"}}>
-                          Rs. {order.totalAmount?.toLocaleString()}
-                        </span>
-                      </div>
-                    </div>
-                    <div style={{padding:"10px 16px"}}>
-                      {(order.items || []).map((it, i) => (
-                        <div key={i} style={{
-                          display:"flex", justifyContent:"space-between", alignItems:"center",
-                          padding:"6px 0", borderBottom: i < order.items.length-1 ? "1px solid #f9f4ef" : "none"
-                        }}>
-                          <div style={{display:"flex", alignItems:"center", gap:8}}>
-                            <span style={{
-                              width:22, height:22, background:"rgba(201,169,110,0.12)",
-                              borderRadius:6, display:"inline-flex", alignItems:"center",
-                              justifyContent:"center", fontSize:10, fontWeight:700, color:"#c9a96e"
-                            }}>{it.quantity}×</span>
-                            <span style={{fontSize:13, fontWeight:600, color:"#333"}}>{it.name}</span>
-                          </div>
-                          <span style={{fontSize:12, fontWeight:600, color:"#888"}}>
-                            Rs. {((it.price || 0) * (it.quantity || 1)).toLocaleString()}
+                      <div style={{
+                        background: "#fdf8f2", padding: "10px 16px",
+                        display: "flex", alignItems: "center", justifyContent: "space-between",
+                        borderBottom: "1px solid #f0e8dc"
+                      }}>
+                        <div>
+                          <span style={{ fontSize: 12, fontWeight: 700, color: "#1a1a1a" }}>
+                            Order #{(order._id || "").slice(-6).toUpperCase()}
+                          </span>
+                          {orderTime && (
+                            <span style={{ fontSize: 11, color: "#bbb", marginLeft: 8 }}>{orderTime}</span>
+                          )}
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <span style={{
+                            fontSize: 10, fontWeight: 700, letterSpacing: "0.5px", textTransform: "uppercase",
+                            padding: "3px 10px", borderRadius: 20, color: os.color, background: os.bg
+                          }}>{order.status}</span>
+                          <span style={{ fontSize: 13, fontWeight: 700, color: "#27ae60" }}>
+                            Rs. {order.totalAmount?.toLocaleString()}
                           </span>
                         </div>
-                      ))}
-                      {order.notes && (
-                        <div style={{
-                          marginTop:8, padding:"6px 10px", background:"#fdf8f2",
-                          border:"1px solid #f0e8dc", borderRadius:8, fontSize:11, color:"#aaa"
-                        }}>
-                          <i className="fa-solid fa-note-sticky me-1" style={{color:"#c9a96e"}}></i>
-                          {order.notes}
-                        </div>
-                      )}
-                      {order.estimatedTime && order.status !== "Delivered" && order.status !== "Cancelled" && (
-                        <div style={{marginTop:6, fontSize:11, color:"#bbb"}}>
-                          <i className="fa-solid fa-clock me-1" style={{color:"#c9a96e"}}></i>
-                          Est. delivery: ~{order.estimatedTime} mins
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        )}
-
-        {/* ══ MENU TAB ══ */}
-        {activeModalTab === "menu" && <div className="order-menu-scroll">
-          {loadingMenu ? (
-            <div className="order-loading-wrap">
-              <div className="spinner-border" style={{ color: "#c9a96e" }}></div>
-              <p className="mt-3" style={{ color: "#bbb", fontSize: "13px" }}>Menu load ho raha hai...</p>
-            </div>
-          ) : filteredItems.length === 0 ? (
-            <div className="order-empty-wrap">
-              <div style={{ fontSize: "36px", marginBottom: "12px" }}>🍽️</div>
-              Koi menu item nahi mila
-            </div>
-          ) : (
-            Object.entries(grouped).map(([cat, items]) => (
-              <div key={cat} className="mb-3">
-                <div className="order-section-title">
-                  {categoryEmoji(cat)} {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                </div>
-                {items.map(item => {
-                  const itemCart = cart[item._id];
-                  const qty = itemCart?.qty || 0;
-                  const imgUrl = getImageUrl(item.image);
-
-                  return (
-                    <div key={item._id}>
-                      <div className="menu-item-row">
-                        {/* Image */}
-                        {imgUrl ? (
-                          <img
-                            src={imgUrl}
-                            alt={item.name}
-                            className="menu-item-img"
-                            onError={(e) => { e.target.style.display = "none"; }}
-                          />
-                        ) : (
-                          <div className="menu-item-img-fallback">
-                            {categoryEmoji(item.category)}
+                      </div>
+                      <div style={{ padding: "10px 16px" }}>
+                        {(order.items || []).map((it, i) => (
+                          <div key={i} style={{
+                            display: "flex", justifyContent: "space-between", alignItems: "center",
+                            padding: "6px 0", borderBottom: i < order.items.length - 1 ? "1px solid #f9f4ef" : "none"
+                          }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                              <span style={{
+                                width: 22, height: 22, background: "rgba(201,169,110,0.12)",
+                                borderRadius: 6, display: "inline-flex", alignItems: "center",
+                                justifyContent: "center", fontSize: 10, fontWeight: 700, color: "#c9a96e"
+                              }}>{it.quantity}×</span>
+                              <span style={{ fontSize: 13, fontWeight: 600, color: "#333" }}>{it.name}</span>
+                            </div>
+                            <span style={{ fontSize: 12, fontWeight: 600, color: "#888" }}>
+                              Rs. {((it.price || 0) * (it.quantity || 1)).toLocaleString()}
+                            </span>
+                          </div>
+                        ))}
+                        {order.notes && (
+                          <div style={{
+                            marginTop: 8, padding: "6px 10px", background: "#fdf8f2",
+                            border: "1px solid #f0e8dc", borderRadius: 8, fontSize: 11, color: "#aaa"
+                          }}>
+                            <i className="fa-solid fa-note-sticky me-1" style={{ color: "#c9a96e" }}></i>
+                            {order.notes}
                           </div>
                         )}
-
-                        {/* Info */}
-                        <div className="menu-item-info">
-                          <div className="menu-item-name">{item.name}</div>
-                          {item.description && (
-                            <div className="menu-item-desc">{item.description}</div>
-                          )}
-                          <div className="menu-item-price">Rs. {item.price?.toLocaleString()}</div>
-                        </div>
-
-                        {/* Qty Controls */}
-                        <div className="menu-item-qty">
-                          <button className="qty-btn" onClick={() => setQty(item._id, -1)}>−</button>
-                          <span className="qty-num">{qty}</span>
-                          <button className="qty-btn" onClick={() => setQty(item._id, 1)}>+</button>
-                        </div>
+                        {order.estimatedTime && order.status !== "Delivered" && order.status !== "Cancelled" && (
+                          <div style={{ marginTop: 6, fontSize: 11, color: "#bbb" }}>
+                            <i className="fa-solid fa-clock me-1" style={{ color: "#c9a96e" }}></i>
+                            Est. delivery: ~{order.estimatedTime} mins
+                          </div>
+                        )}
                       </div>
-
                     </div>
                   );
-                })}
-              </div>
-            ))
-          )}
-        </div>}
-
-        {/* ORDER-LEVEL INFO BANNER + NOTES */}
-        {activeModalTab === "menu" && (
-        <div style={{ padding: "0 28px 0", borderTop: "1px solid #f0e8dc", background: "#fdf8f2" }}>
-          {/* Auto-filled info strip */}
-          <div style={{ display: "flex", gap: "20px", padding: "12px 0 10px", flexWrap: "wrap" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(201,169,110,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: "#c9a96e", fontSize: 11 }}>
-                <i className="fa-solid fa-user"></i>
-              </div>
-              <div>
-                <div style={{ fontSize: 10, color: "#bbb", textTransform: "uppercase", letterSpacing: "0.4px", fontWeight: 600 }}>Guest</div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a" }}>{user?.name}</div>
-              </div>
+                })
+              )}
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(201,169,110,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: "#c9a96e", fontSize: 11 }}>
-                <i className="fa-solid fa-door-open"></i>
+          )}
+
+          {/* ══ MENU TAB ══ */}
+          {activeModalTab === "menu" && <div className="order-menu-scroll">
+            {loadingMenu ? (
+              <div className="order-loading-wrap">
+                <div className="spinner-border" style={{ color: "#c9a96e" }}></div>
+                <p className="mt-3" style={{ color: "#bbb", fontSize: "13px" }}>Menu load ho raha hai...</p>
               </div>
-              <div>
-                <div style={{ fontSize: 10, color: "#bbb", textTransform: "uppercase", letterSpacing: "0.4px", fontWeight: 600 }}>Room</div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a" }}>
-                  {booking.roomId?.roomNumber || booking.roomId?.name || "—"}
+            ) : filteredItems.length === 0 ? (
+              <div className="order-empty-wrap">
+                <div style={{ fontSize: "36px", marginBottom: "12px" }}>🍽️</div>
+                Koi menu item nahi mila
+              </div>
+            ) : (
+              Object.entries(grouped).map(([cat, items]) => (
+                <div key={cat} className="mb-3">
+                  <div className="order-section-title">
+                    {categoryEmoji(cat)} {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                  </div>
+                  {items.map(item => {
+                    const itemCart = cart[item._id];
+                    const qty = itemCart?.qty || 0;
+                    const imgUrl = getImageUrl(item.image);
+
+                    return (
+                      <div key={item._id}>
+                        <div className="menu-item-row">
+                          {/* Image */}
+                          {imgUrl ? (
+                            <img
+                              src={imgUrl}
+                              alt={item.name}
+                              className="menu-item-img"
+                              onError={(e) => { e.target.style.display = "none"; }}
+                            />
+                          ) : (
+                            <div className="menu-item-img-fallback">
+                              {categoryEmoji(item.category)}
+                            </div>
+                          )}
+
+                          {/* Info */}
+                          <div className="menu-item-info">
+                            <div className="menu-item-name">{item.name}</div>
+                            {item.description && (
+                              <div className="menu-item-desc">{item.description}</div>
+                            )}
+                            <div className="menu-item-price">Rs. {item.price?.toLocaleString()}</div>
+                          </div>
+
+                          {/* Qty Controls */}
+                          <div className="menu-item-qty">
+                            <button className="qty-btn" onClick={() => setQty(item._id, -1)}>−</button>
+                            <span className="qty-num">{qty}</span>
+                            <button className="qty-btn" onClick={() => setQty(item._id, 1)}>+</button>
+                          </div>
+                        </div>
+
+                      </div>
+                    );
+                  })}
+                </div>
+              ))
+            )}
+          </div>}
+
+          {/* ORDER-LEVEL INFO BANNER + NOTES */}
+          {activeModalTab === "menu" && (
+            <div style={{ padding: "0 28px 0", borderTop: "1px solid #f0e8dc", background: "#fdf8f2" }}>
+              {/* Auto-filled info strip */}
+              <div style={{ display: "flex", gap: "20px", padding: "12px 0 10px", flexWrap: "wrap" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(201,169,110,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: "#c9a96e", fontSize: 11 }}>
+                    <i className="fa-solid fa-user"></i>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 10, color: "#bbb", textTransform: "uppercase", letterSpacing: "0.4px", fontWeight: 600 }}>Guest</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a" }}>{user?.name}</div>
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(201,169,110,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: "#c9a96e", fontSize: 11 }}>
+                    <i className="fa-solid fa-door-open"></i>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 10, color: "#bbb", textTransform: "uppercase", letterSpacing: "0.4px", fontWeight: 600 }}>Room</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a" }}>
+                      {booking.roomId?.roomNumber || booking.roomId?.name || "—"}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(201,169,110,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: "#c9a96e", fontSize: 11 }}>
+                    <i className="fa-solid fa-clock"></i>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 10, color: "#bbb", textTransform: "uppercase", letterSpacing: "0.4px", fontWeight: 600 }}>Est. Time</div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a" }}>~20 mins</div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <div style={{ width: 28, height: 28, borderRadius: 8, background: "rgba(201,169,110,0.12)", display: "flex", alignItems: "center", justifyContent: "center", color: "#c9a96e", fontSize: 11 }}>
-                <i className="fa-solid fa-clock"></i>
+              {/* Order-level notes */}
+              <div style={{ paddingBottom: "14px" }}>
+                <input
+                  type="text"
+                  className="menu-item-notes"
+                  style={{ borderRadius: "10px" }}
+                  placeholder="Order notes (e.g. allergies, delivery instructions, no plastic...)"
+                  value={orderNotes}
+                  onChange={(e) => setOrderNotes(e.target.value)}
+                />
               </div>
-              <div>
-                <div style={{ fontSize: 10, color: "#bbb", textTransform: "uppercase", letterSpacing: "0.4px", fontWeight: 600 }}>Est. Time</div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "#1a1a1a" }}>~20 mins</div>
-              </div>
             </div>
-          </div>
-          {/* Order-level notes */}
-          <div style={{ paddingBottom: "14px" }}>
-            <input
-              type="text"
-              className="menu-item-notes"
-              style={{ borderRadius: "10px" }}
-              placeholder="Order notes (e.g. allergies, delivery instructions, no plastic...)"
-              value={orderNotes}
-              onChange={(e) => setOrderNotes(e.target.value)}
-            />
-          </div>
+          )}
+
+          {/* FOOTER */}
+          {activeModalTab === "menu" && <div className="order-modal-footer">
+            <div>
+              <div className="order-total-label">Order Total</div>
+              <div className="order-total-amount">Rs. {totalAmount.toLocaleString()}</div>
+              {totalQty > 0 && (
+                <div className="order-items-summary">
+                  {totalQty} item{totalQty > 1 ? "s" : ""} selected
+                </div>
+              )}
+            </div>
+            <button
+              className="btn order-place-btn"
+              disabled={totalQty === 0 || placingOrder}
+              onClick={handlePlaceOrder}
+            >
+              {placingOrder ? (
+                <><span className="spinner-border spinner-border-sm me-2"></span>Placing...</>
+              ) : (
+                <><i className="fa-solid fa-check me-2"></i>Place Order</>
+              )}
+            </button>
+          </div>}
+
         </div>
-        )}
-
-        {/* FOOTER */}
-        {activeModalTab === "menu" && <div className="order-modal-footer">
-          <div>
-            <div className="order-total-label">Order Total</div>
-            <div className="order-total-amount">Rs. {totalAmount.toLocaleString()}</div>
-            {totalQty > 0 && (
-              <div className="order-items-summary">
-                {totalQty} item{totalQty > 1 ? "s" : ""} selected
-              </div>
-            )}
-          </div>
-          <button
-            className="btn order-place-btn"
-            disabled={totalQty === 0 || placingOrder}
-            onClick={handlePlaceOrder}
-          >
-            {placingOrder ? (
-              <><span className="spinner-border spinner-border-sm me-2"></span>Placing...</>
-            ) : (
-              <><i className="fa-solid fa-check me-2"></i>Place Order</>
-            )}
-          </button>
-        </div>}
-
       </div>
-    </div>
+    </>
   );
 }
 
@@ -1362,12 +1398,17 @@ export default function ProfilePage() {
   const { user, token, login } = useAuth();
   const navigate = useNavigate();
 
-  const [bookings, setBookings]               = useState([]);
+  const [bookings, setBookings] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
-  const [editMode, setEditMode]               = useState(false);
-  const [updating, setUpdating]               = useState(false);
-  const [activeTab, setActiveTab]             = useState("all");
-  const [orderModalBooking, setOrderModalBooking] = useState(null); // booking for which modal is open
+  const [editMode, setEditMode] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const [activeTab, setActiveTab] = useState("all");
+  const [orderModalBooking, setOrderModalBooking] = useState(null);
+  const [popup, setPopup] = useState({ show: false, type: '', message: '' });
+  const showPopup = (type, message) => {
+    setPopup({ show: true, type, message });
+    setTimeout(() => setPopup({ show: false, type: '', message: '' }), 3000);
+  };// booking for which modal is open
 
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
 
@@ -1386,7 +1427,7 @@ export default function ProfilePage() {
         });
         setBookings(res.data);
       } catch (err) {
-        toast.error("Booking is not loading");
+        showPopup('error', 'Booking is not loading');
       } finally {
         setLoadingBookings(false);
       }
@@ -1396,7 +1437,7 @@ export default function ProfilePage() {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-    if (!form.name.trim()) { toast.error("Name is required "); return; }
+    if (!form.name.trim()) { showPopup('error', 'Name is required'); return; }
     try {
       setUpdating(true);
       const res = await axios.put(
@@ -1405,20 +1446,20 @@ export default function ProfilePage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       login(res.data.user, token);
-      toast.success("Profile has been Updated!");
+      showPopup('success', 'Profile updated successfully!');
       setEditMode(false);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Update failed");
+      showPopup('error', err.response?.data?.message || 'Update failed');
     } finally {
       setUpdating(false);
     }
   };
 
   const tabs = [
-    { key: "all",      label: "All",      filter: () => true },
+    { key: "all", label: "All", filter: () => true },
     { key: "upcoming", label: "Upcoming", filter: (b) => ["pending", "confirmed"].includes(b.bookingStatus) },
-    { key: "active",   label: "Active",   filter: (b) => b.bookingStatus === "checked_in" },
-    { key: "past",     label: "Past",     filter: (b) => ["checked_out", "completed", "cancelled"].includes(b.bookingStatus) },
+    { key: "active", label: "Active", filter: (b) => b.bookingStatus === "checked_in" },
+    { key: "past", label: "Past", filter: (b) => ["checked_out", "completed", "cancelled"].includes(b.bookingStatus) },
   ];
 
   const filteredBookings = bookings.filter(
@@ -1428,10 +1469,50 @@ export default function ProfilePage() {
   if (!user) return null;
 
   return (
+
     <>
       <style>{PROFILE_STYLES}</style>
+
+      {/* POPUP NOTIFICATION */}
+      {popup.show && (
+        <div style={{
+          position: 'fixed', top: 24, right: 24, zIndex: 99999,
+          minWidth: 300, maxWidth: 380,
+          background: '#fff', borderRadius: 16,
+          boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+          padding: '18px 22px',
+          display: 'flex', alignItems: 'center', gap: 14,
+          animation: 'slideIn 0.3s ease',
+          borderLeft: `4px solid ${popup.type === 'success' ? '#c9a96e' : '#e74c3c'}`
+        }}>
+          <div style={{
+            width: 38, height: 38, borderRadius: '50%', flexShrink: 0,
+            background: popup.type === 'success' ? 'linear-gradient(135deg, #c9a96e, #a67c40)' : '#e74c3c',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: '#fff', fontSize: 18, fontWeight: 700
+          }}>
+            {popup.type === 'success' ? '✓' : '✕'}
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: 14, color: '#1a1a2e', marginBottom: 2 }}>
+              {popup.type === 'success' ? 'Success' : 'Error'}
+            </div>
+            <div style={{ fontSize: 13, color: '#6c757d' }}>{popup.message}</div>
+          </div>
+          <button onClick={() => setPopup({ show: false, type: '', message: '' })}
+            style={{ marginLeft: 'auto', background: 'none', border: 'none', cursor: 'pointer', color: '#adb5bd', fontSize: 18 }}>
+            ✕
+          </button>
+        </div>
+      )}
+
+      <style>{`
+        @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to   { transform: translateX(0);   opacity: 1; }
+        }
+      `}</style>
       <div className="profile-page">
-        <ToastContainer />
 
         {/* ORDER MODAL */}
         {orderModalBooking && (
