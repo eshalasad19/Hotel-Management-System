@@ -73,7 +73,7 @@ const AdminLayout = () => {
     <div id="layout-wrapper">
       <Navbar />
       <Sidebar />
-      <div className="main-content">
+      <div className="main-content" style={{ marginLeft: "250px" }}>
         <div className="page-content">
           <Outlet />
         </div>
