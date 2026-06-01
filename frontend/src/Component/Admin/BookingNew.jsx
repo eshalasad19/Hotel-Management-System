@@ -328,12 +328,13 @@ const BookingNew = () => {
                         className="form-control"
                         value={form.guestPhone}
                         maxLength="11"
-                        onChange={(e) =>
-                          handleChange(
-                            "guestPhone",
-                            e.target.value.replace(/\D/g, ""),
-                          )
-                        }
+                        onChange={(e) => {
+                          const onlyNums = e.target.value.replace(/\D/g, '').slice(0, 11);
+                          const val = onlyNums.length > 0 && !onlyNums.startsWith('03')
+                            ? '03' + onlyNums.replace(/^0*3*/, '').slice(0, 9)
+                            : onlyNums;
+                          handleChange("guestPhone", val);
+                        }}
                         placeholder="03XXXXXXXXX"
                       />
                     </div>

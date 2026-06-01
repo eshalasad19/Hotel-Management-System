@@ -51,7 +51,12 @@ export default function Testimonials() {
       .catch(() => setLoading(false));
   }, []);
 
-  const display = feedbacks.length ? feedbacks : FALLBACK;
+  const [current, setCurrent] = useState(0);
+  const display = feedbacks.length ? feedbacks : [];
+  const total = display.length;
+
+  const prev = () => setCurrent((c) => (c - 1 + total) % total);
+  const next = () => setCurrent((c) => (c + 1) % total);
 
   return (
     <section className="section">
@@ -72,20 +77,17 @@ export default function Testimonials() {
           <div className="text-center py-4">
             <div className="spinner-border text-primary" role="status" />
           </div>
+        ) : display.length === 0 ? (
+          <div className="text-center py-5">
+            <i className="fa-regular fa-comment-dots" style={{ fontSize: '3rem', color: '#c9a96e', opacity: 0.5 }}></i>
+            <p className="mt-3 text-muted fs-5">No feedback yet. Be the first to share your experience!</p>
+          </div>
         ) : (
-          <div
-            className="swiper wow fadeInUp"
-            data-loop="true"
-            data-autoplay="true"
-            data-margin="30"
-            data-items-xs="1"
-            data-items-sm="1"
-            data-items-md="1"
-            data-items-lg="2"
-          >
-            <div className="swiper-wrapper">
-              {display.map((item) => (
-                <div key={item._id} className="swiper-slide">
+          <div className="position-relative wow fadeInUp">
+            {/* Cards */}
+            <div className="row g-4">
+              {(total === 1 ? [display[0]] : [display[current], display[(current + 1) % total]].slice(0, total)).map((item, idx) => (
+                <div key={item._id} className={`col-12 ${total > 1 ? 'col-md-6' : ''}`}>
                   <div className="bg-white rounded-5 p-5 h-100 d-flex flex-column justify-content-between">
 
                     <div className="d-flex gap-1 mb-3">
@@ -143,16 +145,58 @@ export default function Testimonials() {
 
                   </div>
                 </div>
-              ))}
+            ))}
             </div>
 
-            <div className="swiper-button-next mt-n5">
-              <i className="fa-solid fa-angle-right" />
-            </div>
-            <div className="swiper-button-prev mt-n5">
-              <i className="fa-solid fa-angle-left" />
-            </div>
-            <div className="swiper-pagination position-relative mt-4" />
+            {/* Navigation Arrows */}
+            {total > 2 && (
+              <div className="d-flex justify-content-center gap-3 mt-4">
+                <button
+                  onClick={prev}
+                  style={{
+                    width: 48, height: 48, borderRadius: '50%',
+                    border: '2px solid #c9a96e',
+                    background: 'white', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    transition: 'all 0.2s',
+                    color: '#c9a96e', fontSize: '18px',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#c9a96e'; e.currentTarget.style.color = 'white'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'white'; e.currentTarget.style.color = '#c9a96e'; }}
+                >
+                  <i className="fa-solid fa-angle-left" />
+                </button>
+                <button
+                  onClick={next}
+                  style={{
+                    width: 48, height: 48, borderRadius: '50%',
+                    border: '2px solid #c9a96e',
+                    background: 'white', cursor: 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    transition: 'all 0.2s',
+                    color: '#c9a96e', fontSize: '18px',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = '#c9a96e'; e.currentTarget.style.color = 'white'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'white'; e.currentTarget.style.color = '#c9a96e'; }}
+                >
+                  <i className="fa-solid fa-angle-right" />
+                </button>
+              </div>
+            )}
+
+            {/* Dots */}
+            {total > 2 && (
+              <div className="d-flex justify-content-center gap-2 mt-3">
+                {display.map((_, i) => (
+                  <button key={i} onClick={() => setCurrent(i)} style={{
+                    width: i === current ? 24 : 8, height: 8,
+                    borderRadius: 4, border: 'none', padding: 0,
+                    background: i === current ? '#c9a96e' : '#ddd',
+                    transition: 'all 0.3s', cursor: 'pointer',
+                  }} />
+                ))}
+              </div>
+            )}
           </div>
         )}
 

@@ -28,6 +28,10 @@ export default function ContactFormSection() {
     setReviewError('');
 
     let hasError = false;
+    if (!/^03\d{9}$/.test(form.phone)) {
+      setReviewError('Phone number must be Pakistani (03XXXXXXXXX — 11 digits)');
+      hasError = true;
+    }
     if (!form.rating || form.rating < 1) {
       setRatingError('Please select a rating');
       hasError = true;
@@ -121,8 +125,14 @@ export default function ContactFormSection() {
               <div className="mb-4">
                 <label className="form-label text-3 fw-600">Phone</label>
                 <input type="tel" className="form-control rounded-pill"
-                  placeholder="Your Phone Number" value={form.phone}
-                  onChange={e => setForm({ ...form, phone: e.target.value })} />
+                  placeholder="Your Phone Number" value={form.phone} maxLength={11}
+                  onChange={e => {
+                    const onlyNums = e.target.value.replace(/\D/g, '').slice(0, 11);
+                    const val = onlyNums.length > 0 && !onlyNums.startsWith('03')
+                      ? '03' + onlyNums.replace(/^0*3*/, '').slice(0, 9)
+                      : onlyNums;
+                    setForm({ ...form, phone: val });
+                  }} />
               </div>
 
               {/* Email */}
