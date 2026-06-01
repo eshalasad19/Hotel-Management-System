@@ -1,5 +1,7 @@
+import React from 'react';
 import { useState, useEffect } from "react";
 import axios from "axios";
+import CustomPopup from './CustomPopup';
 
 const API_URL = "http://localhost:5001/api";
 
@@ -25,7 +27,8 @@ const Rooms = () => {
   const [showViewModal, setShowViewModal]   = useState(false);
   const [selectedRoom, setSelectedRoom]   = useState(null);
   const [viewRoom, setViewRoom]           = useState(null);
-  const [error, setError]               = useState("");
+  const [popup, setPopup] = useState(null);
+  const error = popup?.message;
 
   const emptyForm = {
     floor: "", roomNumber: "", type: "", price: "",
@@ -102,9 +105,9 @@ const Rooms = () => {
   };
 
   const handleAdd = async () => {
-    setError("");
+    setPopup(null);
     if (!form.roomNumber || !form.type || !form.price || !form.capacity) {
-      setError("Please fill all required fields.");
+      setPopup({ type: 'error', message: "Please fill all required fields." });
       return;
     }
     try {
@@ -125,11 +128,11 @@ const Rooms = () => {
       setShowAddModal(false);
       setForm(emptyForm);
       loadRooms();
-    } catch (err) { setError(err.response?.data?.message || "Error adding room"); }
+    } catch (err) { setPopup({ type: 'error', message: err.response?.data?.message || "Error adding room" }); }
   };
 
   const handleEdit = async () => {
-    setError("");
+    setPopup(null);
     try {
       const formData = new FormData();
       formData.append("roomNumber",  form.roomNumber);
@@ -148,7 +151,7 @@ const Rooms = () => {
       });
       setShowEditModal(false);
       loadRooms();
-    } catch (err) { setError(err.response?.data?.message || "Error updating room"); }
+    } catch (err) { setPopup({ type: 'error', message: err.response?.data?.message || "Error updating room" }); }
   };
 
   const handleDelete = async () => {
@@ -156,7 +159,7 @@ const Rooms = () => {
       await axios.delete(`${API_URL}/rooms/${selectedRoom._id}`, { headers });
       setShowDeleteModal(false);
       loadRooms();
-    } catch (err) { alert(err.response?.data?.message || "Cannot delete room"); }
+    } catch (err) { setPopup({ type: 'error', message: err.response?.data?.message || "Cannot delete room" }); }
   };
 
   const changeStatus = async (id, status) => {
@@ -179,7 +182,7 @@ const Rooms = () => {
       status:      room.status,
       images:      [],
     });
-    setError("");
+    setPopup(null);
     setShowEditModal(true);
   };
 
@@ -192,7 +195,7 @@ const Rooms = () => {
             <h4 className="mb-sm-0">Manage Rooms</h4>
             <button className="btn btn-success" onClick={() => {
               setForm(emptyForm);
-              setError("");
+              setPopup(null);
               setShowAddModal(true);
             }}>
               <i className="ri-add-line me-1"></i> Add Room

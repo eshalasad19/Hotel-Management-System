@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import CustomPopup from './CustomPopup';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001/api';
 
@@ -8,13 +9,12 @@ const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+const [popup, setPopup] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showPass, setShowPass] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError('');
     setLoading(true);
 
     try {
@@ -37,7 +37,7 @@ const Login = () => {
         navigate('/admin/dashboard');
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Invalid email or password');
+     setPopup({ type: 'error', message: err.response?.data?.message || 'Invalid email or password' });
     }
     setLoading(false);
   };
@@ -57,8 +57,12 @@ const Login = () => {
               <div className="card mt-2">
                 <div className="card-body p-4">
 
-                  {error && (
-                    <div className="alert alert-danger">{error}</div>
+                  {popup && (
+                    <CustomPopup
+                      type={popup.type}
+                      message={popup.message}
+                      onClose={() => setPopup(null)}
+                    />
                   )}
 
                   <div className="p-2">
