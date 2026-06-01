@@ -14,6 +14,7 @@ const CheckinCheckout = () => {
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState("paid");
+  const [showPaymentWarning, setShowPaymentWarning] = useState(false);
   const [activeTab, setActiveTab] = useState("checkin");
 
   const today = new Date();
@@ -40,10 +41,10 @@ const CheckinCheckout = () => {
     d1.getMonth() === d2.getMonth() &&
     d1.getDate() === d2.getDate();
 
-  // CHECK-IN: confirmed + checkInDate = today
+  // CHECK-IN: confirmed ya pending (cash) + checkInDate = today
 const checkInList = bookings.filter(
     (b) =>
-      b.bookingStatus === "confirmed" &&
+      ["confirmed", "pending"].includes(b.bookingStatus) &&
       isSameDay(new Date(b.checkInDate), today)
   );
 
@@ -123,12 +124,17 @@ const checkInList = bookings.filter(
         )}
         {showCheckout && (
           <td>
-           <button className="btn btn-warning btn-sm"
-              disabled={b.paymentStatus !== 'paid'}
-              title={b.paymentStatus !== 'paid' ? 'Payment pending — mark as paid first' : ''}
-              onClick={() => { setSelectedBooking(b); setPaymentStatus(b.paymentStatus); setShowCheckoutModal(true); }}>
-              <i className="ri-logout-box-line me-1"></i>
-              {b.paymentStatus !== 'paid' ? '🔒 Check-out' : 'Check-out'}
+            <button className="btn btn-warning btn-sm"
+              onClick={() => {
+                setSelectedBooking(b);
+                setPaymentStatus(b.paymentStatus);
+                if (b.paymentStatus !== 'paid') {
+                  setShowPaymentWarning(true);
+                } else {
+                  setShowCheckoutModal(true);
+                }
+              }}>
+              <i className="ri-logout-box-line me-1"></i>Check-out
             </button>
           </td>
         )}
@@ -364,10 +370,42 @@ const checkInList = bookings.filter(
               <div className="modal-footer">
                 <button className="btn btn-light" onClick={() => setShowCheckoutModal(false)}>Cancel</button>
                <button className="btn btn-warning"
-                  disabled={selectedBooking?.paymentStatus !== 'paid'}
                   onClick={handleCheckout}>
-                  <i className="ri-logout-box-line me-1"></i>
-                  {selectedBooking?.paymentStatus !== 'paid' ? '🔒 Payment Pending' : 'Confirm Check-out'}
+                  <i className="ri-logout-box-line me-1"></i>Confirm Check-out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* PAYMENT WARNING MODAL */}
+      {showPaymentWarning && selectedBooking && (
+        <div className="modal fade show d-block" style={{ backgroundColor: "rgba(0,0,0,0.5)", zIndex: 1060 }}>
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content border-0 shadow-lg">
+              <div className="modal-header bg-danger text-white">
+                <h5 className="modal-title">
+                  <i className="ri-error-warning-line me-2"></i>Payment Required
+                </h5>
+                <button className="btn-close btn-close-white" onClick={() => setShowPaymentWarning(false)}></button>
+              </div>
+              <div className="modal-body text-center py-4">
+                <div className="mb-3">
+                  <i className="ri-secure-payment-line text-danger" style={{ fontSize: "3rem" }}></i>
+                </div>
+                <h5 className="fw-bold mb-2">Checkout Not Allowed</h5>
+                <p className="text-muted mb-3">
+                  Guest <strong>{selectedBooking.userId?.name || selectedBooking.guestName || "Guest"}</strong> has a pending payment of{" "}
+                  <strong className="text-danger">PKR {Number(selectedBooking.totalAmount).toLocaleString()}</strong>.
+                </p>
+                <div className="alert alert-warning text-start">
+                  <i className="ri-information-line me-2"></i>
+                  Please collect the payment first and mark it as <strong>Paid</strong> in the Payments section, then proceed with checkout.
+                </div>
+              </div>
+              <div className="modal-footer justify-content-center">
+                <button className="btn btn-light px-4" onClick={() => setShowPaymentWarning(false)}>
+                  Close
                 </button>
               </div>
             </div>
