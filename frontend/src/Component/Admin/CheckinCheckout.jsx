@@ -41,7 +41,7 @@ const CheckinCheckout = () => {
     d1.getDate() === d2.getDate();
 
   // CHECK-IN: confirmed + checkInDate = today
-  const checkInList = bookings.filter(
+const checkInList = bookings.filter(
     (b) =>
       b.bookingStatus === "confirmed" &&
       isSameDay(new Date(b.checkInDate), today)
@@ -123,9 +123,12 @@ const CheckinCheckout = () => {
         )}
         {showCheckout && (
           <td>
-            <button className="btn btn-warning btn-sm"
+           <button className="btn btn-warning btn-sm"
+              disabled={b.paymentStatus !== 'paid'}
+              title={b.paymentStatus !== 'paid' ? 'Payment pending — mark as paid first' : ''}
               onClick={() => { setSelectedBooking(b); setPaymentStatus(b.paymentStatus); setShowCheckoutModal(true); }}>
-              <i className="ri-logout-box-line me-1"></i>Check-out
+              <i className="ri-logout-box-line me-1"></i>
+              {b.paymentStatus !== 'paid' ? '🔒 Check-out' : 'Check-out'}
             </button>
           </td>
         )}
@@ -360,8 +363,11 @@ const CheckinCheckout = () => {
               </div>
               <div className="modal-footer">
                 <button className="btn btn-light" onClick={() => setShowCheckoutModal(false)}>Cancel</button>
-                <button className="btn btn-warning" onClick={handleCheckout}>
-                  <i className="ri-logout-box-line me-1"></i>Confirm Check-out
+               <button className="btn btn-warning"
+                  disabled={selectedBooking?.paymentStatus !== 'paid'}
+                  onClick={handleCheckout}>
+                  <i className="ri-logout-box-line me-1"></i>
+                  {selectedBooking?.paymentStatus !== 'paid' ? '🔒 Payment Pending' : 'Confirm Check-out'}
                 </button>
               </div>
             </div>

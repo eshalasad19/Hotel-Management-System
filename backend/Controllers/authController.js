@@ -95,8 +95,8 @@ const updateOwnProfile = async (req, res) => {
       return res.status(400).json({ message: 'Naam required hai' });
     }
 
-    const user = await User.findByIdAndUpdate(
-      req.user.id,  // token se aata hai — safe hai
+ const user = await User.findByIdAndUpdate(
+      req.user.id || req.user._id,
       { name: name.trim(), phone: phone || "" },
       { new: true }
     ).select('-password');

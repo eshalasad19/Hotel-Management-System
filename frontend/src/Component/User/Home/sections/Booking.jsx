@@ -28,7 +28,7 @@ const BookingPage = () => {
   }, [user, navigate, roomId]);
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("Hoteluser"));
+    const storedUser = JSON.parse(localStorage.getItem("hotelUser"));
     if (storedUser) {
       setForm(prev => ({
         ...prev,
@@ -107,7 +107,7 @@ const BookingPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await createBooking({ roomId, ...form, totalAmount });
+     await createBooking({ roomId, ...form, totalAmount, userId: user?._id || user?.id });
       setShowSuccessModal(true);
     } catch (err) {
       console.log("Booking error:", err);
@@ -322,7 +322,7 @@ const BookingPage = () => {
             </div>
 
             <button
-              onClick={() => { setShowSuccessModal(false); navigate('/my-bookings'); }}
+              onClick={() => { setShowSuccessModal(false); navigate('/profile'); }}
               style={{
                 background: 'linear-gradient(135deg, #c9a96e, #a67c40)',
                 color: '#fff', border: 'none', borderRadius: 50,

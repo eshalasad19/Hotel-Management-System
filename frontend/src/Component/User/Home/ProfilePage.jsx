@@ -883,27 +883,7 @@ function GuestRequestModal({ booking, token, user, onClose }) {
   const [submitting, setSubmitting] = useState(false);
   const [popup, setPopup] = useState({ show: false, type: '', message: '' });
   const [myServices, setMyServices] = useState([]);
-const [loadingServices, setLoadingServices] = useState(true);
-useEffect(() => {
-  const fetchMyServices = async () => {
-    try {
-      const [maintRes, hkRes, svcRes] = await Promise.all([
-        axios.get(`${BASE_URL}/maintenance?roomNumber=${roomNumber}`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: [] })),
-        axios.get(`${BASE_URL}/housekeeping?roomNumber=${roomNumber}`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: [] })),
-        axios.get(`${BASE_URL}/services?roomNumber=${roomNumber}`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: [] })),
-      ]);
-      const toArr = (r) => Array.isArray(r.data) ? r.data : Array.isArray(r.data?.data) ? r.data.data : [];
-      const combined = [
-        ...toArr(maintRes).map(x => ({ ...x, _type: 'Maintenance' })),
-        ...toArr(hkRes).map(x => ({ ...x, _type: 'Housekeeping' })),
-        ...toArr(svcRes).map(x => ({ ...x, _type: 'Guest Service' })),
-      ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-      setMyServices(combined);
-    } catch { setMyServices([]); }
-    finally { setLoadingServices(false); }
-  };
-  fetchMyServices();
-}, []);
+  const [loadingServices, setLoadingServices] = useState(true);
 
   const roomNumber = booking.roomId?.roomNumber || booking.roomId?.name || '';
   const roomId = booking.roomId?._id || booking.roomId;
@@ -912,6 +892,30 @@ useEffect(() => {
     setPopup({ show: true, type, message });
     setTimeout(() => setPopup({ show: false, type: '', message: '' }), 3500);
   };
+
+  useEffect(() => {
+    const fetchMyServices = async () => {
+      try {
+        const headers = { Authorization: `Bearer ${token}` };
+        const [maintRes, hkRes, svcRes] = await Promise.allSettled([
+          axios.get(`${BASE_URL}/maintenance/my`, { headers }),
+          axios.get(`${BASE_URL}/housekeeping/my`, { headers }),
+          axios.get(`${BASE_URL}/services/my`, { headers }),
+        ]);
+        const toArr = (r) => r.status === 'fulfilled'
+          ? (Array.isArray(r.value.data) ? r.value.data : Array.isArray(r.value.data?.data) ? r.value.data.data : [])
+          : [];
+        const combined = [
+          ...toArr(maintRes).map(x => ({ ...x, _type: 'Maintenance' })),
+          ...toArr(hkRes).map(x => ({ ...x, _type: 'Housekeeping' })),
+          ...toArr(svcRes).map(x => ({ ...x, _type: 'Guest Service' })),
+        ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setMyServices(combined);
+      } catch { setMyServices([]); }
+      finally { setLoadingServices(false); }
+    };
+    fetchMyServices();
+  }, [token]);
 
   // Maintenance form
   const [maintForm, setMaintForm] = useState({ issueType: 'other', issue: '', priority: 'medium' });
@@ -979,11 +983,11 @@ useEffect(() => {
   };
 
   const tabs = [
-  { key: 'maintenance', label: 'Maintenance', icon: 'fa-solid fa-wrench', emoji: '🔧' },
-  { key: 'housekeeping', label: 'Housekeeping', icon: 'fa-solid fa-broom', emoji: '🧹' },
-  { key: 'service', label: 'Guest Service', icon: 'fa-solid fa-bell-concierge', emoji: '🛎️' },
-  { key: 'myservices', label: 'My Services', icon: 'fa-solid fa-list-check', emoji: '📋' },  // ← YEH ADD KARO
-];
+    { key: 'maintenance', label: 'Maintenance', icon: 'fa-solid fa-wrench', emoji: '🔧' },
+    { key: 'housekeeping', label: 'Housekeeping', icon: 'fa-solid fa-broom', emoji: '🧹' },
+    { key: 'service', label: 'Guest Service', icon: 'fa-solid fa-bell-concierge', emoji: '🛎️' },
+    { key: 'myservices', label: 'My Services', icon: 'fa-solid fa-list-check', emoji: '📋' },
+  ];
 
   return (
     <>
@@ -1157,94 +1161,65 @@ useEffect(() => {
                 </button>
               </div>
             )}
+
+            {/* ── MY SERVICES TAB ── */}
             {activeTab === 'myservices' && (
-  <div style={{ flex: 1, overflowY: 'auto', padding: '20px 28px', scrollbarWidth: 'thin' }}>
-    {loadingServices ? (
-      <div style={{ textAlign: 'center', padding: '48px 0' }}>
-        <div className="spinner-border" style={{ color: '#c9a96e' }}></div>
-      </div>
-    ) : myServices.length === 0 ? (
-      <div style={{ textAlign: 'center', padding: '48px 0', color: '#bbb' }}>
-        <div style={{ fontSize: 36, marginBottom: 12 }}>🛎️</div>
-        <p style={{ fontSize: 14, margin: 0 }}>No service requests yet for this room</p>
-      </div>
-    ) : (
-      myServices.map((svc, idx) => {
-        const statusColors = {
-          pending:    { color: '#f39c12', bg: 'rgba(243,156,18,0.1)' },
-          in_progress:{ color: '#3498db', bg: 'rgba(52,152,219,0.1)' },
-          completed:  { color: '#27ae60', bg: 'rgba(39,174,96,0.1)'  },
-          cancelled:  { color: '#e74c3c', bg: 'rgba(231,76,60,0.1)'  },
-        };
-        const sc = statusColors[svc.status?.toLowerCase()] || statusColors.pending;
-        const typeIcons = {
-          'Maintenance':  '🔧',
-          'Housekeeping': '🧹',
-          'Guest Service':'🛎️',
-        };
-        const timeStr = svc.createdAt
-          ? new Date(svc.createdAt).toLocaleString('en-PK', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
-          : '';
-        return (
-          <div key={svc._id || idx} style={{
-            border: '1px solid #ede5d8', borderRadius: 14,
-            marginBottom: 12, overflow: 'hidden', background: '#fff'
-          }}>
-            {/* Header row */}
-            <div style={{
-              background: '#fdf8f2', padding: '10px 16px',
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              borderBottom: '1px solid #f0e8dc'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 18 }}>{typeIcons[svc._type] || '🛎️'}</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#1a1a1a' }}>
-                  {svc._type}
-                </span>
-                {svc.issueType && (
-                  <span style={{ fontSize: 11, color: '#888', background: '#f0e8dc', borderRadius: 20, padding: '1px 8px' }}>
-                    {svc.issueType.replace(/_/g, ' ')}
-                  </span>
-                )}
-                {svc.taskType && (
-                  <span style={{ fontSize: 11, color: '#888', background: '#f0e8dc', borderRadius: 20, padding: '1px 8px' }}>
-                    {svc.taskType.replace(/_/g, ' ')}
-                  </span>
-                )}
-                {svc.serviceType && (
-                  <span style={{ fontSize: 11, color: '#888', background: '#f0e8dc', borderRadius: 20, padding: '1px 8px' }}>
-                    {svc.serviceType.replace(/_/g, ' ')}
-                  </span>
+              <div>
+                {loadingServices ? (
+                  <div style={{ textAlign: 'center', padding: '48px 0' }}>
+                    <div className="spinner-border" style={{ color: '#c9a96e' }}></div>
+                  </div>
+                ) : myServices.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: '48px 0', color: '#bbb' }}>
+                    <div style={{ fontSize: 36, marginBottom: 12 }}>🛎️</div>
+                    <p style={{ fontSize: 14, margin: 0 }}>No service requests yet</p>
+                  </div>
+                ) : (
+                  myServices.map((svc, idx) => {
+                    const statusColors = {
+                      pending:     { color: '#f39c12', bg: 'rgba(243,156,18,0.1)' },
+                      in_progress: { color: '#3498db', bg: 'rgba(52,152,219,0.1)' },
+                      completed:   { color: '#27ae60', bg: 'rgba(39,174,96,0.1)'  },
+                      resolved:    { color: '#27ae60', bg: 'rgba(39,174,96,0.1)'  },
+                      cancelled:   { color: '#e74c3c', bg: 'rgba(231,76,60,0.1)'  },
+                    };
+                    const rawStatus = (svc.status || svc.cleaningStatus || 'pending').toLowerCase();
+                    const sc = statusColors[rawStatus] || statusColors.pending;
+                    const typeIcons = { 'Maintenance': '🔧', 'Housekeeping': '🧹', 'Guest Service': '🛎️' };
+                    const subType = (svc.issueType || svc.taskType || svc.serviceType || '').replace(/_/g, ' ');
+                    const timeStr = svc.createdAt
+                      ? new Date(svc.createdAt).toLocaleString('en-PK', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
+                      : '';
+                    return (
+                      <div key={svc._id || idx} style={{ border: '1px solid #ede5d8', borderRadius: 14, marginBottom: 12, overflow: 'hidden', background: '#fff' }}>
+                        <div style={{ background: '#fdf8f2', padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #f0e8dc' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span style={{ fontSize: 18 }}>{typeIcons[svc._type] || '🛎️'}</span>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: '#1a1a1a' }}>{svc._type}</span>
+                            {subType && (
+                              <span style={{ fontSize: 11, color: '#888', background: '#f0e8dc', borderRadius: 20, padding: '1px 8px', textTransform: 'capitalize' }}>{subType}</span>
+                            )}
+                          </div>
+                          <span style={{ fontSize: 11, fontWeight: 700, padding: '3px 10px', borderRadius: 20, background: sc.bg, color: sc.color, textTransform: 'uppercase' }}>
+                            {rawStatus.replace('_', ' ')}
+                          </span>
+                        </div>
+                        <div style={{ padding: '10px 16px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                          {(svc.issue || svc.notes || svc.description) && (
+                            <p style={{ fontSize: 13, color: '#444', margin: 0 }}>{svc.issue || svc.notes || svc.description}</p>
+                          )}
+                          <div style={{ display: 'flex', gap: 16, fontSize: 11, color: '#aaa', marginTop: 4 }}>
+                            {svc.priority && <span>⚡ <b style={{ color: svc.priority === 'high' ? '#e74c3c' : '#888' }}>{svc.priority}</b></span>}
+                            {timeStr && <span>🕐 {timeStr}</span>}
+                            {svc.roomNumber && <span>🚪 Room {svc.roomNumber}</span>}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
                 )}
               </div>
-              <span style={{
-                fontSize: 11, fontWeight: 700, padding: '3px 10px',
-                borderRadius: 20, background: sc.bg, color: sc.color
-              }}>
-                {svc.status || 'Pending'}
-              </span>
-            </div>
-            {/* Body */}
-            <div style={{ padding: '10px 16px', display: 'flex', flexDirection: 'column', gap: 4 }}>
-              {(svc.issue || svc.notes || svc.description) && (
-                <p style={{ fontSize: 13, color: '#444', margin: 0 }}>
-                  {svc.issue || svc.notes || svc.description}
-                </p>
-              )}
-              <div style={{ display: 'flex', gap: 16, fontSize: 11, color: '#aaa', marginTop: 4 }}>
-                {svc.priority && (
-                  <span>⚡ Priority: <b style={{ color: svc.priority === 'high' ? '#e74c3c' : '#888' }}>{svc.priority}</b></span>
-                )}
-                {timeStr && <span>🕐 {timeStr}</span>}
-                {svc.roomNumber && <span>🚪 Room {svc.roomNumber}</span>}
-              </div>
-            </div>
-          </div>
-        );
-      })
-    )}
-  </div>
-)}
+            )}
           </div>
 
         </div>
@@ -1856,11 +1831,11 @@ useEffect(() => {
         { name: form.name, phone: form.phone },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      login(res.data.user, token);
+      login({ ...user, name: res.data.user.name, phone: res.data.user.phone }, token);
       showPopup('success', 'Profile updated successfully!');
       setEditMode(false);
     } catch (err) {
-      showPopup('error', err.response?.data?.message || 'Update failed');
+      showPopup('error', err.response?.data?.message || 'Failed to Update Profile, Try Again.');
     } finally {
       setUpdating(false);
     }
