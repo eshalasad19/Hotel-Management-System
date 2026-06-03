@@ -11,7 +11,7 @@ const Bookings = () => {
   const [filtered, setFiltered] = useState([]);
   const [filterBookingStatus, setFilterBookingStatus] = useState("");
   const [filterPaymentStatus, setFilterPaymentStatus] = useState("");
-  const [showViewModal, setShowViewModal] = useState(false);
+  const [ showViewModal, setShowViewModal ] = useState(false);
   // const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
   // const [updateStatus, setUpdateStatus] = useState({ bookingStatus: '', paymentStatus: '' });
