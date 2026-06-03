@@ -52,6 +52,7 @@ const Housekeeping = () => {
       const q = search.toLowerCase();
       result = result.filter(t =>
         (t.roomId?.roomNumber || '').toLowerCase().includes(q) ||
+        (t.requestedBy?.name || '').toLowerCase().includes(q) ||
         (t.assignedStaff?.name || '').toLowerCase().includes(q)
       );
     }
@@ -105,11 +106,6 @@ const Housekeeping = () => {
   };
 
   const taskTypeLabel = (t) => TASK_TYPES.find(x => x.value === t)?.label || t;
-
-  const isOverdue = (task) => {
-    if (!task.dueDate || task.cleaningStatus === 'completed') return false;
-    return new Date(task.dueDate) < new Date();
-  };
 
   const handleAdd = async () => {
     setError('');
@@ -203,22 +199,19 @@ const Housekeeping = () => {
         <div className="card-header d-flex align-items-center flex-wrap gap-2">
           <h5 className="card-title mb-0 flex-grow-1">Cleaning Tasks</h5>
 
-          {/* Search */}
           <input
             type="text"
             className="form-control form-control-sm w-auto"
-            placeholder="Search room or staff..."
+            placeholder="Search room or guest..."
             value={search}
             onChange={e => setSearch(e.target.value)}
           />
 
-          {/* Priority Filter */}
           <select className="form-select form-select-sm w-auto" value={filterPriority} onChange={e => setFilterPriority(e.target.value)}>
             <option value="">All Priorities</option>
             {PRIORITIES.map(p => <option key={p.value} value={p.value}>{p.label}</option>)}
           </select>
 
-          {/* Status Filter */}
           <select className="form-select form-select-sm w-auto" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
             <option value="">All Status</option>
             <option value="pending">Pending</option>
@@ -234,76 +227,53 @@ const Housekeeping = () => {
                 <tr>
                   <th>#</th>
                   <th>Room</th>
+                  <th>Requested By</th>
                   <th>Task Type</th>
-                  <th>Assigned Staff</th>
                   <th>Priority</th>
-                  <th>Due Date</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
-                  <tr><td colSpan="8" className="text-center py-4 text-muted">No tasks found.</td></tr>
-                ) : filtered.map((t, i) => {
-                  const staffName = t.assignedStaff?.name || '—';
-                  const initials = staffName !== '—'
-                    ? staffName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-                    : '?';
-                  const overdue = isOverdue(t);
-                  return (
-                    <tr key={t._id} style={overdue ? { background: '#fff8f8' } : {}}>
-                      <td>{i + 1}</td>
-                      <td>
-                        <span className="fw-medium">
-                          {t.roomId ? `Room ${t.roomId.roomNumber}` : '—'}
-                        </span>
-                        {t.roomId?.type && <small className="text-muted d-block">{t.roomId.type}</small>}
-                      </td>
-                      <td>
-                        <span className="badge bg-info-subtle text-info">{taskTypeLabel(t.taskType)}</span>
-                      </td>
-                      <td>
-                        <div className="d-flex align-items-center gap-2">
-                          <div className="avatar-xs">
-                            <span className="avatar-title rounded-circle bg-success-subtle text-success" style={{ fontSize: '11px' }}>
-                              {initials}
-                            </span>
-                          </div>
-                          {staffName}
-                        </div>
-                      </td>
-                      <td>{priorityBadge(t.priority || 'medium')}</td>
-                      <td>
-                        {t.dueDate ? (
-                          <span style={{ color: overdue ? '#dc3545' : '#212529', fontWeight: overdue ? 600 : 400 }}>
-                            {overdue && <i className="ri-alarm-warning-line me-1 text-danger"></i>}
-                            <small>{new Date(t.dueDate).toLocaleString('en-PK', { dateStyle: 'short', timeStyle: 'short' })}</small>
-                          </span>
-                        ) : <small className="text-muted">—</small>}
-                      </td>
-                      <td>{statusBadge(t.cleaningStatus)}</td>
-                      <td>
-                        <div className="d-flex gap-1">
-                          {/* View */}
-                          <button className="btn btn-soft-info btn-sm" onClick={() => { setSelectedTask(t); setShowDetailModal(true); }} title="View">
-                            <i className="ri-eye-line"></i>
+                  <tr><td colSpan="7" className="text-center py-4 text-muted">No tasks found.</td></tr>
+                ) : filtered.map((t, i) => (
+                  <tr key={t._id}>
+                    <td>{i + 1}</td>
+                    <td>
+                      <span className="fw-medium">
+                        {t.roomId ? `Room ${t.roomId.roomNumber}` : (t.roomNumber ? `Room ${t.roomNumber}` : '—')}
+                      </span>
+                      {t.roomId?.type && <small className="text-muted d-block">{t.roomId.type}</small>}
+                    </td>
+                    <td>
+                      {t.guestRequest
+                        ? <span className="fw-medium text-primary">{t.requestedBy?.name || 'Guest'}</span>
+                        : <span className="text-muted">—</span>
+                      }
+                    </td>
+                    <td>
+                      <span className="badge bg-info-subtle text-info">{taskTypeLabel(t.taskType)}</span>
+                    </td>
+                    <td>{priorityBadge(t.priority || 'medium')}</td>
+                    <td>{statusBadge(t.cleaningStatus)}</td>
+                    <td>
+                      <div className="d-flex gap-1">
+                        <button className="btn btn-soft-info btn-sm" onClick={() => { setSelectedTask(t); setShowDetailModal(true); }} title="View">
+                          <i className="ri-eye-line"></i>
+                        </button>
+                        {NEXT_STATUS[t.cleaningStatus] && (
+                          <button className="btn btn-soft-success btn-sm" onClick={() => handleNextStatus(t)} title={`Move to ${NEXT_STATUS[t.cleaningStatus]}`}>
+                            <i className="ri-arrow-right-line"></i>
                           </button>
-                          {/* Next step */}
-                          {NEXT_STATUS[t.cleaningStatus] && (
-                            <button className="btn btn-soft-success btn-sm" onClick={() => handleNextStatus(t)} title={`Move to ${NEXT_STATUS[t.cleaningStatus]}`}>
-                              <i className="ri-arrow-right-line"></i>
-                            </button>
-                          )}
-                          {/* Delete */}
-                          <button className="btn btn-soft-danger btn-sm" onClick={() => { setSelectedTask(t); setShowDeleteModal(true); }} title="Delete">
-                            <i className="ri-delete-bin-line"></i>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
+                        )}
+                        <button className="btn btn-soft-danger btn-sm" onClick={() => { setSelectedTask(t); setShowDeleteModal(true); }} title="Delete">
+                          <i className="ri-delete-bin-line"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -322,14 +292,13 @@ const Housekeeping = () => {
               <div className="modal-body">
                 <div className="row g-3">
                   {[
-                    { label: 'Room',        value: selectedTask.roomId ? `Room ${selectedTask.roomId.roomNumber} (${selectedTask.roomId.type})` : '—' },
-                    { label: 'Task Type',   value: taskTypeLabel(selectedTask.taskType) },
-                    { label: 'Assigned To', value: selectedTask.assignedStaff?.name || '—' },
-                    { label: 'Priority',    value: priorityBadge(selectedTask.priority), isNode: true },
-                    { label: 'Status',      value: statusBadge(selectedTask.cleaningStatus), isNode: true },
-                    { label: 'Due Date',    value: selectedTask.dueDate ? new Date(selectedTask.dueDate).toLocaleString('en-PK') : '—' },
-                    { label: 'Assigned On', value: new Date(selectedTask.createdAt).toLocaleString('en-PK') },
-                    { label: 'Completed At',value: selectedTask.completedAt ? new Date(selectedTask.completedAt).toLocaleString('en-PK') : '—' },
+                    { label: 'Room',         value: selectedTask.roomId ? `Room ${selectedTask.roomId.roomNumber} (${selectedTask.roomId.type})` : (selectedTask.roomNumber ? `Room ${selectedTask.roomNumber}` : '—') },
+                    { label: 'Requested By', value: selectedTask.guestRequest ? (selectedTask.requestedBy?.name || 'Guest') : '—' },
+                    { label: 'Task Type',    value: taskTypeLabel(selectedTask.taskType) },
+                    { label: 'Priority',     value: priorityBadge(selectedTask.priority), isNode: true },
+                    { label: 'Status',       value: statusBadge(selectedTask.cleaningStatus), isNode: true },
+                    { label: 'Requested On', value: new Date(selectedTask.createdAt).toLocaleString('en-PK') },
+                    { label: 'Completed At', value: selectedTask.completedAt ? new Date(selectedTask.completedAt).toLocaleString('en-PK') : '—' },
                   ].map((item, i) => (
                     <div className="col-md-6" key={i}>
                       <div className="p-3 bg-light rounded">
@@ -348,7 +317,6 @@ const Housekeeping = () => {
                   )}
                 </div>
 
-                {/* Next step in modal */}
                 {NEXT_STATUS[selectedTask.cleaningStatus] && (
                   <div className="mt-3">
                     <button className="btn btn-success" onClick={() => handleNextStatus(selectedTask)}>
@@ -378,7 +346,6 @@ const Housekeeping = () => {
               <div className="modal-body">
                 {error && <div className="alert alert-danger">{error}</div>}
                 <div className="row g-3">
-                  {/* Room */}
                   <div className="col-md-6">
                     <label className="form-label">Select Room <span className="text-danger">*</span></label>
                     <select className="form-select" value={addForm.roomId} onChange={e => setAddForm({ ...addForm, roomId: e.target.value })}>
@@ -389,7 +356,6 @@ const Housekeeping = () => {
                     </select>
                   </div>
 
-                  {/* Staff */}
                   <div className="col-md-6">
                     <label className="form-label">Assign Staff <span className="text-danger">*</span></label>
                     <select className="form-select" value={addForm.staffId} onChange={e => setAddForm({ ...addForm, staffId: e.target.value })}>
@@ -401,7 +367,6 @@ const Housekeeping = () => {
                     </select>
                   </div>
 
-                  {/* Task Type */}
                   <div className="col-md-6">
                     <label className="form-label">Task Type</label>
                     <select className="form-select" value={addForm.taskType} onChange={e => setAddForm({ ...addForm, taskType: e.target.value })}>
@@ -409,7 +374,6 @@ const Housekeeping = () => {
                     </select>
                   </div>
 
-                  {/* Priority */}
                   <div className="col-md-6">
                     <label className="form-label">Priority</label>
                     <select className="form-select" value={addForm.priority} onChange={e => setAddForm({ ...addForm, priority: e.target.value })}>
@@ -417,18 +381,6 @@ const Housekeeping = () => {
                     </select>
                   </div>
 
-                  {/* Due Date */}
-                  <div className="col-md-6">
-                    <label className="form-label">Due Date & Time</label>
-                    <input
-                      type="datetime-local"
-                      className="form-control"
-                      value={addForm.dueDate}
-                      onChange={e => setAddForm({ ...addForm, dueDate: e.target.value })}
-                    />
-                  </div>
-
-                  {/* Notes */}
                   <div className="col-12">
                     <label className="form-label">Notes / Instructions</label>
                     <textarea

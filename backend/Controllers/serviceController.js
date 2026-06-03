@@ -7,14 +7,11 @@ const createService = async (req, res) => {
 
     const serviceData = { serviceType, description };
 
-    // Admin se create kar raha hai — guestName/roomNumber use karo
-    if (guestName) {
-      serviceData.guestName  = guestName;
-      serviceData.roomNumber = roomNumber;
-    } else {
-      // User website se — userId use karo
-      serviceData.userId = req.user.id;
-    }
+   // userId always save karo (user ya admin dono ke liye)
+    serviceData.userId = req.user.id;
+    // guestName aur roomNumber bhi save karo agar aaye
+    if (guestName) serviceData.guestName = guestName;
+    if (roomNumber) serviceData.roomNumber = roomNumber;
 
     const service = await Service.create(serviceData);
     res.status(201).json({ message: 'Service request created', service });

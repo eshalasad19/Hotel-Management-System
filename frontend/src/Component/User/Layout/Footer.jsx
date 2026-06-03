@@ -12,8 +12,12 @@ import { NavLink } from 'react-router-dom'
       try { setHotelInfo(JSON.parse(localStorage.getItem('hotel_info')) || {}); }
       catch {}
     };
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+   window.addEventListener('storage', handleStorage);
+    window.addEventListener('hotel_info_updated', handleStorage);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('hotel_info_updated', handleStorage);
+    };
   }, []);
   return (
     <footer id="footer" className="footer-dark">

@@ -21,13 +21,6 @@ const Settings = () => {
     timezone:    'Asia/Karachi',
   });
 
-  const [pricing, setPricing] = useState({
-    single: 5000,
-    double: 8000,
-    suite:  15000,
-    deluxe: 12000,
-  });
-
   const showSuccess = (msg) => {
     setSuccess(msg); setError('');
     setTimeout(() => setSuccess(''), 3000);
@@ -44,38 +37,31 @@ const Settings = () => {
     }
   };
 
-  const saveHotelInfo = () => {
-    // hotel_info key — Payments invoice is se read karta hai
+ const saveHotelInfo = () => {
+    // hotel_info key — Footer aur Payments invoice is se read karte hain
     localStorage.setItem('hotel_info', JSON.stringify(hotelInfo));
     persistSettings('hotelInfo', hotelInfo, 'Hotel information saved!');
+    // Same-tab footer update ke liye custom event fire karo
+    window.dispatchEvent(new Event('hotel_info_updated'));
   };
 
-  const savePricing = () => {
-    // hotel_pricing key — Rooms add form is se auto-fill karta hai
-    localStorage.setItem('hotel_pricing', JSON.stringify(pricing));
-    persistSettings('pricing', pricing, 'Pricing saved!');
-  };
 
   useEffect(() => {
     const loadFromApi = async () => {
       try {
         const res = await axios.get(`${API_URL}/settings`, { headers });
         const s = res.data;
-        if (s.hotelInfo) setHotelInfo(s.hotelInfo);
-        if (s.pricing)   setPricing(s.pricing);
+     if (s.hotelInfo) setHotelInfo(s.hotelInfo);
       } catch {
         const savedHotelInfo = localStorage.getItem('hotel_hotelInfo') || localStorage.getItem('hotel_info');
-        const savedPricing   = localStorage.getItem('hotel_pricing');
         if (savedHotelInfo) setHotelInfo(JSON.parse(savedHotelInfo));
-        if (savedPricing)   setPricing(JSON.parse(savedPricing));
       }
     };
     loadFromApi();
   }, []);
 
-  const tabs = [
-    { key: 'hotel',   label: 'Hotel Info', icon: 'ri-building-line'    },
-    { key: 'pricing', label: 'Pricing',    icon: 'ri-price-tag-3-line' },
+const tabs = [
+    { key: 'hotel', label: 'Hotel Info', icon: 'ri-building-line' },
   ];
 
   return (
@@ -174,82 +160,6 @@ const Settings = () => {
                 <div className="mt-4 text-end">
                   <button className="btn btn-primary" onClick={saveHotelInfo}>
                     <i className="ri-save-line me-1"></i> Save Hotel Info
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ── PRICING ── */}
-          {activeTab === 'pricing' && (
-            <div className="card">
-              <div className="card-header">
-                <h5 className="card-title mb-0">
-                  <i className="ri-price-tag-3-line me-2 text-success"></i>Room Pricing (PKR per night)
-                </h5>
-                <small className="text-muted">
-                  <i className="ri-information-line me-1"></i>
-                  These prices can be automatically filled when adding new rooms.
-                </small>
-              </div>
-              <div className="card-body">
-                <div className="row g-3">
-                  {[
-                    { label: 'Single Room', key: 'single', icon: 'ri-hotel-bed-line',  color: 'info'    },
-                    { label: 'Double Room', key: 'double', icon: 'ri-hotel-bed-line',  color: 'primary' },
-                    { label: 'Suite Room',  key: 'suite',  icon: 'ri-building-2-line', color: 'warning' },
-                    { label: 'Deluxe Room', key: 'deluxe', icon: 'ri-vip-crown-line',  color: 'danger'  },
-                  ].map(room => (
-                    <div className="col-md-6" key={room.key}>
-                      <div className={`p-3 bg-${room.color}-subtle rounded`}>
-                        <label className="form-label fw-semibold">
-                          <i className={`${room.icon} me-1 text-${room.color}`}></i>{room.label}
-                        </label>
-                        <div className="input-group">
-                          <span className="input-group-text">PKR</span>
-                          <input
-                            type="number"
-                            className="form-control"
-                            value={pricing[room.key]}
-                            onChange={e => setPricing({ ...pricing, [room.key]: Number(e.target.value) })}
-                          />
-                          <span className="input-group-text">/night</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Summary table */}
-                <div className="mt-4 p-3 bg-light rounded">
-                  <h6 className="fw-semibold mb-3">Pricing Summary</h6>
-                  <div className="table-responsive">
-                    <table className="table table-sm table-bordered mb-0">
-                      <thead className="table-light">
-                        <tr><th>Room Type</th><th>Per Night</th><th>Weekly (7 nights)</th><th>Monthly (30 nights)</th></tr>
-                      </thead>
-                      <tbody>
-                        {[
-                          { label: 'Single', key: 'single' },
-                          { label: 'Double', key: 'double' },
-                          { label: 'Suite',  key: 'suite'  },
-                          { label: 'Deluxe', key: 'deluxe' },
-                        ].map(r => (
-                          <tr key={r.key}>
-                            <td className="fw-medium">{r.label}</td>
-                            <td>PKR {Number(pricing[r.key]).toLocaleString()}</td>
-                            <td>PKR {(pricing[r.key] * 7).toLocaleString()}</td>
-                            <td>PKR {(pricing[r.key] * 30).toLocaleString()}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-
-                <div className="mt-4 text-end">
-                  <button className="btn btn-success" onClick={savePricing}>
-                    <i className="ri-save-line me-1"></i> Save Pricing
                   </button>
                 </div>
               </div>

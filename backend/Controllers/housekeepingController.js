@@ -4,7 +4,6 @@ const createTask = async (req, res) => {
   try {
     const { roomId, assignedStaff, taskType, priority, notes, dueDate, guestRequest, roomNumber } = req.body;
 
-    // Guest request — roomId aur assignedStaff optional
     if (guestRequest) {
       const task = await Housekeeping.create({
         roomId: roomId || undefined,
@@ -34,6 +33,7 @@ const getAllTasks = async (req, res) => {
     const tasks = await Housekeeping.find()
       .populate('roomId', 'roomNumber type')
       .populate('assignedStaff', 'name email')
+      .populate('requestedBy', 'name email phone')
       .sort({ createdAt: -1 });
     res.status(200).json(tasks);
   } catch (err) {
