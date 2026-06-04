@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../../Context/AuthContext";
 import axios from "axios";
 
@@ -1749,8 +1749,9 @@ function OrderModal({ booking, token, user, onClose }) {
    MAIN PROFILE PAGE
 ───────────────────────────────────────────── */
 export default function ProfilePage() {
-  const { user, token, login } = useAuth();
+const { user, token, login, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [bookings, setBookings] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
@@ -1769,10 +1770,11 @@ const [loadingRequests, setLoadingRequests] = useState(false);
 
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
 
-  useEffect(() => {
-    if (!user) { navigate("/user-login"); return; }
+ useEffect(() => {
+   if (loading) return;
+    if (!user) { navigate("/user-login", { state: { from: location.pathname } }); return; }
     setForm({ name: user.name || "", email: user.email || "", phone: user.phone || "" });
-  }, [user]);
+  }, [user, loading]);
 useEffect(() => {
     if (!user?._id && !user?.id) return;
     const fetchRequests = async () => {
@@ -1781,18 +1783,15 @@ useEffect(() => {
         const uid = user._id || user.id;
         const headers = { Authorization: `Bearer ${token}` };
         const [maintRes, hkRes, svcRes] = await Promise.allSettled([
-          axios.get(`${BASE_URL}/maintenance`, { headers }),
-          axios.get(`${BASE_URL}/housekeeping`, { headers }),
-          axios.get(`${BASE_URL}/services`, { headers }),
+          axios.get(`${BASE_URL}/maintenance/my`, { headers }),
+          axios.get(`${BASE_URL}/housekeeping/my`, { headers }),
+          axios.get(`${BASE_URL}/services/my`, { headers }),
         ]);
         const maint = (maintRes.status === 'fulfilled' ? maintRes.value.data : [])
-          .filter(r => String(r.reportedBy?._id || r.reportedBy) === String(uid))
           .map(r => ({ ...r, _type: 'maintenance', _label: 'Maintenance', _icon: '🔧' }));
         const hk = (hkRes.status === 'fulfilled' ? hkRes.value.data : [])
-          .filter(r => String(r.requestedBy?._id || r.requestedBy) === String(uid))
           .map(r => ({ ...r, _type: 'housekeeping', _label: 'Housekeeping', _icon: '🧹' }));
         const svc = (svcRes.status === 'fulfilled' ? svcRes.value.data : [])
-          .filter(r => String(r.userId?._id || r.userId) === String(uid))
           .map(r => ({ ...r, _type: 'service', _label: 'Guest Service', _icon: '🛎️' }));
         const all = [...maint, ...hk, ...svc].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setMyRequests(all);

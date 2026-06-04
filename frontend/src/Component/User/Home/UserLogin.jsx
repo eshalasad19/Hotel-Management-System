@@ -43,7 +43,7 @@ const UserLogin = () => {
     setTimeout(() => setPopup({ show: false, type: '', message: '' }), 3500);
   };
 
-  const from = location.state?.from || '/home';
+  const from = location.state?.from?.pathname || location.state?.from || '/home';
 
   useEffect(() => {
     if (user) navigate(from, { replace: true });
