@@ -232,21 +232,20 @@ const Maintenance = () => {
           <div className="table-responsive">
             <table className="table table-hover align-middle mb-0">
               <thead className="table-light">
-                <tr>
+              <tr>
                   <th>#</th>
                   <th>Room</th>
                   <th>Issue Type</th>
                   <th>Issue</th>
-                  <th>Assigned To</th>
+                  <th>Reported By</th>
                   <th>Priority</th>
-                  <th>Due Date</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
-                  <tr><td colSpan="9" className="text-center py-4 text-muted">No maintenance requests found.</td></tr>
+                  <tr><td colSpan="8" className="text-center py-4 text-muted">No maintenance requests found.</td></tr>
                 ) : filtered.map((r, i) => {
                   const overdue = isOverdue(r);
                   const typeInfo = issueTypeInfo(r.issueType);
@@ -266,26 +265,9 @@ const Maintenance = () => {
                         </small>
                       </td>
                       <td>
-                        {r.assignedTo?.name ? (
-                          <div className="d-flex align-items-center gap-2">
-                            <div className="avatar-xs">
-                              <span className="avatar-title rounded-circle bg-warning-subtle text-warning" style={{ fontSize: '11px' }}>
-                                {r.assignedTo.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
-                              </span>
-                            </div>
-                            {r.assignedTo.name}
-                          </div>
-                        ) : <small className="text-muted">Not assigned</small>}
+                        <span className="fw-medium text-primary">{r.reportedBy?.name || '—'}</span>
                       </td>
                       <td>{priorityBadge(r.priority || 'medium')}</td>
-                      <td>
-                        {r.dueDate ? (
-                          <span style={{ color: overdue ? '#dc3545' : '#212529', fontWeight: overdue ? 600 : 400 }}>
-                            {overdue && <i className="ri-alarm-warning-line me-1 text-danger"></i>}
-                            <small>{new Date(r.dueDate).toLocaleString('en-PK', { dateStyle: 'short', timeStyle: 'short' })}</small>
-                          </span>
-                        ) : <small className="text-muted">—</small>}
-                      </td>
                       <td>{statusBadge(r.status)}</td>
                       <td>
                         <div className="d-flex gap-1">
@@ -326,10 +308,8 @@ const Maintenance = () => {
                     { label: 'Room',        value: selectedRequest.roomId ? `Room ${selectedRequest.roomId.roomNumber} (${selectedRequest.roomId.type})` : '—' },
                     { label: 'Issue Type',  value: issueTypeInfo(selectedRequest.issueType).label },
                     { label: 'Reported By', value: selectedRequest.reportedBy?.name || '—' },
-                    { label: 'Assigned To', value: selectedRequest.assignedTo?.name || 'Not assigned' },
                     { label: 'Priority',    value: priorityBadge(selectedRequest.priority), isNode: true },
                     { label: 'Status',      value: statusBadge(selectedRequest.status), isNode: true },
-                    { label: 'Due Date',    value: selectedRequest.dueDate ? new Date(selectedRequest.dueDate).toLocaleString('en-PK') : '—' },
                     { label: 'Resolved At', value: selectedRequest.resolvedAt ? new Date(selectedRequest.resolvedAt).toLocaleString('en-PK') : '—' },
                   ].map((item, i) => (
                     <div className="col-md-6" key={i}>
@@ -406,7 +386,7 @@ const Maintenance = () => {
                     </select>
                   </div>
 
-                  <div className="col-md-6">
+                  {/* <div className="col-md-6">
                     <label className="form-label">Assign Staff</label>
                     <select className="form-select" value={addForm.assignedTo} onChange={e => setAddForm({ ...addForm, assignedTo: e.target.value })}>
                       <option value="">Not Assigned</option>
@@ -421,7 +401,7 @@ const Maintenance = () => {
                     <label className="form-label">Due Date & Time</label>
                     <input type="datetime-local" className="form-control" value={addForm.dueDate}
                       onChange={e => setAddForm({ ...addForm, dueDate: e.target.value })} />
-                  </div>
+                  </div> */}
 
                   <div className="col-12">
                     <label className="form-label">Issue Description <span className="text-danger">*</span></label>

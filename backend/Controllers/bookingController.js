@@ -244,8 +244,8 @@ const checkInBooking = async (req, res) => {
       return res.status(404).json({ success: false, message: "Booking not found" });
     }
 
-    if (booking.bookingStatus !== "confirmed") {
-      return res.status(400).json({ success: false, message: "Only confirmed bookings can be checked in" });
+    if (!["confirmed", "pending"].includes(booking.bookingStatus)) {
+      return res.status(400).json({ success: false, message: "Only confirmed or pending bookings can be checked in" });
     }
 
     booking.bookingStatus = "checked_in";
@@ -272,6 +272,10 @@ const checkOutBooking = async (req, res) => {
 
     if (booking.bookingStatus !== "checked_in") {
       return res.status(400).json({ success: false, message: "Only checked-in guests can checkout" });
+    }
+
+    if (booking.paymentStatus !== "paid") {
+      return res.status(400).json({ success: false, message: "Payment is pending. Please collect payment before checkout." });
     }
 
     booking.bookingStatus = "checked_out";

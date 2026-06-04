@@ -72,8 +72,20 @@ const BookingPage = () => {
     return room?.capacity || 4;
   };
 
+  const handlePhoneInput = (val) => {
+    const onlyNums = val.replace(/\D/g, '').slice(0, 11);
+    if (onlyNums.length > 0 && !onlyNums.startsWith('03')) {
+      return '03' + onlyNums.replace(/^0*3*/, '').slice(0, 9);
+    }
+    return onlyNums;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
+    if (name === 'guestPhone') {
+      setForm({ ...form, guestPhone: handlePhoneInput(value) });
+      return;
+    }
 
     if (name === "checkInDate") {
       if (form.checkOutDate && value > form.checkOutDate) {

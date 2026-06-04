@@ -3,11 +3,12 @@ const Maintenance = require('../Models/Maintenance');
 const createMaintenance = async (req, res) => {
   try {
     const { roomId, issue, issueType, priority, assignedTo, dueDate, notes } = req.body;
-    const maintenance = await Maintenance.create({
+ const maintenance = await Maintenance.create({
       roomId, issue, issueType, priority,
       assignedTo: assignedTo || undefined,
       dueDate:    dueDate    || undefined,
       notes,
+      roomNumber: req.body.roomNumber || '',
       reportedBy: req.user?.id
     });
     res.status(201).json({ message: 'Maintenance request created', maintenance });

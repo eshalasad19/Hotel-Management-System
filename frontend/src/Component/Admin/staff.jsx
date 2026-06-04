@@ -82,8 +82,10 @@ const Staff = () => {
   const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
   const handlePhoneInput = (val) => {
-    // Sirf numbers allow karo, max 11 digits
     const onlyNums = val.replace(/\D/g, '').slice(0, 11);
+    if (onlyNums.length > 0 && !onlyNums.startsWith('03')) {
+      return '03' + onlyNums.replace(/^0*3*/, '').slice(0, 9);
+    }
     return onlyNums;
   };
 

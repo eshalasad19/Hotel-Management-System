@@ -40,12 +40,29 @@ const Register = () => {
     setTimeout(() => setPopup({ show: false, type: '', message: '' }), 3500);
   };
 
+  const handlePhoneInput = (val) => {
+    const onlyNums = val.replace(/\D/g, '').slice(0, 11);
+    if (onlyNums.length > 0 && !onlyNums.startsWith('03')) {
+      return '03' + onlyNums.replace(/^0*3*/, '').slice(0, 9);
+    }
+    return onlyNums;
+  };
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (e.target.name === 'phone') {
+      setFormData({ ...formData, phone: handlePhoneInput(e.target.value) });
+    } else {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!/^03\d{9}$/.test(formData.phone)) {
+      showPopup('error', 'Phone number must be Pakistani (03XXXXXXXXX — 11 digits)');
+      return;
+    }
 
     if (formData.password !== formData.confirmPassword) {
       showPopup('error', 'Passwords do not match!');
@@ -67,8 +84,9 @@ const Register = () => {
       } else {
         showPopup('error', data.message || 'Registration failed.');
       }
-    } catch (err) {
-      showPopup('error', 'Server error. Please try again.');
+   } catch (err) {
+      const msg = err.response?.data?.message || 'Server error. Please try again.';
+      showPopup('error', msg);
     } finally {
       setLoading(false);
     }

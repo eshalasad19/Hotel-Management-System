@@ -974,6 +974,7 @@ function GuestRequestModal({ booking, token, user, onClose }) {
         serviceType: svcForm.serviceType,
         description: svcForm.description,
         roomNumber,
+        guestName: user?.name || '',
       }, { headers: { Authorization: `Bearer ${token}` } });
       showPopup('success', 'Service request submitted! We\'ll take care of it.');
       setSvcForm({ serviceType: 'room_service', description: '' });
