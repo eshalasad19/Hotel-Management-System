@@ -3,7 +3,7 @@ const router = express.Router();
 const { 
   register, login, getProfile, getAllUsers, 
   updateUser, deleteUser, createWalkInGuest,
-  updateOwnProfile  // ✅ naya add karo
+  updateOwnProfile, changePassword
 } = require('../Controllers/authController');
 const { protect, adminOnly } = require('../Middleware/authMiddleware');
 
@@ -13,6 +13,9 @@ router.get('/profile', protect, getProfile);
 
 // ✅ User apna profile update kare — sirf protect (no adminOnly)
 router.put('/profile/update', protect, updateOwnProfile);
+
+// ✅ User apna password change kare
+router.put('/profile/change-password', protect, changePassword);
 
 // Users management — Admin only
 router.get('/users', protect, adminOnly, getAllUsers);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../Context/AuthContext";
 import axios from "axios";
 
@@ -974,7 +974,6 @@ function GuestRequestModal({ booking, token, user, onClose }) {
         serviceType: svcForm.serviceType,
         description: svcForm.description,
         roomNumber,
-        guestName: user?.name || '',
       }, { headers: { Authorization: `Bearer ${token}` } });
       showPopup('success', 'Service request submitted! We\'ll take care of it.');
       setSvcForm({ serviceType: 'room_service', description: '' });
@@ -1749,14 +1748,16 @@ function OrderModal({ booking, token, user, onClose }) {
    MAIN PROFILE PAGE
 ───────────────────────────────────────────── */
 export default function ProfilePage() {
-const { user, token, login, loading } = useAuth();
+  const { user, token, login } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const [bookings, setBookings] = useState([]);
   const [loadingBookings, setLoadingBookings] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [updating, setUpdating] = useState(false);
+  const [showPassForm, setShowPassForm] = useState(false);
+  const [passForm, setPassForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [changingPass, setChangingPass] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
   const [orderModalBooking, setOrderModalBooking] = useState(null);
   const [guestRequestBooking, setGuestRequestBooking] = useState(null);
@@ -1770,11 +1771,10 @@ const [loadingRequests, setLoadingRequests] = useState(false);
 
   const [form, setForm] = useState({ name: "", email: "", phone: "" });
 
- useEffect(() => {
-   if (loading) return;
-    if (!user) { navigate("/user-login", { state: { from: location.pathname } }); return; }
+  useEffect(() => {
+    if (!user) { navigate("/user-login"); return; }
     setForm({ name: user.name || "", email: user.email || "", phone: user.phone || "" });
-  }, [user, loading]);
+  }, [user]);
 useEffect(() => {
     if (!user?._id && !user?.id) return;
     const fetchRequests = async () => {
@@ -1783,15 +1783,18 @@ useEffect(() => {
         const uid = user._id || user.id;
         const headers = { Authorization: `Bearer ${token}` };
         const [maintRes, hkRes, svcRes] = await Promise.allSettled([
-          axios.get(`${BASE_URL}/maintenance/my`, { headers }),
-          axios.get(`${BASE_URL}/housekeeping/my`, { headers }),
-          axios.get(`${BASE_URL}/services/my`, { headers }),
+          axios.get(`${BASE_URL}/maintenance`, { headers }),
+          axios.get(`${BASE_URL}/housekeeping`, { headers }),
+          axios.get(`${BASE_URL}/services`, { headers }),
         ]);
         const maint = (maintRes.status === 'fulfilled' ? maintRes.value.data : [])
+          .filter(r => String(r.reportedBy?._id || r.reportedBy) === String(uid))
           .map(r => ({ ...r, _type: 'maintenance', _label: 'Maintenance', _icon: '🔧' }));
         const hk = (hkRes.status === 'fulfilled' ? hkRes.value.data : [])
+          .filter(r => String(r.requestedBy?._id || r.requestedBy) === String(uid))
           .map(r => ({ ...r, _type: 'housekeeping', _label: 'Housekeeping', _icon: '🧹' }));
         const svc = (svcRes.status === 'fulfilled' ? svcRes.value.data : [])
+          .filter(r => String(r.userId?._id || r.userId) === String(uid))
           .map(r => ({ ...r, _type: 'service', _label: 'Guest Service', _icon: '🛎️' }));
         const all = [...maint, ...hk, ...svc].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setMyRequests(all);
@@ -1838,6 +1841,41 @@ useEffect(() => {
       showPopup('error', err.response?.data?.message || 'Failed to Update Profile, Try Again.');
     } finally {
       setUpdating(false);
+    }
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (passForm.newPassword !== passForm.confirmPassword) {
+      showPopup('error', 'New passwords do not match'); return;
+    }
+    if (passForm.newPassword.length < 6) {
+      showPopup('error', 'Password must be at least 6 characters'); return;
+    }
+    try {
+      setChangingPass(true);
+      await axios.put(`${BASE_URL}/auth/profile/change-password`,
+        { currentPassword: passForm.currentPassword, newPassword: passForm.newPassword },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      showPopup('success', 'Password changed successfully!');
+      setShowPassForm(false);
+      setPassForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (err) {
+      showPopup('error', err.response?.data?.message || 'Failed to change password');
+    } finally { setChangingPass(false); }
+  };
+
+  const handleCancelBooking = async (bookingId) => {
+    if (!window.confirm('Are you sure you want to cancel this booking?')) return;
+    try {
+      await axios.put(`${BASE_URL}/bookings/${bookingId}/cancel`, {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      showPopup('success', 'Booking cancelled successfully');
+      setBookings(prev => prev.map(b => b._id === bookingId ? { ...b, bookingStatus: 'cancelled' } : b));
+    } catch (err) {
+      showPopup('error', err.response?.data?.message || 'Failed to cancel booking');
     }
   };
 
@@ -1975,6 +2013,37 @@ useEffect(() => {
                       <button className="btn profile-edit-btn mt-2" onClick={() => setEditMode(true)}>
                         <i className="fa-solid fa-pen me-2"></i> Edit Profile
                       </button>
+                      <button className="btn profile-edit-btn mt-2" style={{ background: 'linear-gradient(135deg,#1a1510,#2d231a)' }} onClick={() => setShowPassForm(!showPassForm)}>
+                        <i className="fa-solid fa-lock me-2"></i> Change Password
+                      </button>
+                      {showPassForm && (
+                        <form onSubmit={handleChangePassword} className="mt-3">
+                          <div className="mb-2">
+                            <label className="profile-form-label">Current Password</label>
+                            <input type="password" className="profile-form-input" placeholder="Current password"
+                              value={passForm.currentPassword} onChange={e => setPassForm({ ...passForm, currentPassword: e.target.value })} required />
+                          </div>
+                          <div className="mb-2">
+                            <label className="profile-form-label">New Password</label>
+                            <input type="password" className="profile-form-input" placeholder="New password (min 6 chars)"
+                              value={passForm.newPassword} onChange={e => setPassForm({ ...passForm, newPassword: e.target.value })} required />
+                          </div>
+                          <div className="mb-3">
+                            <label className="profile-form-label">Confirm New Password</label>
+                            <input type="password" className="profile-form-input" placeholder="Confirm new password"
+                              value={passForm.confirmPassword} onChange={e => setPassForm({ ...passForm, confirmPassword: e.target.value })} required />
+                          </div>
+                          <div className="d-flex gap-2">
+                            <button type="submit" className="btn profile-save-btn" disabled={changingPass}>
+                              {changingPass ? <span className="spinner-border spinner-border-sm me-1"></span> : <i className="fa-solid fa-check me-1"></i>}
+                              Save
+                            </button>
+                            <button type="button" className="btn profile-cancel-btn" onClick={() => { setShowPassForm(false); setPassForm({ currentPassword: '', newPassword: '', confirmPassword: '' }); }}>
+                              Cancel
+                            </button>
+                          </div>
+                        </form>
+                      )}
                     </>
                   ) : (
                     <form onSubmit={handleUpdate}>
@@ -2272,6 +2341,18 @@ useEffect(() => {
                                   >
                                     <i className="fa-solid fa-bell-concierge" style={{ fontSize: "10px" }}></i>
                                     Request Service
+                                  </button>
+                                )}
+
+                                {/* ── CANCEL BUTTON (only pending/confirmed) ── */}
+                                {['pending', 'confirmed'].includes(booking.bookingStatus) && (
+                                  <button
+                                    className="btn order-now-btn"
+                                    style={{ background: 'linear-gradient(135deg, #4a1a1a, #6b2020)' }}
+                                    onClick={() => handleCancelBooking(booking._id)}
+                                  >
+                                    <i className="fa-solid fa-xmark" style={{ fontSize: "10px" }}></i>
+                                    Cancel Booking
                                   </button>
                                 )}
                               </div>

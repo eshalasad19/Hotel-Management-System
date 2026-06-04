@@ -10,7 +10,7 @@ const AdminLayout = () => {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     if (!token) { navigate('/login'); return; }
-    const allowedRoles = ['admin', 'manager', 'receptionist', 'housekeeping', 'maintenance'];
+  const allowedRoles = ['admin', 'manager', 'receptionist', 'housekeeping', 'maintenance', 'kitchen'];
     if (!allowedRoles.includes(user.role)) { navigate('/login'); return; }
 
     // Set template attributes

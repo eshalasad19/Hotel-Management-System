@@ -36,6 +36,29 @@ router.get(
   getAllBookings
 );
 
+// ✅ User apni booking cancel kare (sirf pending/confirmed)
+router.put('/:id/cancel', protect, async (req, res) => {
+  try {
+    const booking = await require('../Models/Booking').findById(req.params.id);
+    if (!booking) return res.status(404).json({ message: 'Booking not found' });
+
+    const userId = req.user.id || req.user._id;
+    if (String(booking.userId) !== String(userId))
+      return res.status(403).json({ message: 'Not authorized' });
+
+    if (!['pending', 'confirmed'].includes(booking.bookingStatus))
+      return res.status(400).json({ message: 'Only pending or confirmed bookings can be cancelled' });
+
+    booking.bookingStatus = 'cancelled';
+    await booking.save();
+    await require('../Models/Room').findByIdAndUpdate(booking.roomId, { status: 'available' });
+
+    res.status(200).json({ message: 'Booking cancelled successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+});
+
 // Update Booking Status
 router.put(
   '/:id',
