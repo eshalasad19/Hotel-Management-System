@@ -49,6 +49,23 @@ import Register from './Component/User/Home/Register';
 import ProfilePage from './Component/User/Home/ProfilePage';
 import ServicesPage from './Component/User/Home/ServicesPage';
 
+function RoleBasedRedirect() {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const role = user.role;
+  if (role === 'admin' || role === 'manager')   return <Navigate to="dashboard"        replace />;
+  if (role === 'receptionist')                  return <Navigate to="bookings"          replace />;
+  if (role === 'housekeeping')                  return <Navigate to="housekeeping"      replace />;
+  if (role === 'maintenance')                   return <Navigate to="maintenance"       replace />;
+  if (role === 'kitchen')                       return <Navigate to="restaurant-orders" replace />;
+  return <Navigate to="/login" replace />;
+}
+
+function RoleRoute({ roles, children }) {
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  if (!roles.includes(user.role)) return <RoleBasedRedirect />;
+  return children;
+}
+
 function App() {
   return (
     <AuthProvider>
@@ -84,8 +101,8 @@ function App() {
 
           {/* Admin routes */}
           <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<Navigate to="dashboard" replace />} />
-            <Route path="dashboard" element={<Dashboard />} />
+            <Route index element={<RoleBasedRedirect />} />
+            <Route path="dashboard" element={<RoleRoute roles={['admin','manager']}><Dashboard /></RoleRoute>} />
             <Route path="rooms" element={<Rooms />} />
             <Route path="bookings" element={<Bookings />} />
             <Route path="booking-new" element={<BookingNew />} />

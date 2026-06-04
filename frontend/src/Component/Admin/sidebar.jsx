@@ -193,7 +193,7 @@ const Sidebar = () => {
         <div style={sectionLabelStyle}>Main Menu</div>
 
         {/* Dashboard */}
-        {hasRole('admin','manager','receptionist','housekeeping','maintenance','kitchen') && (
+    {hasRole('admin','manager') && (
           <NavLink to="/admin/dashboard" icon="ri-dashboard-2-line" label="Dashboard" active={isActive('/admin/dashboard')} />
         )}
 
