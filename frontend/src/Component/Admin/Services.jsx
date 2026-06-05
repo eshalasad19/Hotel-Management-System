@@ -210,7 +210,7 @@ const Services = () => {
                 ) : filtered.map((s, i) => (
                   <tr key={s._id}>
                     <td>{i + 1}</td>
-                    <td className="fw-medium">{s.userId?.name || s.guestName || 'Guest'}</td>
+                    <td className="fw-medium">{s.guestName || s.userId?.name || 'Guest'}</td>
                     <td>{s.roomNumber || '—'}</td>
                     <td>
                       <span className="badge bg-info-subtle text-info">

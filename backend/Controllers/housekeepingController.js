@@ -14,8 +14,8 @@ const createTask = async (req, res) => {
         dueDate: dueDate || undefined,
         guestRequest: true,
         roomNumber: roomNumber || '',
-        requestedBy: req.user?.id,
-      });
+        requestedBy: req.user?.id || req.user?._id || undefined,
+      })
       return res.status(201).json({ message: 'Task created', task });
     }
 
@@ -30,7 +30,7 @@ const createTask = async (req, res) => {
 
 const getAllTasks = async (req, res) => {
   try {
-    const tasks = await Housekeeping.find()
+    const tasks = await Housekeeping.find().lean()
       .populate('roomId', 'roomNumber type')
       .populate('assignedStaff', 'name email')
       .populate('requestedBy', 'name email phone')

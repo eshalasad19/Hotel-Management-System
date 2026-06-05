@@ -279,9 +279,9 @@ const Maintenance = () => {
                               <i className="ri-arrow-right-line"></i>
                             </button>
                           )}
-                          <button className="btn btn-soft-danger btn-sm" onClick={() => { setSelectedRequest(r); setShowDeleteModal(true); }} title="Delete">
+                          {/* <button className="btn btn-soft-danger btn-sm" onClick={() => { setSelectedRequest(r); setShowDeleteModal(true); }} title="Delete">
                             <i className="ri-delete-bin-line"></i>
-                          </button>
+                          </button> */}
                         </div>
                       </td>
                     </tr>

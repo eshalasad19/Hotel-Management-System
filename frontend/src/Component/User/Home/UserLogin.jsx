@@ -61,8 +61,8 @@ const UserLogin = () => {
       const data = await loginUser(formData);
 
       if (data.token) {
-        localStorage.setItem("Hoteluser", JSON.stringify(data.user));
-        localStorage.setItem("token", data.token);
+      localStorage.setItem("hotelUser", JSON.stringify(data.user));
+        localStorage.setItem("hotelToken", data.token);
         login(data.user, data.token);
         showPopup('success', `Welcome back, ${data.user.name}!`);
         setTimeout(() => navigate(from, { replace: true }), 1000);
