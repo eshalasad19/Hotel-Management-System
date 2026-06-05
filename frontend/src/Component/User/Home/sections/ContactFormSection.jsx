@@ -5,13 +5,13 @@ import axios from "axios";
 const BASE_URL = "http://localhost:5001/api";
 
 export default function ContactFormSection() {
-  const [form, setForm] = useState({ name: "Guest", phone: "", email: "", rating: 0, review: "" });
+  const [form, setForm] = useState({ name: "", phone: "", email: "", rating: 0, review: "" });
   const [submitted, setSubmitted] = useState(false);
   const [ratingError, setRatingError] = useState('');
   const [reviewError, setReviewError] = useState('');
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("Hoteluser"));
+    const storedUser = JSON.parse(localStorage.getItem("hotelUser"));
     if (storedUser?.name) {
       setForm(prev => ({
         ...prev,
@@ -43,7 +43,7 @@ export default function ContactFormSection() {
     if (hasError) return;
 
     try {
-      const storedUser = JSON.parse(localStorage.getItem("Hoteluser"));
+     const storedUser = JSON.parse(localStorage.getItem("hotelUser"));
       const payload = {
         name: form.name, email: form.email,
         phone: form.phone, rating: Number(form.rating), review: form.review,
