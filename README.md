@@ -202,14 +202,6 @@ EMAIL_PASS=your_password
 
 ---
 
-## 👩‍💻 Developed By
-
-**Alizah**
-
-Academic Project – Hotel Management System
-
----
-
 ## 📄 License
 
 This project is developed for educational and learning purposes.
