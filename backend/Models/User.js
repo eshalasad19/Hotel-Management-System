@@ -41,6 +41,10 @@ const userSchema = new mongoose.Schema({
     enum: ['active', 'inactive', 'on_leave', 'suspended'],
     default: 'active'
   },
+  refreshToken: {
+    type: String,
+    default: null
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

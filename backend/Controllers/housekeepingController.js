@@ -1,11 +1,16 @@
 const Housekeeping = require('../Models/Housekeeping');
+const auditLog = require('../Services/auditLogService'); // ✅ ADD
 
+// ========================
+// CREATE TASK
+// ========================
 const createTask = async (req, res) => {
   try {
     const { roomId, assignedStaff, taskType, priority, notes, dueDate, guestRequest, roomNumber } = req.body;
 
+    let task;
     if (guestRequest) {
-      const task = await Housekeeping.create({
+      task = await Housekeeping.create({
         roomId: roomId || undefined,
         assignedStaff: undefined,
         taskType: taskType || 'room_cleaning',
@@ -14,20 +19,30 @@ const createTask = async (req, res) => {
         dueDate: dueDate || undefined,
         guestRequest: true,
         roomNumber: roomNumber || '',
-        requestedBy: req.user?.id || req.user?._id || undefined,
-      })
-      return res.status(201).json({ message: 'Task created', task });
+        requestedBy: req.user?._id || undefined,
+      });
+    } else {
+      task = await Housekeeping.create({ roomId, assignedStaff, taskType, priority, notes, dueDate });
     }
 
-    const task = await Housekeeping.create({
-      roomId, assignedStaff, taskType, priority, notes, dueDate
+    // ✅ AUDIT LOG
+    await auditLog.log(req, {
+      action: 'HOUSEKEEPING_ASSIGNED',
+      targetModel: 'Housekeeping',
+      targetId: task._id,
+      description: `Housekeeping task created — ${taskType || 'room_cleaning'} ${guestRequest ? '(guest request)' : ''}`,
+      metadata: { taskType, priority, roomId, guestRequest },
     });
+
     res.status(201).json({ message: 'Task created', task });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 
+// ========================
+// GET ALL TASKS
+// ========================
 const getAllTasks = async (req, res) => {
   try {
     const tasks = await Housekeeping.find().lean()
@@ -41,18 +56,43 @@ const getAllTasks = async (req, res) => {
   }
 };
 
+// ========================
+// UPDATE TASK STATUS
+// ========================
 const updateTaskStatus = async (req, res) => {
   try {
     const updates = { ...req.body };
+    const previousTask = await Housekeeping.findById(req.params.id);
+
     if (req.body.cleaningStatus === 'completed') updates.completedAt = new Date();
+
     const task = await Housekeeping.findByIdAndUpdate(req.params.id, updates, { new: true });
     if (!task) return res.status(404).json({ message: 'Task not found' });
+
+    // ✅ AUDIT LOG
+    const isCompleted = req.body.cleaningStatus === 'completed';
+    await auditLog.log(req, {
+      action: isCompleted ? 'HOUSEKEEPING_COMPLETED' : 'HOUSEKEEPING_ASSIGNED',
+      targetModel: 'Housekeeping',
+      targetId: task._id,
+      description: isCompleted
+        ? `Housekeeping task completed`
+        : `Housekeeping task updated — status: ${req.body.cleaningStatus}`,
+      metadata: {
+        previousStatus: previousTask?.cleaningStatus,
+        newStatus: req.body.cleaningStatus,
+      },
+    });
+
     res.status(200).json({ message: 'Task updated', task });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 
+// ========================
+// DELETE TASK
+// ========================
 const deleteTask = async (req, res) => {
   try {
     const task = await Housekeeping.findByIdAndDelete(req.params.id);
